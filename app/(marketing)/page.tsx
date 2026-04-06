@@ -103,10 +103,10 @@ const stats = [
 ]
 
 const steps = [
-  { num: '01', title: 'Create your sweepstake', desc: 'Name it, set your entry fee, add your participants. Takes under a minute.' },
-  { num: '02', title: 'Run the draw', desc: 'Hit the button. All 48 World Cup teams are randomly assigned across your players.' },
-  { num: '03', title: 'Share the link', desc: 'One URL. Everyone can follow live standings, their teams, and the leaderboard.' },
-  { num: '04', title: 'Track it all', desc: 'Live scores, group standings, knockout bracket and payment tracking — all in one place.' },
+  { num: '01', title: 'Create your sweepstake', desc: 'Name it, set your entry fee if you want one, and invite participants via a link. Takes under a minute.' },
+  { num: '02', title: 'Run the draw', desc: 'Hit the button. All 48 World Cup teams are randomly assigned — fair, instant, no arguments.' },
+  { num: '03', title: 'Share with your group', desc: 'Send one link to the office, the pub group chat, or the family WhatsApp. No accounts needed.' },
+  { num: '04', title: 'Track it all summer', desc: 'Live scores, group standings, knockout bracket and payment tracking update automatically for 8 weeks.' },
 ]
 
 const features = [
@@ -119,9 +119,9 @@ const features = [
 ]
 
 const testimonials = [
-  { text: '"Finally sorted our office sweepstake without a single WhatsApp argument about who got which team. Sent one link, job done."', author: 'Sarah M.', role: 'Office Manager, Manchester' },
-  { text: '"Been running the pub sweepstake on a spreadsheet for years. This is embarrassingly better. Worth every penny."', author: 'Dave K.', role: 'Pub landlord, Leeds' },
-  { text: '"The payment tracking alone saved me chasing half the lads for weeks. Everyone can see who\'s paid which sorts it out instantly."', author: 'Jamie T.', role: '5-a-side organiser, Bristol' },
+  { text: '"Finally sorted our office sweepstake without a single WhatsApp argument about who got which team. Sent one link, everyone was in within the hour."', author: 'Sarah M.', role: '🏢 Office Manager, Manchester' },
+  { text: '"Been running the pub sweepstake on a scrap of paper for years. This is embarrassingly better. Takes me five minutes and the leaderboard updates itself."', author: 'Dave K.', role: '🍺 Pub landlord, Leeds' },
+  { text: '"The payment tracking alone saved me chasing the lads for weeks. Everyone can see who\'s paid — sorts it out immediately."', author: 'Jamie T.', role: '⚽ Five-a-side organiser, Bristol' },
 ]
 
 // ── LANDING PAGE ──────────────────────────────────────────────────────────────
@@ -154,19 +154,28 @@ export default async function LandingPage() {
         {/* Eyebrow pill */}
         <div className="animate-fade-up-1 inline-flex items-center gap-2 bg-lime/10 border border-lime/25 rounded-full px-4 py-1.5 mb-8">
           <span className="eyebrow-dot w-1.5 h-1.5 rounded-full bg-lime" />
-          <span className="text-xs font-medium tracking-widest uppercase text-lime">World Cup 2026 — Spots filling up</span>
+          <span className="text-xs font-medium tracking-widest uppercase text-lime">World Cup 2026 — Free sweepstake tool</span>
         </div>
 
         {/* Headline */}
-        <h1 className="animate-fade-up-2 font-heading font-bold leading-tight tracking-tight text-[clamp(40px,8vw,96px)] mb-5 max-w-3xl">
-          Reserve your World Cup draw<br />
-          <span className="text-lime">before it fills up</span>
+        <h1 className="animate-fade-up-2 font-heading font-bold leading-tight tracking-tight text-[clamp(36px,7vw,88px)] mb-5 max-w-3xl">
+          Your World Cup sweepstake.<br />
+          <span className="text-lime">Set up in 3 minutes.</span>
         </h1>
 
         {/* Subheading */}
-        <p className="animate-fade-up-3 max-w-xl text-lg text-white/60 leading-relaxed mb-10">
-          The biggest sweepstake of the year is weeks away. Get set up now — free draw, live leaderboard, one shareable link. Ready to launch the moment the tournament starts.
+        <p className="animate-fade-up-3 max-w-xl text-lg text-white/60 leading-relaxed mb-6">
+          Whether it&apos;s the office, the pub, the five-a-side group or the family WhatsApp — run your own sweepstake with a free draw, live leaderboard, and one link to share with everyone.
         </p>
+
+        {/* Use case pills */}
+        <div className="animate-fade-up-3 flex flex-wrap justify-center gap-2 mb-10">
+          {['🏢 Office', '🍺 Pub', '⚽ Five-a-side', '👨‍👩‍👧 Family', '🎮 Online group'].map(label => (
+            <span key={label} className="text-xs font-medium bg-white/8 border border-white/15 text-white/70 px-3 py-1.5 rounded-full">
+              {label}
+            </span>
+          ))}
+        </div>
 
         {/* Email form */}
         <div className="animate-fade-up-4 w-full max-w-md mb-5">
@@ -236,10 +245,10 @@ export default async function LandingPage() {
           <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">How it works</span>
         </div>
         <h2 className="font-heading text-[clamp(36px,5vw,64px)] leading-none tracking-tight mb-4">
-          Three steps.<br /><span className="text-lime">One draw.</span>
+          Set up in minutes.<br /><span className="text-lime">Runs itself all summer.</span>
         </h2>
         <p className="text-white/50 text-lg font-light max-w-md mb-12">
-          No spreadsheets. No group chats. No chasing people for cash. Just a link.
+          No spreadsheets. No group chat chaos. No chasing people for cash. Just a link.
         </p>
         <ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
@@ -305,8 +314,8 @@ export default async function LandingPage() {
 
         <div className="relative max-w-lg mx-auto">
           <h2 className="font-heading text-[clamp(32px,5vw,64px)] leading-tight tracking-tight mb-3">
-            Don&apos;t be sorting this<br />
-            <span className="text-lime">the week it starts.</span>
+            Office, pub, five-a-side<br />
+            <span className="text-lime">or family — it&apos;s yours.</span>
           </h2>
           <p className="text-lg text-white/50 font-light mb-10">
             Three minutes now saves hours of WhatsApp chaos in June.
