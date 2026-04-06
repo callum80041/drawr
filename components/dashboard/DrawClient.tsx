@@ -4,6 +4,8 @@ import { useState, useTransition, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ManualDraw } from '@/components/dashboard/ManualDraw'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
+
 interface Team {
   id: number
   name: string
@@ -27,6 +29,7 @@ interface Assignment {
 
 interface Props {
   sweepstakeId: string
+  shareToken: string
   assignmentMode: string
   drawCompletedAt: string | null
   participants: Participant[]
@@ -148,8 +151,29 @@ function DrawnCard({ item }: { item: DrawItem }) {
   )
 }
 
+function ShareNativeButton({ shareToken }: { shareToken: string }) {
+  const [canShare, setCanShare] = useState(false)
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && !!navigator.share)
+  }, [])
+  if (!canShare) return null
+  return (
+    <button
+      onClick={() => navigator.share({
+        title: 'World Cup 2026 Draw Results',
+        text: 'Check out the draw results for our sweepstake!',
+        url: `${APP_URL}/s/${shareToken}`,
+      }).catch(() => {})}
+      className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs font-medium px-4 py-2.5 rounded-lg hover:bg-white/20 transition-colors"
+    >
+      ↗ Share
+    </button>
+  )
+}
+
 export function DrawClient({
   sweepstakeId,
+  shareToken,
   assignmentMode,
   drawCompletedAt,
   participants,
@@ -169,6 +193,7 @@ export function DrawClient({
     return map
   }, [participants, teams])
 
+  const [shareCopied,   setShareCopied]   = useState(false)
   const [phase,         setPhase]         = useState<Phase>(() =>
     drawCompletedAt && initialAssignments.length > 0 ? 'revealed' : 'idle'
   )
@@ -519,6 +544,41 @@ export function DrawClient({
         >
           Redo draw
         </button>
+      </div>
+
+      {/* Share your draw card */}
+      <div className="bg-pitch rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="font-heading font-bold text-white text-sm tracking-tight mb-0.5">
+            📱 Share your draw on socials
+          </p>
+          <p className="text-white/50 text-xs leading-relaxed">
+            Download a branded 1080×1080 results card — perfect for WhatsApp, Instagram, or the group chat.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <a
+            href={`${APP_URL}/api/og/draw/${shareToken}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            className="inline-flex items-center gap-1.5 bg-lime text-pitch text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors"
+          >
+            ⬇ Download image
+          </a>
+          <button
+            onClick={async () => {
+              const url = `${APP_URL}/s/${shareToken}`
+              await navigator.clipboard.writeText(url)
+              setShareCopied(true)
+              setTimeout(() => setShareCopied(false), 2000)
+            }}
+            className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs font-medium px-4 py-2.5 rounded-lg hover:bg-white/20 transition-colors"
+          >
+            {shareCopied ? '✓ Copied!' : '🔗 Copy leaderboard link'}
+          </button>
+          <ShareNativeButton shareToken={shareToken} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

@@ -56,18 +56,23 @@ export function MarketingNav() {
             href="#reserve"
             className="text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
           >
-            Reserve your draw
+            Reserve your free sweepstake
           </a>
         </li>
       </ul>
 
-      {/* Mobile CTA only */}
-      <a
-        href="#reserve"
-        className="md:hidden text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
-      >
-        Reserve
-      </a>
+      {/* Mobile: demo link + CTA */}
+      <div className="md:hidden flex items-center gap-3">
+        <Link href="/s/demo2026" className="text-sm text-white/60 hover:text-white transition-colors">
+          Demo
+        </Link>
+        <a
+          href="#reserve"
+          className="text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
+        >
+          Reserve free
+        </a>
+      </div>
     </nav>
   )
 }

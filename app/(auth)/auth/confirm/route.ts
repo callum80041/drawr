@@ -12,6 +12,14 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
+      // Stamp last_login_at
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('organisers')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

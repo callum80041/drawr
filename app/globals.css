@@ -29,22 +29,6 @@ body {
   font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
 }
 
-/* ── Hero orb animations ── */
-@keyframes orb-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes orb-spin-reverse {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(-360deg); }
-}
-
-@keyframes orbit {
-  from { transform: translateX(-50%) translateY(-50%) rotate(0deg)   translateX(108px) rotate(0deg); }
-  to   { transform: translateX(-50%) translateY(-50%) rotate(360deg) translateX(108px) rotate(-360deg); }
-}
-
 @keyframes eyebrow-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.4; transform: scale(0.65); }
@@ -73,15 +57,6 @@ body {
 .animate-fade-up-5 { animation: fade-up 0.6s 0.4s ease both; }
 .animate-fade-up-6 { animation: fade-up 0.6s 0.5s ease both; }
 
-.orb-ring-1 { animation: orb-spin 12s linear infinite; }
-.orb-ring-2 { animation: orb-spin-reverse 8s linear infinite; }
-.orb-ring-3 { animation: orb-spin 20s linear infinite; }
-
-.orb-ball   { position: absolute; top: 50%; left: 50%; }
-.orb-ball-1 { animation: orbit 6s linear infinite; }
-.orb-ball-2 { animation: orbit 6s linear infinite; animation-delay: -2s; }
-.orb-ball-3 { animation: orbit 6s linear infinite; animation-delay: -4s; }
-
 .eyebrow-dot { animation: eyebrow-pulse 2s ease infinite; }
 
 @keyframes live-pulse {
@@ -89,6 +64,22 @@ body {
   50%       { opacity: 0.4; }
 }
 .live-dot { animation: live-pulse 2s ease infinite; }
+
+@keyframes hero-reveal {
+  0%   { opacity: 0; transform: scale(0.82) translateY(10px); }
+  60%  { opacity: 1; transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes draw-spin {
+  0%   { opacity: 0; transform: scale(0.5) rotate(-20deg); }
+  100% { opacity: 1; transform: scale(1)   rotate(0deg); }
+}
+
+@keyframes progress-fill {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
 
 /* ── Scroll reveal ── */
 .reveal {

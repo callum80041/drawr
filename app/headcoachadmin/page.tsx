@@ -61,6 +61,7 @@ export default async function HeadCoachAdminPage() {
     { count: totalParticipants },
     { count: participantsWithEmail },
     { data: recentOrganisers },
+    { data: organiserDetails },
     analytics,
   ] = await Promise.all([
     supabase.from('organisers').select('*', { count: 'exact', head: true }),
@@ -69,7 +70,14 @@ export default async function HeadCoachAdminPage() {
     supabase.from('sweepstakes').select('id, name, status, created_at, draw_completed_at, entry_fee'),
     supabase.from('participants').select('*', { count: 'exact', head: true }),
     supabase.from('participants').select('*', { count: 'exact', head: true }).not('email', 'is', null),
-    supabase.from('organisers').select('id, name, email, created_at').order('created_at', { ascending: false }).limit(10),
+    supabase.from('organisers').select('id, name, email, created_at, last_login_at').order('created_at', { ascending: false }).limit(10),
+    supabase.from('organisers').select(`
+      id, name, email, created_at, last_login_at,
+      sweepstakes (
+        id, name, status, entry_fee, share_token, created_at, draw_completed_at,
+        participants ( id, name, email, paid, created_at )
+      )
+    `).order('created_at', { ascending: false }),
     fetchVercelAnalytics(),
   ])
 
@@ -93,6 +101,7 @@ export default async function HeadCoachAdminPage() {
         participantsWithEmail: participantsWithEmail ?? 0,
       }}
       recentOrganisers={recentOrganisers ?? []}
+      organiserDetails={organiserDetails ?? []}
       analytics={analytics}
     />
   )

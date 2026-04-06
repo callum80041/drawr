@@ -44,7 +44,7 @@ export function CreateForm({ organiserId }: Props) {
         status: 'setup',
         plan: 'free',
       })
-      .select('id')
+      .select('id, share_token')
       .single()
 
     if (insertError || !data) {
@@ -52,6 +52,13 @@ export function CreateForm({ organiserId }: Props) {
       setLoading(false)
       return
     }
+
+    // Fire confirmation email (non-blocking)
+    fetch('/api/email/sweepstake-created', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sweepstakeId: data.id }),
+    }).catch(() => { /* best-effort */ })
 
     router.push(`/dashboard/${data.id}`)
   }

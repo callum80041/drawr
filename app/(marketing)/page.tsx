@@ -6,6 +6,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 import { HeroEmailForm } from '@/components/marketing/HeroEmailForm'
+import { HeroDrawAnimation } from '@/components/marketing/HeroDrawAnimation'
 
 export const revalidate = 300 // revalidate every 5 min so signup count stays fresh
 
@@ -181,24 +182,9 @@ export default async function LandingPage() {
           </p>
         </div>
 
-        {/* Orb animation */}
-        <div className="animate-fade-up-6 relative w-64 h-64 md:w-80 md:h-80">
-          <div className="orb-ring-1 absolute inset-0 rounded-full border border-lime/15" />
-          <div className="orb-ring-2 absolute inset-5 rounded-full border border-lime/10" />
-          <div className="orb-ring-3 absolute inset-11 rounded-full border border-lime/[0.06]" />
-          {[
-            { label: 'ENG', cls: 'orb-ball-1', bg: 'bg-lime text-pitch' },
-            { label: 'BRA', cls: 'orb-ball-2', bg: 'bg-grass/80 text-white border border-grass' },
-            { label: 'ARG', cls: 'orb-ball-3', bg: 'bg-pitch border border-mid/40 text-mid' },
-          ].map(b => (
-            <div
-              key={b.label}
-              className={`orb-ball ${b.cls} w-11 h-11 rounded-full flex items-center justify-center font-heading text-xs font-bold ${b.bg}`}
-            />
-          ))}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-grass/20 border border-lime/20 flex items-center justify-center">
-            <span className="font-heading text-lime text-[11px] tracking-widest">DRAW</span>
-          </div>
+        {/* Live mock draw animation */}
+        <div className="animate-fade-up-6 w-full max-w-sm">
+          <HeroDrawAnimation />
         </div>
       </section>
 

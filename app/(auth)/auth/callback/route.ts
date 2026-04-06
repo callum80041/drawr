@@ -10,6 +10,14 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Stamp last_login_at
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('organisers')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

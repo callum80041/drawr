@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Stats {
@@ -19,6 +20,35 @@ interface Organiser {
   name: string
   email: string
   created_at: string
+  last_login_at?: string | null
+}
+
+interface ParticipantDetail {
+  id: string
+  name: string
+  email: string | null
+  paid: boolean
+  created_at: string
+}
+
+interface SweepstakeDetail {
+  id: string
+  name: string
+  status: string
+  entry_fee: number | null
+  share_token: string
+  created_at: string
+  draw_completed_at: string | null
+  participants: ParticipantDetail[]
+}
+
+interface OrganiserDetail {
+  id: string
+  name: string
+  email: string
+  created_at: string
+  last_login_at: string | null
+  sweepstakes: SweepstakeDetail[]
 }
 
 interface AnalyticsData {
@@ -30,7 +60,16 @@ interface AnalyticsData {
 interface Props {
   stats: Stats
   recentOrganisers: Organiser[]
+  organiserDetails: OrganiserDetail[]
   analytics: AnalyticsData | null
+}
+
+const APP_URL = 'https://playdrawr.co.uk'
+
+const STATUS_COLOURS: Record<string, string> = {
+  setup:    'bg-amber-100 text-amber-800',
+  active:   'bg-green-100 text-green-800',
+  complete: 'bg-slate-100 text-slate-600',
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -43,8 +82,10 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, recentOrganisers, analytics }: Props) {
+export function AdminDashboard({ stats, recentOrganisers, organiserDetails, analytics }: Props) {
   const router = useRouter()
+  const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
+  const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
 
   async function handleLogout() {
     await fetch('/api/headcoachadmin', { method: 'DELETE' })
@@ -140,6 +181,148 @@ export function AdminDashboard({ stats, recentOrganisers, analytics }: Props) {
           </div>
         </section>
 
+        {/* All organisers — drill-down */}
+        <section>
+          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">All organisers</h2>
+          <div className="space-y-2">
+            {organiserDetails.length === 0 && (
+              <p className="text-sm text-mid">No organisers yet.</p>
+            )}
+            {organiserDetails.map(o => {
+              const isOpen = expandedOrganiser === o.id
+              const totalParticipants = o.sweepstakes.reduce((n, s) => n + s.participants.length, 0)
+              return (
+                <div key={o.id} className="bg-white rounded-xl border border-[#E5EDEA] overflow-hidden">
+                  {/* Organiser row */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExpandedOrganiser(isOpen ? null : o.id)
+                      setExpandedSweepstake(null)
+                    }}
+                    className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-light/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-pitch text-sm truncate">{o.name}</p>
+                      <p className="text-xs text-mid truncate">{o.email}</p>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-4 text-xs text-mid shrink-0">
+                      <span>{o.sweepstakes.length} sweepstake{o.sweepstakes.length !== 1 ? 's' : ''}</span>
+                      <span>{totalParticipants} participant{totalParticipants !== 1 ? 's' : ''}</span>
+                      <span>
+                        {o.last_login_at
+                          ? `Last login ${new Date(o.last_login_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+                          : 'Never logged in'}
+                      </span>
+                      <span>Joined {new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                    <span className="text-mid text-xs ml-2">{isOpen ? '▲' : '▼'}</span>
+                  </button>
+
+                  {/* Sweepstakes */}
+                  {isOpen && (
+                    <div className="border-t border-[#E5EDEA] bg-light/40 px-5 py-4 space-y-3">
+                      {o.sweepstakes.length === 0 && (
+                        <p className="text-sm text-mid italic">No sweepstakes created yet.</p>
+                      )}
+                      {o.sweepstakes.map(s => {
+                        const swOpen = expandedSweepstake === s.id
+                        const joinUrl = `${APP_URL}/join/${s.share_token}`
+                        const lbUrl   = `${APP_URL}/s/${s.share_token}`
+                        const paidCount = s.participants.filter(p => p.paid).length
+                        return (
+                          <div key={s.id} className="bg-white rounded-lg border border-[#E5EDEA] overflow-hidden">
+                            {/* Sweepstake row */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedSweepstake(swOpen ? null : s.id)}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-light/50 transition-colors"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-medium text-pitch text-sm">{s.name}</p>
+                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOURS[s.status] ?? 'bg-slate-100 text-slate-600'}`}>
+                                    {s.status}
+                                  </span>
+                                  {Number(s.entry_fee) > 0 && (
+                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                      £{Number(s.entry_fee).toFixed(2)} entry
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-mid mt-0.5">
+                                  {s.participants.length} participant{s.participants.length !== 1 ? 's' : ''}
+                                  {Number(s.entry_fee) > 0 ? ` · ${paidCount} paid` : ''}
+                                  {' · '}Created {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </p>
+                              </div>
+                              <span className="text-mid text-xs shrink-0">{swOpen ? '▲' : '▼'}</span>
+                            </button>
+
+                            {/* Sweepstake detail */}
+                            {swOpen && (
+                              <div className="border-t border-[#E5EDEA] px-4 py-3 space-y-3">
+                                {/* Links */}
+                                <div className="grid sm:grid-cols-2 gap-2 text-xs">
+                                  <div className="bg-light rounded-lg px-3 py-2">
+                                    <p className="font-semibold text-pitch mb-1">Self-signup link</p>
+                                    <a href={joinUrl} target="_blank" rel="noopener noreferrer" className="text-grass hover:underline break-all font-mono">{joinUrl}</a>
+                                  </div>
+                                  <div className="bg-light rounded-lg px-3 py-2">
+                                    <p className="font-semibold text-pitch mb-1">Leaderboard link</p>
+                                    <a href={lbUrl} target="_blank" rel="noopener noreferrer" className="text-grass hover:underline break-all font-mono">{lbUrl}</a>
+                                  </div>
+                                </div>
+
+                                {/* Participants table */}
+                                {s.participants.length === 0 ? (
+                                  <p className="text-xs text-mid italic px-1">No participants yet.</p>
+                                ) : (
+                                  <table className="w-full text-xs">
+                                    <thead>
+                                      <tr className="border-b border-[#E5EDEA]">
+                                        <th className="text-left py-1.5 px-1 font-medium text-mid">Name</th>
+                                        <th className="text-left py-1.5 px-1 font-medium text-mid">Email</th>
+                                        {Number(s.entry_fee) > 0 && (
+                                          <th className="text-center py-1.5 px-1 font-medium text-mid">Paid</th>
+                                        )}
+                                        <th className="text-right py-1.5 px-1 font-medium text-mid">Joined</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[#E5EDEA]/60">
+                                      {s.participants.map(p => (
+                                        <tr key={p.id} className="hover:bg-light/50">
+                                          <td className="py-1.5 px-1 text-pitch font-medium">{p.name}</td>
+                                          <td className="py-1.5 px-1 text-mid">{p.email ?? <span className="text-[#C0CFC8]">—</span>}</td>
+                                          {Number(s.entry_fee) > 0 && (
+                                            <td className="py-1.5 px-1 text-center">
+                                              {p.paid
+                                                ? <span className="text-green-600 font-semibold">✓</span>
+                                                : <span className="text-[#C0CFC8]">–</span>
+                                              }
+                                            </td>
+                                          )}
+                                          <td className="py-1.5 px-1 text-mid text-right tabular-nums whitespace-nowrap">
+                                            {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
         {/* Recent signups */}
         <section>
           <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">Recent signups</h2>
@@ -153,6 +336,7 @@ export function AdminDashboard({ stats, recentOrganisers, analytics }: Props) {
                     <th className="text-left px-5 py-3 text-xs font-medium text-mid uppercase tracking-wide">Name</th>
                     <th className="text-left px-5 py-3 text-xs font-medium text-mid uppercase tracking-wide">Email</th>
                     <th className="text-right px-5 py-3 text-xs font-medium text-mid uppercase tracking-wide">Joined</th>
+                    <th className="text-right px-5 py-3 text-xs font-medium text-mid uppercase tracking-wide">Last login</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EDEA]/60">
@@ -162,6 +346,12 @@ export function AdminDashboard({ stats, recentOrganisers, analytics }: Props) {
                       <td className="px-5 py-3 text-mid">{o.email}</td>
                       <td className="px-5 py-3 text-mid text-right tabular-nums whitespace-nowrap">
                         {new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="px-5 py-3 text-mid text-right tabular-nums whitespace-nowrap">
+                        {o.last_login_at
+                          ? new Date(o.last_login_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : <span className="text-[#C0CFC8]">Never</span>
+                        }
                       </td>
                     </tr>
                   ))}
