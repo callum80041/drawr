@@ -63,21 +63,21 @@ function TeamDisplay({ name, flag, logo, participant, align }: {
   align: 'left' | 'right'
 }) {
   return (
-    <div className={`flex items-center gap-2 min-w-0 flex-1 ${align === 'right' ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex items-center gap-1.5 min-w-0 flex-1 ${align === 'right' ? 'flex-row-reverse' : ''}`}>
       {/* Logo or flag */}
-      <div className="w-8 h-8 shrink-0 flex items-center justify-center">
+      <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center">
         {logo ? (
           <Image src={logo} alt={name} width={32} height={32} className="object-contain" unoptimized />
         ) : flag ? (
-          <span className="text-2xl">{flag}</span>
+          <span className="text-xl sm:text-2xl leading-none">{flag}</span>
         ) : (
-          <span className="text-2xl">🏳️</span>
+          <span className="text-xl sm:text-2xl leading-none">🏳️</span>
         )}
       </div>
-      <div className={`min-w-0 ${align === 'right' ? 'text-right' : ''}`}>
-        <p className="text-sm font-medium text-pitch truncate">{name}</p>
+      <div className={`min-w-0 overflow-hidden ${align === 'right' ? 'text-right' : ''}`}>
+        <p className="text-xs sm:text-sm font-medium text-pitch truncate leading-tight">{name}</p>
         {participant && (
-          <p className="text-[11px] text-grass font-medium truncate">{participant}</p>
+          <p className="text-[10px] sm:text-[11px] text-grass font-medium truncate leading-tight">{participant}</p>
         )}
       </div>
     </div>
@@ -134,20 +134,18 @@ export function FixtureList({ matches, highlightTeamIds = [] }: Props) {
                   </div>
 
                   {/* Teams + score */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <TeamDisplay name={m.home_team_name} flag={m.home_flag} logo={m.home_logo} participant={m.home_participant ?? null} align="left" />
 
-                    <div className="shrink-0 text-center min-w-[64px]">
+                    <div className="shrink-0 text-center w-14 sm:w-16">
                       {isFinished || isLive ? (
-                        <span className={`font-heading text-xl font-bold ${isLive ? 'text-red-500' : 'text-pitch'}`}>
-                          {m.home_score ?? 0} – {m.away_score ?? 0}
+                        <span className={`font-heading text-lg sm:text-xl font-bold ${isLive ? 'text-red-500' : 'text-pitch'}`}>
+                          {m.home_score ?? 0}–{m.away_score ?? 0}
                         </span>
                       ) : (
-                        <div>
-                          <p className="font-medium text-pitch text-sm">
-                            {m.kickoff ? formatTime(m.kickoff) : 'TBC'}
-                          </p>
-                        </div>
+                        <p className="font-medium text-pitch text-xs sm:text-sm leading-tight">
+                          {m.kickoff ? formatTime(m.kickoff) : 'TBC'}
+                        </p>
                       )}
                     </div>
 
