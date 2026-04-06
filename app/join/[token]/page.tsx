@@ -2,6 +2,9 @@
 
 import { useState, use } from 'react'
 import Link from 'next/link'
+import { ShareButtons } from '@/components/dashboard/ShareButtons'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -11,13 +14,16 @@ export default function JoinPage({ params }: Props) {
   const { token } = use(params)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [honeypot, setHoneypot] = useState('') // spam trap
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number } | null>(null)
 
+  const joinUrl = `${APP_URL}/join/${token}`
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || !email.trim()) return
     setStatus('submitting')
     setErrorMsg('')
 
@@ -25,7 +31,7 @@ export default function JoinPage({ params }: Props) {
       const res = await fetch('/api/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, name: name.trim(), email: email.trim() || undefined }),
+        body: JSON.stringify({ token, name: name.trim(), email: email.trim(), website: honeypot }),
       })
       const data = await res.json()
 
@@ -70,13 +76,22 @@ export default function JoinPage({ params }: Props) {
                 Sit tight — you&apos;ll find out which team you&apos;ve drawn once the organiser runs the draw.
                 Fingers crossed for a decent one.
               </p>
+
               {successData.entryFee > 0 && (
-                <div className="mt-5 bg-light rounded-xl px-5 py-4">
+                <div className="mt-5 bg-light rounded-xl px-5 py-4 text-left">
                   <p className="text-xs text-mid uppercase tracking-wide font-semibold mb-1">Entry fee</p>
                   <p className="text-2xl font-heading font-black text-pitch">£{successData.entryFee.toFixed(2)}</p>
                   <p className="text-xs text-mid mt-1">Pay your organiser directly — they&apos;ll mark you as paid.</p>
                 </div>
               )}
+
+              {/* Tell a mate */}
+              <div className="mt-5 bg-light rounded-xl px-5 py-4 text-left">
+                <p className="text-sm font-semibold text-pitch mb-0.5">Know someone else who&apos;d want in?</p>
+                <p className="text-xs text-mid mb-3">Send them the join link.</p>
+                <ShareButtons url={joinUrl} sweepstakeName={successData.sweepstakeName} />
+              </div>
+
               <p className="mt-6 text-xs text-mid">
                 Want to run your own sweepstake?{' '}
                 <Link href="/signup" className="text-grass hover:underline font-medium">
@@ -110,6 +125,18 @@ export default function JoinPage({ params }: Props) {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Honeypot — hidden from real users, bots fill it */}
+              <div style={{ display: 'none' }} aria-hidden="true">
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={honeypot}
+                  onChange={e => setHoneypot(e.target.value)}
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-pitch uppercase tracking-wide mb-1.5">
                   Your name <span className="text-red-400">*</span>
@@ -127,26 +154,27 @@ export default function JoinPage({ params }: Props) {
 
               <div>
                 <label className="block text-xs font-semibold text-pitch uppercase tracking-wide mb-1.5">
-                  Email address <span className="text-mid font-normal normal-case">(optional — for draw updates)</span>
+                  Email address <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="email"
+                  required
                   placeholder="e.g. jamie@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   disabled={status === 'submitting'}
                   className="w-full px-4 py-3 rounded-xl border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:opacity-60"
                 />
-                <p className="text-xs text-mid mt-1.5">We&apos;ll only email you about this sweepstake. No spam, ever.</p>
+                <p className="text-xs text-mid mt-1.5">Used to verify your entry. No spam, ever.</p>
               </div>
 
-              {(status === 'error') && errorMsg && (
+              {status === 'error' && errorMsg && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{errorMsg}</p>
               )}
 
               <button
                 type="submit"
-                disabled={status === 'submitting' || !name.trim()}
+                disabled={status === 'submitting' || !name.trim() || !email.trim()}
                 className="w-full bg-lime text-pitch font-bold text-base py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === 'submitting' ? 'Joining…' : 'Join sweepstake →'}

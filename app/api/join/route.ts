@@ -2,10 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
-  const { token, name, email } = await req.json()
+  const { token, name, email, website } = await req.json()
+
+  // Honeypot — bots fill this in, humans don't
+  if (website) {
+    // Silently pretend it worked
+    return NextResponse.json({ ok: true, participant: { id: 'x', name, email }, sweepstake: { name: '', entryFee: 0 } })
+  }
 
   if (!token || !name?.trim()) {
     return NextResponse.json({ error: 'Missing token or name' }, { status: 400 })
+  }
+
+  if (!email?.trim()) {
+    return NextResponse.json({ error: 'Email is required to verify your entry.' }, { status: 400 })
+  }
+
+  // Basic email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email.trim())) {
+    return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
   }
 
   const supabase = await createClient()
@@ -25,6 +41,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'This sweepstake is complete — no new entries.' }, { status: 400 })
   }
 
+  // Check for duplicate email in this sweepstake
+  const { count: dupeCount } = await supabase
+    .from('participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('sweepstake_id', sweepstake.id)
+    .eq('email', email.trim().toLowerCase())
+
+  if ((dupeCount ?? 0) > 0) {
+    return NextResponse.json({ error: 'That email address has already been used to join this sweepstake.' }, { status: 400 })
+  }
+
   // Free plan cap
   if (sweepstake.plan === 'free') {
     const { count } = await supabase
@@ -42,7 +69,7 @@ export async function POST(req: NextRequest) {
     .insert({
       sweepstake_id: sweepstake.id,
       name: name.trim(),
-      email: email?.trim() || null,
+      email: email.trim().toLowerCase(),
       paid: false,
     })
     .select('id, name, email')

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { ShareButtons } from '@/components/dashboard/ShareButtons'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -159,6 +160,10 @@ export default async function SweepstakeOverviewPage({ params }: Props) {
               Open →
             </Link>
           </div>
+          <ShareButtons
+            url={`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'}/join/${sweepstake.share_token}`}
+            sweepstakeName={sweepstake.name}
+          />
         </div>
       </div>
 
