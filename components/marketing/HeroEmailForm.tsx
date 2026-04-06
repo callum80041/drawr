@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function HeroEmailForm({ variant = 'hero' }: Props) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -31,6 +32,7 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
       email: email.trim().toLowerCase(),
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: name.trim() ? { name: name.trim() } : undefined,
       },
     })
 
@@ -73,6 +75,15 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-2">
+      <input
+        type="text"
+        required
+        placeholder="Your name"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        disabled={status === 'submitting'}
+        className={`${inputClass} w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors disabled:opacity-60`}
+      />
       <div className="flex gap-2">
         <input
           type="email"
@@ -85,10 +96,10 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
         />
         <button
           type="submit"
-          disabled={status === 'submitting' || !email.trim()}
+          disabled={status === 'submitting' || !email.trim() || !name.trim()}
           className="shrink-0 bg-lime text-pitch font-bold text-sm px-5 py-3 rounded-xl hover:bg-[#d4f54d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
-          {status === 'submitting' ? '…' : 'Reserve my draw →'}
+          {status === 'submitting' ? '…' : 'Reserve free →'}
         </button>
       </div>
       {status === 'error' && errorMsg && (
