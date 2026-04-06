@@ -32,6 +32,9 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
   const cap = plan === 'free' ? FREE_PLAN_CAP : Infinity
   const atCap = participants.length >= cap
   const paidCount = participants.filter(p => p.paid).length
+  const [chaseAllStatus, setChaseAllStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const unpaidWithEmail = participants.filter(p => !p.paid && p.email).length
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -91,6 +94,20 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
       const { error } = await supabase.from('participants').delete().eq('id', id)
       if (error) setParticipants(previous)
     })
+  }
+
+  async function handleChaseAll() {
+    setChaseAllStatus('sending')
+    try {
+      const res = await fetch('/api/email/payment-chase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sweepstakeId, sendToAll: true }),
+      })
+      setChaseAllStatus(res.ok ? 'sent' : 'error')
+    } catch {
+      setChaseAllStatus('error')
+    }
   }
 
   function handleMarkAllPaid() {
@@ -165,15 +182,33 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
                 {participants.length}{plan === 'free' ? `/${FREE_PLAN_CAP}` : ''}
               </span>
             </h2>
-            {paidCount < participants.length && (
-              <button
-                type="button"
-                onClick={handleMarkAllPaid}
-                className="text-xs text-grass font-medium hover:underline"
-              >
-                Mark all paid
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {entryFee > 0 && unpaidWithEmail > 0 && (
+                <button
+                  type="button"
+                  onClick={handleChaseAll}
+                  disabled={chaseAllStatus === 'sending' || chaseAllStatus === 'sent'}
+                  className={`text-xs font-medium hover:underline disabled:opacity-60 ${
+                    chaseAllStatus === 'sent' ? 'text-mid cursor-default' :
+                    chaseAllStatus === 'error' ? 'text-red-500' : 'text-mid'
+                  }`}
+                >
+                  {chaseAllStatus === 'sending' ? 'Sending…' :
+                   chaseAllStatus === 'sent' ? `✓ Reminders sent` :
+                   chaseAllStatus === 'error' ? 'Failed — retry' :
+                   `Chase all unpaid (${unpaidWithEmail})`}
+                </button>
+              )}
+              {paidCount < participants.length && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllPaid}
+                  className="text-xs text-grass font-medium hover:underline"
+                >
+                  Mark all paid
+                </button>
+              )}
+            </div>
           </div>
 
           <ul className="px-4 py-2 divide-y divide-[#E5EDEA]/60">

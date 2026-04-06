@@ -17,10 +17,11 @@ interface Props {
   onRemove: (id: string) => void
 }
 
-type InviteStatus = 'idle' | 'sending' | 'sent' | 'error'
+type ActionStatus = 'idle' | 'sending' | 'sent' | 'error'
 
 export function ParticipantRow({ participant, sweepstakeId, entryFee, onTogglePaid, onRemove }: Props) {
-  const [inviteStatus, setInviteStatus] = useState<InviteStatus>('idle')
+  const [inviteStatus, setInviteStatus] = useState<ActionStatus>('idle')
+  const [chaseStatus, setChaseStatus] = useState<ActionStatus>('idle')
 
   async function handleInvite() {
     setInviteStatus('sending')
@@ -33,6 +34,20 @@ export function ParticipantRow({ participant, sweepstakeId, entryFee, onTogglePa
       setInviteStatus(res.ok ? 'sent' : 'error')
     } catch {
       setInviteStatus('error')
+    }
+  }
+
+  async function handleChase() {
+    setChaseStatus('sending')
+    try {
+      const res = await fetch('/api/email/payment-chase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participantId: participant.id, sweepstakeId }),
+      })
+      setChaseStatus(res.ok ? 'sent' : 'error')
+    } catch {
+      setChaseStatus('error')
     }
   }
 
@@ -67,6 +82,23 @@ export function ParticipantRow({ participant, sweepstakeId, entryFee, onTogglePa
           } disabled:opacity-60`}
         >
           {inviteStatus === 'sending' ? '…' : inviteStatus === 'sent' ? '✓ Invited' : inviteStatus === 'error' ? 'Retry' : 'Invite'}
+        </button>
+      )}
+
+      {/* Chase button — only if email present and not paid */}
+      {participant.email && !participant.paid && entryFee > 0 && (
+        <button
+          type="button"
+          onClick={handleChase}
+          disabled={chaseStatus === 'sending' || chaseStatus === 'sent'}
+          title={chaseStatus === 'sent' ? 'Reminder sent!' : `Send payment reminder to ${participant.email}`}
+          className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-colors shrink-0 ${
+            chaseStatus === 'sent'  ? 'bg-lime/20 border-lime/40 text-pitch cursor-default' :
+            chaseStatus === 'error' ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' :
+            'bg-white border-[#D1D9D5] text-mid hover:border-mid hover:text-pitch'
+          } disabled:opacity-60`}
+        >
+          {chaseStatus === 'sending' ? '…' : chaseStatus === 'sent' ? '✓ Chased' : chaseStatus === 'error' ? 'Retry' : 'Chase'}
         </button>
       )}
 

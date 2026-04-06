@@ -121,22 +121,44 @@ export default async function SweepstakeOverviewPage({ params }: Props) {
         </div>
       )}
 
-      {/* Share link */}
-      <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
-        <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">Participant link</h2>
-        <p className="text-sm text-mid mb-3">Share this with your participants — no login needed.</p>
-        <div className="flex items-center gap-2">
-          <code className="flex-1 bg-light rounded-lg px-3 py-2 text-sm text-pitch font-mono truncate">
-            {process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'}/s/{sweepstake.share_token}
-          </code>
-          <Link
-            href={`/s/${sweepstake.share_token}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 bg-lime text-pitch text-xs font-medium px-3 py-2 rounded-lg hover:bg-[#b8e03d] transition-colors"
-          >
-            Open →
-          </Link>
+      {/* Links */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Leaderboard link */}
+        <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
+          <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">Leaderboard link</h2>
+          <p className="text-sm text-mid mb-3">View standings, fixtures and groups.</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+              {process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'}/s/{sweepstake.share_token}
+            </code>
+            <Link
+              href={`/s/${sweepstake.share_token}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 bg-lime text-pitch text-xs font-medium px-3 py-2 rounded-lg hover:bg-[#b8e03d] transition-colors"
+            >
+              Open →
+            </Link>
+          </div>
+        </div>
+
+        {/* Self-signup join link */}
+        <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
+          <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">Self-signup link</h2>
+          <p className="text-sm text-mid mb-3">Participants can join themselves — no manual adding.</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+              {process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'}/join/{sweepstake.share_token}
+            </code>
+            <Link
+              href={`/join/${sweepstake.share_token}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 bg-pitch text-white text-xs font-medium px-3 py-2 rounded-lg hover:bg-pitch/80 transition-colors"
+            >
+              Open →
+            </Link>
+          </div>
         </div>
       </div>
 
