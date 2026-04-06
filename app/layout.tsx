@@ -3,6 +3,7 @@ import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { BuyMeACoffee } from "@/components/brand/BuyMeACoffee";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -32,6 +33,12 @@ export default function RootLayout({
         {children}
         <BuyMeACoffee />
         <Analytics />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4502089642412261"
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
