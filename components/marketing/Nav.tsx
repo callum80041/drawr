@@ -37,7 +37,7 @@ export function MarketingNav() {
           </a>
         </li>
         <li>
-          <a href="#pricing" className="text-sm font-medium text-lime hover:text-lime/80 transition-colors">
+          <a href="#reserve" className="text-sm font-medium text-lime hover:text-lime/80 transition-colors">
             It&apos;s free
           </a>
         </li>
@@ -52,22 +52,22 @@ export function MarketingNav() {
           </Link>
         </li>
         <li>
-          <Link
-            href="/signup"
+          <a
+            href="#reserve"
             className="text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
           >
-            Start your draw →
-          </Link>
+            Reserve your draw
+          </a>
         </li>
       </ul>
 
       {/* Mobile CTA only */}
-      <Link
-        href="/signup"
+      <a
+        href="#reserve"
         className="md:hidden text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
       >
-        Start free
-      </Link>
+        Reserve
+      </a>
     </nav>
   )
 }

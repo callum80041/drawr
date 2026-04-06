@@ -84,6 +84,12 @@ body {
 
 .eyebrow-dot { animation: eyebrow-pulse 2s ease infinite; }
 
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.live-dot { animation: live-pulse 2s ease infinite; }
+
 /* ── Scroll reveal ── */
 .reveal {
   opacity: 0;
