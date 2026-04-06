@@ -56,9 +56,9 @@ const DEMO_DRAW = [
 
 type Phase = 'idle' | 'drawing' | 'grid'
 
-const DRAW_INTERVAL = 320  // ms per reveal — fast enough for 48
-const GRID_HOLD    = 4000  // ms to hold the full results grid
-const IDLE_HOLD    = 1200  // ms on "ready to draw" screen
+const DRAW_INTERVAL = 480  // ms per reveal
+const GRID_HOLD    = 5000  // ms to hold the full results grid
+const IDLE_HOLD    = 1400  // ms on "ready to draw" screen
 
 export function HeroDrawAnimation() {
   const [phase, setPhase]           = useState<Phase>('idle')
@@ -126,7 +126,7 @@ export function HeroDrawAnimation() {
         {current && (
           <div
             key={currentIdx}
-            className="bg-white rounded-2xl border-2 border-lime shadow-xl shadow-black/20 p-5 text-center"
+            className="bg-white rounded-2xl border-2 border-lime shadow-xl shadow-black/20 p-5 text-center md:max-w-xs md:mx-auto"
             style={{ animation: 'hero-reveal 0.3s ease both' }}
           >
             <p className="text-xs text-mid mb-2 tabular-nums">
@@ -145,8 +145,8 @@ export function HeroDrawAnimation() {
 
         {/* Scrollable mini grid of already-drawn */}
         {shown.length > 0 && (
-          <div className="max-h-48 overflow-y-auto rounded-xl">
-            <div className="grid grid-cols-2 gap-1">
+          <div className="max-h-52 overflow-y-auto rounded-xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
               {shown.map((entry, i) => (
                 <div
                   key={i}
@@ -176,7 +176,7 @@ export function HeroDrawAnimation() {
           {DEMO_DRAW.length} teams drawn
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-1 max-h-[420px] overflow-y-auto rounded-xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 max-h-[420px] overflow-y-auto rounded-xl">
         {DEMO_DRAW.map((entry, i) => (
           <div
             key={i}

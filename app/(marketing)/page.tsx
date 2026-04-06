@@ -183,7 +183,7 @@ export default async function LandingPage() {
         </div>
 
         {/* Live mock draw animation */}
-        <div className="animate-fade-up-6 w-full max-w-sm">
+        <div className="animate-fade-up-6 w-full max-w-sm md:max-w-2xl">
           <HeroDrawAnimation />
         </div>
       </section>
