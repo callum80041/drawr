@@ -1,10 +1,32 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { Countdown } from '@/components/marketing/Countdown'
 
 export const revalidate = 3600 // ISR — revalidate fixtures strip hourly
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
+
+export const metadata: Metadata = {
+  title: 'playdrawr — Free World Cup 2026 Sweepstake',
+  description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
+  openGraph: {
+    title: 'playdrawr — Free World Cup 2026 Sweepstake',
+    description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
+    url: APP_URL,
+    siteName: 'playdrawr',
+    images: [{ url: `${APP_URL}/api/og/home`, width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'playdrawr — Free World Cup 2026 Sweepstake',
+    description: 'Run a World Cup 2026 sweepstake in minutes. Free forever.',
+    images: [`${APP_URL}/api/og/home`],
+  },
+}
 
 async function getUpcomingFixtures() {
   const supabase = await createClient()

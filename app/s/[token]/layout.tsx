@@ -1,15 +1,50 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { PublicTabs } from '@/components/participant/PublicTabs'
 import { DemoBar } from '@/components/participant/DemoBar'
 
 const DEMO_TOKEN = 'demo2026'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 interface Props {
   children: React.ReactNode
   params: Promise<{ token: string }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
+  const { token } = await params
+  const supabase = await createClient()
+  const { data: sweepstake } = await supabase
+    .from('sweepstakes')
+    .select('name, tournament_name')
+    .eq('share_token', token)
+    .single()
+
+  if (!sweepstake) return {}
+
+  const title       = `${sweepstake.name} — playdrawr`
+  const description = `Live leaderboard for ${sweepstake.name}. Follow the standings and see who's winning the sweepstake.`
+  const ogImage     = `${APP_URL}/api/og/sweepstake?token=${token}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  }
 }
 
 export default async function PublicLayout({ children, params }: Props) {
