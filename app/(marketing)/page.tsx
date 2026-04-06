@@ -191,9 +191,27 @@ export default async function LandingPage() {
           </p>
         </div>
 
+        {/* Scroll-to-demo nudge */}
+        <a
+          href="#demo"
+          className="animate-fade-up-6 inline-flex items-center gap-2 text-xs text-white/40 hover:text-white/70 transition-colors mb-8"
+        >
+          <span>Watch a live draw</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="mt-px">
+            <path d="M6 2v8M2.5 6.5 6 10l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </a>
+
         {/* Live mock draw animation */}
-        <div className="animate-fade-up-6 w-full max-w-sm md:max-w-2xl">
+        <div id="demo" className="animate-fade-up-6 w-full max-w-sm md:max-w-2xl scroll-mt-24">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="live-dot w-1.5 h-1.5 rounded-full bg-lime shrink-0" />
+            <p className="text-xs font-medium tracking-widest uppercase text-lime/80">Live demo — watch the draw run</p>
+          </div>
           <HeroDrawAnimation />
+          <p className="text-center text-xs text-white/30 mt-3">
+            This is what your group sees when you hit draw — 48 teams, randomly assigned, instantly.
+          </p>
         </div>
       </section>
 
@@ -259,6 +277,48 @@ export default async function LandingPage() {
                 <p className="text-sm text-white/50 font-light leading-relaxed">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ── SEE IT IN ACTION ──────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
+        <ScrollReveal>
+          <div className="bg-grass/10 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
+            {/* Copy */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-6 h-px bg-lime" />
+                <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">See it in action</span>
+              </div>
+              <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight tracking-tight mb-4">
+                Try the real thing.<br />
+                <span className="text-lime">No sign-up needed.</span>
+              </h2>
+              <p className="text-white/50 font-light leading-relaxed mb-6">
+                We&apos;ve set up a demo sweepstake with 48 participants — one per World Cup team. Browse the live leaderboard, see the draw results, and get a feel for exactly what your group will see.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="/leaderboard/demo2026"
+                  className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
+                >
+                  View demo leaderboard
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </a>
+                <a
+                  href="#reserve"
+                  className="inline-flex items-center justify-center gap-2 bg-white/8 border border-white/15 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-white/12 transition-colors"
+                >
+                  Set up yours free
+                </a>
+              </div>
+            </div>
+
+            {/* Mini animation */}
+            <div className="w-full md:w-80 shrink-0">
+              <HeroDrawAnimation />
+            </div>
           </div>
         </ScrollReveal>
       </section>
