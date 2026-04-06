@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drawr — Football Sweepstakes, Reinvented</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --pitch: #0d1a0e;
+    --green: #b8ff47;
+    --green-dim: #7abf2a;
+    --white: #f5f5f0;
+    --muted: #6b6b65;
+    --card-bg: #141414;
+    --card-border: #222220;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    position: relative;
+  }
+
+  .logo-wordmark {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .logo-wordmark span {
+    color: var(--green);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--green);
+    color: var(--black) !important;
+    font-weight: 500 !important;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: background 0.2s, transform 0.15s !important;
+  }
+
+  .nav-cta:hover {
+    background: #ceff6e !important;
+    transform: translateY(-1px);
+    color: var(--black) !important;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Pitch lines background */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,0.02) 49.5%, rgba(255,255,255,0.02) 50.5%, transparent 50.5%),
+      radial-gradient(ellipse 60% 40% at 50% 60%, rgba(184,255,71,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(184,255,71,0.08);
+    border: 1px solid rgba(184,255,71,0.2);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 14vw, 180px);
+    line-height: 0.9;
+    letter-spacing: 4px;
+    color: var(--white);
+    margin-bottom: 8px;
+    animation: fadeUp 0.6s 0.1s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-title .accent { color: var(--green); }
+
+  .hero-title-sub {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 4vw, 48px);
+    letter-spacing: 6px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-desc {
+    max-width: 520px;
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(245,245,240,0.65);
+    line-height: 1.7;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: var(--black);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 14px 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-primary:hover {
+    background: #ceff6e;
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 400;
+    padding: 14px 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.04);
+    transform: translateY(-2px);
+  }
+
+  /* Draw animation */
+  .draw-orb {
+    width: 320px;
+    height: 320px;
+    margin: 60px auto 0;
+    position: relative;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  .orb-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(184,255,71,0.15);
+    animation: spin 12s linear infinite;
+  }
+
+  .orb-ring:nth-child(2) {
+    inset: 20px;
+    border-color: rgba(184,255,71,0.1);
+    animation-duration: 8s;
+    animation-direction: reverse;
+  }
+
+  .orb-ring:nth-child(3) {
+    inset: 44px;
+    border-color: rgba(184,255,71,0.06);
+    animation-duration: 20s;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .orb-ball {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 1px;
+    top: 50%;
+    left: 50%;
+    transform-origin: -112px center;
+  }
+
+  .ball-1 { background: var(--green); color: var(--black); animation: orbit1 6s linear infinite; }
+  .ball-2 { background: #1a1a1a; border: 1px solid #333; color: var(--white); animation: orbit1 6s linear infinite; animation-delay: -2s; }
+  .ball-3 { background: #1a1a1a; border: 1px solid #333; color: var(--green-dim); animation: orbit1 6s linear infinite; animation-delay: -4s; }
+
+  @keyframes orbit1 {
+    from { transform: translateX(-50%) translateY(-50%) rotate(0deg) translateX(112px) rotate(0deg); }
+    to { transform: translateX(-50%) translateY(-50%) rotate(360deg) translateX(112px) rotate(-360deg); }
+  }
+
+  .orb-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .orb-center-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+    padding: 28px 48px;
+    display: flex;
+    justify-content: center;
+    gap: 64px;
+    flex-wrap: wrap;
+  }
+
+  .stat { text-align: center; }
+  .stat-val {
+    font-family: var(--font-display);
+    font-size: 42px;
+    letter-spacing: 2px;
+    color: var(--green);
+    line-height: 1;
+    display: block;
+  }
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ── SECTION ── */
+  section {
+    padding: 100px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--green);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 5vw, 72px);
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+
+  .section-title .accent { color: var(--green); }
+
+  .section-desc {
+    font-size: 17px;
+    font-weight: 300;
+    color: rgba(245,245,240,0.55);
+    max-width: 500px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+    background: var(--card-border);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .step {
+    background: var(--card-bg);
+    padding: 36px 28px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .step:hover { background: #181818; }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 64px;
+    letter-spacing: 2px;
+    color: rgba(184,255,71,0.12);
+    line-height: 1;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .step-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--card-border);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--card-bg);
+    padding: 32px;
+    transition: background 0.2s;
+  }
+
+  .feature-card:hover { background: #181818; }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(184,255,71,0.08);
+    border: 1px solid rgba(184,255,71,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 18px;
+  }
+
+  .feature-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── PRICING ── */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .price-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 36px 32px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .price-card:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-4px);
+  }
+
+  .price-card.featured {
+    border-color: var(--green);
+    background: linear-gradient(135deg, #0d1a0e 0%, #0a0a0a 100%);
+  }
+
+  .price-card.featured:hover { border-color: #ceff6e; }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .price-tier {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .price-amount {
+    font-family: var(--font-display);
+    font-size: 56px;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .price-card.featured .price-amount { color: var(--green); }
+
+  .price-period {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .price-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: rgba(245,245,240,0.7);
+    font-weight: 300;
+  }
+
+  .price-features li::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(184,255,71,0.12);
+    border: 1px solid rgba(184,255,71,0.3);
+    flex-shrink: 0;
+    margin-top: 2px;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%23b8ff47' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  /* ── TESTIMONIALS / TRUST ── */
+  .trust-strip {
+    background: var(--card-bg);
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+    padding: 60px 48px;
+    text-align: center;
+  }
+
+  .trust-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .testimonial {
+    background: var(--black);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .testimonial-text {
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(245,245,240,0.75);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+  }
+
+  .testimonial-role {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── CTA BAND ── */
+  .cta-band {
+    background: linear-gradient(135deg, #0d1a0e 0%, var(--black) 60%);
+    border-top: 1px solid rgba(184,255,71,0.1);
+    border-bottom: 1px solid rgba(184,255,71,0.1);
+    padding: 100px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,255,71,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: 3px;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1;
+    position: relative;
+  }
+
+  .cta-title .accent { color: var(--green); }
+
+  .cta-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: rgba(245,245,240,0.5);
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 48px;
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: var(--white);
+  }
+
+  .footer-logo span { color: var(--green); }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--white); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── BRAND SECTION ── */
+  .brand-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .brand-panel {
+    border-radius: 12px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .brand-panel.dark { background: var(--card-bg); border: 1px solid var(--card-border); }
+  .brand-panel.light { background: var(--white); }
+
+  .brand-swatch-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .swatch {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 4px 6px;
+  }
+
+  .swatch-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-type-row { display: flex; flex-direction: column; gap: 8px; }
+
+  .type-sample {
+    font-family: var(--font-display);
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+
+  .type-body-sample { font-family: var(--font-body); font-size: 14px; font-weight: 300; line-height: 1.6; }
+
+  .logo-large {
+    font-family: var(--font-display);
+    font-size: 64px;
+    letter-spacing: 4px;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    .stats-bar { padding: 24px 20px; gap: 32px; }
+    .brand-showcase { grid-template-columns: 1fr; }
+    footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
+    .cta-band, .trust-strip { padding: 60px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="17" stroke="#b8ff47" stroke-width="1"/>
+      <circle cx="18" cy="18" r="11" stroke="#b8ff47" stroke-width="0.5" stroke-dasharray="3 3"/>
+      <circle cx="18" cy="5" r="4" fill="#b8ff47"/>
+      <circle cx="29.5" cy="24.5" r="3" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+      <circle cx="6.5" cy="24.5" r="3" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+    </svg>
+    <span class="logo-wordmark">DRAW<span>R</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#" class="nav-cta">Start your draw →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    World Cup 2026 — Ready
+  </div>
+
+  <h1 class="hero-title">PLAY<span class="accent">DRAWR</span></h1>
+  <div class="hero-title-sub">Football Sweepstakes, Reinvented</div>
+
+  <p class="hero-desc">
+    Run your World Cup sweepstake in minutes. Random draws, live standings, payment tracking — shared with a single link.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#" class="btn-primary">
+      Create your draw
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#how" class="btn-ghost">See how it works</a>
+  </div>
+
+  <div class="draw-orb">
+    <div class="orb-ring"></div>
+    <div class="orb-ring"></div>
+    <div class="orb-ring"></div>
+    <div class="orb-ball ball-1">ENG</div>
+    <div class="orb-ball ball-2">BRA</div>
+    <div class="orb-ball ball-3">ARG</div>
+    <div class="orb-center">
+      <span class="orb-center-text">DRAW</span>
+    </div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-val">48</span>
+    <span class="stat-lbl">Nations</span>
+  </div>
+  <div class="stat">
+    <span class="stat-val">104</span>
+    <span class="stat-lbl">Matches</span>
+  </div>
+  <div class="stat">
+    <span class="stat-val">30s</span>
+    <span class="stat-lbl">To set up</span>
+  </div>
+  <div class="stat">
+    <span class="stat-val">£0</span>
+    <span class="stat-lbl">To start</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">THREE STEPS.<br><span class="accent">ONE DRAW.</span></h2>
+  <p class="section-desc">No spreadsheets. No group chats. No chasing people for cash. Just a link.</p>
+
+  <div class="steps reveal">
+    <div class="step">
+      <span class="step-num">01</span>
+      <div class="step-title">Create your sweepstake</div>
+      <p class="step-desc">Name it, set your entry fee, add your participants. Takes under a minute.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <div class="step-title">Run the draw</div>
+      <p class="step-desc">Hit the button. All 48 World Cup teams are randomly assigned across your players.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <div class="step-title">Share the link</div>
+      <p class="step-desc">One URL. Everyone can follow live standings, their teams, and the leaderboard.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <div class="step-title">Track it all</div>
+      <p class="step-desc">Live scores, group standings, knockout bracket and payment tracking — all in one place.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="padding-top:0;">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">EVERYTHING YOU<br><span class="accent">NEED.</span></h2>
+  <p class="section-desc">Built for pub landlords, office managers, and anyone who runs the sweepstake every tournament.</p>
+
+  <div class="features reveal">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Instant random draw</div>
+      <p class="feature-desc">Cryptographically fair distribution of all 48 teams across any number of participants. Fully auditable.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📡</div>
+      <div class="feature-title">Live scores & standings</div>
+      <p class="feature-desc">Group tables and knockout results update automatically from official data. No manual entry needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💷</div>
+      <div class="feature-title">Payment tracking</div>
+      <p class="feature-desc">Mark participants paid or unpaid. See your collected pot at a glance. Collect online via Stripe.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">Shareable participant view</div>
+      <p class="feature-desc">One link, no login required. Participants see their teams, live standings, and the full leaderboard.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">Automatic leaderboard</div>
+      <p class="feature-desc">Points calculated in real time as results come in. Group wins, knockout rounds, and the final.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Group bracket view</div>
+      <p class="feature-desc">Full group stage tables with P, W, D, L, GD and Pts. Qualified positions highlighted automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">SIMPLE,<br><span class="accent">HONEST PRICING.</span></h2>
+  <p class="section-desc">Start free. Pay only when you need more.</p>
+
+  <div class="pricing-grid reveal">
+    <div class="price-card">
+      <div class="price-tier">Free</div>
+      <div class="price-amount">£0</div>
+      <div class="price-period">forever</div>
+      <ul class="price-features">
+        <li>Up to 10 participants</li>
+        <li>Full random draw</li>
+        <li>Shareable participant link</li>
+        <li>Payment tracking</li>
+        <li>Group & knockout standings</li>
+        <li>Ads on participant view</li>
+      </ul>
+      <a href="#" class="btn-ghost" style="width:100%;justify-content:center;">Get started free</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="featured-badge">Most popular</div>
+      <div class="price-tier">Pro</div>
+      <div class="price-amount">£2</div>
+      <div class="price-period">per sweepstake</div>
+      <ul class="price-features">
+        <li>Unlimited participants</li>
+        <li>No ads for participants</li>
+        <li>Online entry fee collection</li>
+        <li>PDF results export</li>
+        <li>Priority support</li>
+        <li>Early access to new sports</li>
+      </ul>
+      <a href="#" class="btn-primary" style="width:100%;justify-content:center;">Start this draw →</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-tier">Business</div>
+      <div class="price-amount">£15</div>
+      <div class="price-period">per month</div>
+      <ul class="price-features">
+        <li>Unlimited sweepstakes</li>
+        <li>Custom branding & colours</li>
+        <li>Your logo on participant view</li>
+        <li>Bulk participant import</li>
+        <li>Analytics dashboard</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="#" class="btn-ghost" style="width:100%;justify-content:center;">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST / TESTIMONIALS -->
+<div class="trust-strip">
+  <div class="trust-label">Trusted by sweepstake organisers across the UK</div>
+  <div class="testimonials">
+    <div class="testimonial">
+      <p class="testimonial-text">"Finally sorted our office sweepstake without a single WhatsApp argument about who got which team. Sent one link, job done."</p>
+      <div class="testimonial-author">Sarah M.</div>
+      <div class="testimonial-role">Office Manager, Manchester</div>
+    </div>
+    <div class="testimonial">
+      <p class="testimonial-text">"Been running the pub sweepstake on a spreadsheet for years. This is embarrassingly better. Worth every penny."</p>
+      <div class="testimonial-author">Dave K.</div>
+      <div class="testimonial-role">Pub landlord, Leeds</div>
+    </div>
+    <div class="testimonial">
+      <p class="testimonial-text">"The payment tracking alone saved me chasing half the lads for weeks. Everyone can see who's paid which sorts it out instantly."</p>
+      <div class="testimonial-author">Jamie T.</div>
+      <div class="testimonial-role">5-a-side organiser, Bristol</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <h2 class="cta-title">YOUR DRAW.<br><span class="accent">YOUR RULES.</span></h2>
+  <p class="cta-sub">Set up your World Cup 2026 sweepstake in 30 seconds. Free to start.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="#" class="btn-primary" style="font-size:16px;padding:16px 40px;">
+      Create your draw
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+  <p style="margin-top:20px;font-size:13px;color:var(--muted);">No credit card required · Free tier always available · playdrawr.co.uk</p>
+</div>
+
+<!-- BRAND SECTION -->
+<section>
+  <div class="section-label">Brand identity</div>
+  <h2 class="section-title">THE<br><span class="accent">DRAWR MARK.</span></h2>
+  <p class="section-desc">Dark, confident, and built for the floodlit atmosphere of tournament football.</p>
+
+  <div class="brand-showcase">
+    <div class="brand-panel dark">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="25" stroke="#b8ff47" stroke-width="1"/>
+          <circle cx="26" cy="26" r="16" stroke="#b8ff47" stroke-width="0.5" stroke-dasharray="4 4"/>
+          <circle cx="26" cy="7" r="6" fill="#b8ff47"/>
+          <circle cx="43" cy="36" r="4.5" fill="#141414" stroke="#333" stroke-width="0.5"/>
+          <circle cx="9" cy="36" r="4.5" fill="#141414" stroke="#333" stroke-width="0.5"/>
+        </svg>
+        <div>
+          <div class="logo-large" style="color:var(--white);">DRAW<span style="color:var(--green);">R</span></div>
+          <div style="font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px;">playdrawr.co.uk</div>
+        </div>
+      </div>
+      <div class="brand-swatch-row">
+        <div class="swatch" style="background:#0a0a0a;border:1px solid #333;"><span class="swatch-label" style="color:#666;">#0a0a0a</span></div>
+        <div class="swatch" style="background:#b8ff47;"><span class="swatch-label" style="color:#0a0a0a;">#b8ff47</span></div>
+        <div class="swatch" style="background:#141414;border:1px solid #333;"><span class="swatch-label" style="color:#666;">#141414</span></div>
+        <div class="swatch" style="background:#f5f5f0;"><span class="swatch-label" style="color:#333;">#f5f5f0</span></div>
+        <div class="swatch" style="background:#6b6b65;"><span class="swatch-label" style="color:#333;">#6b6b65</span></div>
+      </div>
+      <div class="brand-type-row">
+        <div class="type-sample" style="font-size:32px;color:var(--white);">BEBAS NEUE</div>
+        <div class="type-sample" style="font-size:20px;color:var(--green);">DISPLAY FONT</div>
+        <div class="type-body-sample" style="color:rgba(245,245,240,0.6);">DM Sans — Body copy, UI elements, and all supporting text at weights 300–500.</div>
+      </div>
+    </div>
+
+    <div class="brand-panel light" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="25" stroke="#0a0a0a" stroke-width="1"/>
+          <circle cx="26" cy="26" r="16" stroke="#0a0a0a" stroke-width="0.5" stroke-dasharray="4 4"/>
+          <circle cx="26" cy="7" r="6" fill="#0a0a0a"/>
+          <circle cx="43" cy="36" r="4.5" fill="white" stroke="#ccc" stroke-width="0.5"/>
+          <circle cx="9" cy="36" r="4.5" fill="white" stroke="#ccc" stroke-width="0.5"/>
+        </svg>
+        <div>
+          <div class="logo-large" style="color:#0a0a0a;">DRAW<span style="color:#3a7a0a;">R</span></div>
+          <div style="font-size:11px;letter-spacing:3px;color:#999;text-transform:uppercase;margin-top:2px;">playdrawr.co.uk</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:8px;">Light variant — for print and light backgrounds</div>
+        <div style="font-size:13px;color:#555;font-weight:300;line-height:1.6;">The Drawr mark works across dark digital surfaces and light print collateral. The circular orbit symbol represents the draw mechanic — three balls, one of which is always highlighted.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div class="swatch" style="background:#0a0a0a;"><span class="swatch-label" style="color:#b8ff47;">#0a0a0a</span></div>
+        <div class="swatch" style="background:#3a7a0a;"><span class="swatch-label" style="color:#eaf3de;">#3a7a0a</span></div>
+        <div class="swatch" style="background:#f5f5f0;border:1px solid #ddd;"><span class="swatch-label" style="color:#999;">#f5f5f0</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DRAW<span>R</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Privacy policy</a></li>
+    <li><a href="#">Terms of service</a></li>
+    <li><a href="#">Contact</a></li>
+    <li><a href="#">Blog</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Drawr. All rights reserved.</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
