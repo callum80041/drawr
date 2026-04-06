@@ -15,6 +15,7 @@ export default function JoinPage({ params }: Props) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [honeypot, setHoneypot] = useState('') // spam trap
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number } | null>(null)
@@ -168,13 +169,37 @@ export default function JoinPage({ params }: Props) {
                 <p className="text-xs text-mid mt-1.5">Used to verify your entry. No spam, ever.</p>
               </div>
 
+              {/* 18+ confirmation */}
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  required
+                  checked={ageConfirmed}
+                  onChange={e => setAgeConfirmed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-[#D1D9D5] accent-[#1A2E22] shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-mid leading-relaxed group-hover:text-pitch transition-colors">
+                  I confirm I am aged 18 or over. I understand this is a sweepstake for entertainment purposes only —
+                  no gambling services are provided.{' '}
+                  <a
+                    href="/responsible-gambling"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-grass hover:underline"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    Gamble responsibly.
+                  </a>
+                </span>
+              </label>
+
               {status === 'error' && errorMsg && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{errorMsg}</p>
               )}
 
               <button
                 type="submit"
-                disabled={status === 'submitting' || !name.trim() || !email.trim()}
+                disabled={status === 'submitting' || !name.trim() || !email.trim() || !ageConfirmed}
                 className="w-full bg-lime text-pitch font-bold text-base py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === 'submitting' ? 'Joining…' : 'Join sweepstake →'}

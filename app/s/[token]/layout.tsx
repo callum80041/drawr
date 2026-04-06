@@ -93,9 +93,25 @@ export default async function PublicLayout({ children, params }: Props) {
         {children}
       </main>
 
-      <footer className="text-center py-6 text-xs text-mid">
-        Powered by{' '}
-        <Link href="/" className="text-grass font-medium hover:underline">playdrawr</Link>
+      <footer className="text-center py-6 px-4 space-y-1.5">
+        <p className="text-xs text-mid">
+          Powered by{' '}
+          <Link href="/" className="text-grass font-medium hover:underline">playdrawr</Link>
+        </p>
+        <p className="text-xs text-mid/60">
+          Sweepstake tool for entertainment purposes only. No gambling services provided.
+        </p>
+        <p className="text-xs text-mid/60">
+          18+ only. Please gamble responsibly.{' '}
+          <a
+            href="https://www.begambleaware.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-mid transition-colors"
+          >
+            BeGambleAware.org
+          </a>
+        </p>
       </footer>
     </div>
   )
