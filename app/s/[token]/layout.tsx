@@ -32,6 +32,9 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
   return {
     title,
     description,
+    other: {
+      'google-adsense-account': 'ca-pub-4502089642412261',
+    },
     openGraph: {
       title,
       description,

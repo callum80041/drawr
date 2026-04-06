@@ -12,6 +12,9 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 export const metadata: Metadata = {
   title: 'playdrawr — Free World Cup 2026 Sweepstake',
   description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
+  other: {
+    'google-adsense-account': 'ca-pub-4502089642412261',
+  },
   openGraph: {
     title: 'playdrawr — Free World Cup 2026 Sweepstake',
     description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
