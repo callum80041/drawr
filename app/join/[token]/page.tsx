@@ -86,8 +86,16 @@ export default function JoinPage({ params }: Props) {
                 </div>
               )}
 
+              {/* View leaderboard */}
+              <Link
+                href={`/s/${token}`}
+                className="block mt-5 bg-pitch text-white font-bold text-sm text-center py-3.5 rounded-xl hover:bg-pitch/90 transition-colors"
+              >
+                View the leaderboard →
+              </Link>
+
               {/* Tell a mate */}
-              <div className="mt-5 bg-light rounded-xl px-5 py-4 text-left">
+              <div className="mt-4 bg-light rounded-xl px-5 py-4 text-left">
                 <p className="text-sm font-semibold text-pitch mb-0.5">Know someone else who&apos;d want in?</p>
                 <p className="text-xs text-mid mb-3">Send them the join link.</p>
                 <ShareButtons url={joinUrl} sweepstakeName={successData.sweepstakeName} />
