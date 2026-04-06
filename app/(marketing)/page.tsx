@@ -300,7 +300,7 @@ export default async function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="/leaderboard/demo2026"
+                  href="/s/demo2026"
                   className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
                 >
                   View demo leaderboard
