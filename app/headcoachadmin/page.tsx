@@ -42,7 +42,8 @@ async function fetchVercelAnalytics() {
 export default async function HeadCoachAdminPage() {
   const cookieStore = await cookies()
   const adminCookie = cookieStore.get('hc_admin')
-  const isAuthed = adminCookie?.value === process.env.ADMIN_PASSWORD
+  const adminPassword = process.env.ADMIN_PASSWORD
+  const isAuthed = !!adminPassword && !!adminCookie?.value && adminCookie.value === adminPassword
 
   if (!isAuthed) return <AdminLogin />
 
