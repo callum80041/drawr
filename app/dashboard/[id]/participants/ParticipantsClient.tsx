@@ -134,7 +134,7 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
       <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
         <h2 className="font-heading font-bold text-pitch tracking-tight mb-4">Add participant</h2>
         <form onSubmit={handleAdd} className="space-y-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               required
@@ -142,7 +142,7 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
               value={name}
               onChange={e => setName(e.target.value)}
               disabled={atCap}
-              className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:bg-light disabled:cursor-not-allowed"
+              className="w-full sm:flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:bg-light disabled:cursor-not-allowed"
             />
             <input
               type="email"
@@ -150,12 +150,12 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={atCap}
-              className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:bg-light disabled:cursor-not-allowed"
+              className="w-full sm:flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:bg-light disabled:cursor-not-allowed"
             />
             <button
               type="submit"
               disabled={atCap || !name.trim()}
-              className="bg-lime text-pitch text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              className="w-full sm:w-auto bg-lime text-pitch text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             >
               Add
             </button>

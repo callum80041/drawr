@@ -22,9 +22,9 @@ export function PaymentSummary({ total, paid, entryFee }: Props) {
   ]
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className={`grid gap-3 ${stats.length <= 3 ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-5'}`}>
       {stats.map(s => (
-        <div key={s.label} className="bg-white rounded-xl border border-[#E5EDEA] px-4 py-3 min-w-[90px]">
+        <div key={s.label} className="bg-white rounded-xl border border-[#E5EDEA] px-4 py-3">
           <p className={`text-xl font-heading font-bold ${s.accent ? 'text-grass' : 'text-pitch'}`}>
             {s.value}
           </p>
