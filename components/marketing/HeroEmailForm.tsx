@@ -44,7 +44,7 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
 
   if (status === 'success') {
     return (
-      <div className="flex items-start gap-3 bg-lime/15 border border-lime/30 rounded-xl px-5 py-4 max-w-md mx-auto">
+      <div className="flex items-start gap-3 bg-lime/15 border border-lime/30 rounded-xl px-5 py-4 max-w-md mx-auto text-left">
         <div className="w-5 h-5 rounded-full bg-lime flex items-center justify-center shrink-0 mt-0.5">
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
             <path d="M1 4l2.5 2.5L9 1" stroke="#0B3D2E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -52,7 +52,16 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
         </div>
         <div>
           <p className="text-sm font-semibold text-white">You&apos;re reserved!</p>
-          <p className="text-sm text-white/70 mt-0.5">Check your email — your dashboard is waiting.</p>
+          <p className="text-sm text-white/70 mt-0.5">
+            We&apos;ve sent a magic link to <span className="text-white font-medium">{email}</span> — click it to open your dashboard.
+          </p>
+          <p className="text-xs text-white/50 mt-2">
+            Next time, sign in at{' '}
+            <a href="/login" className="text-lime hover:underline">
+              playdrawr.co.uk/login
+            </a>
+            {' '}→ use &ldquo;Magic link&rdquo; with the same email.
+          </p>
         </div>
       </div>
     )
