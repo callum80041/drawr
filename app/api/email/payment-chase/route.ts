@@ -14,25 +14,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing sweepstakeId' }, { status: 400 })
   }
 
-  // Verify the organiser owns this sweepstake and fetch details
+  // Get organiser row (id ≠ user.id)
+  const { data: organiser } = await supabase
+    .from('organisers')
+    .select('id, name')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!organiser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  // Verify the organiser owns this sweepstake
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
     .select('id, name, share_token, organiser_id, entry_fee')
     .eq('id', sweepstakeId)
+    .eq('organiser_id', organiser.id)
     .single()
 
-  if (!sweepstake || sweepstake.organiser_id !== user.id) {
+  if (!sweepstake) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // Get organiser name
-  const { data: organiser } = await supabase
-    .from('organisers')
-    .select('name')
-    .eq('user_id', user.id)
-    .single()
-
-  const organiserName = organiser?.name ?? 'Your organiser'
+  const organiserName = organiser.name ?? 'Your organiser'
 
   const emailArgs = {
     sweepstakeName: sweepstake.name,
