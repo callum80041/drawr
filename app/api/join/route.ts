@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'That email address has already been used to join this sweepstake.' }, { status: 400 })
   }
 
-  // Free plan cap
+  // Free plan cap — if full, add to waitlist instead of blocking
   if (sweepstake.plan === 'free') {
     const { count } = await supabase
       .from('participants')
@@ -66,7 +66,37 @@ export async function POST(req: NextRequest) {
       .eq('sweepstake_id', sweepstake.id)
 
     if ((count ?? 0) >= 48) {
-      return NextResponse.json({ error: 'This sweepstake is full.' }, { status: 400 })
+      // Check not already on waitlist
+      const { count: wCount } = await supabase
+        .from('waitlist')
+        .select('*', { count: 'exact', head: true })
+        .eq('sweepstake_id', sweepstake.id)
+        .eq('email', email.trim().toLowerCase())
+
+      if ((wCount ?? 0) > 0) {
+        return NextResponse.json({ error: 'You\'re already on the reserve list for this sweepstake.' }, { status: 400 })
+      }
+
+      const { data: waitlistEntry, error: wErr } = await service
+        .from('waitlist')
+        .insert({
+          sweepstake_id: sweepstake.id,
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+        })
+        .select('id, name, email')
+        .single()
+
+      if (wErr || !waitlistEntry) {
+        return NextResponse.json({ error: 'Failed to join reserve list. Please try again.' }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        ok: true,
+        waitlisted: true,
+        participant: { name: waitlistEntry.name },
+        sweepstake: { name: sweepstake.name, entryFee: Number(sweepstake.entry_fee ?? 0) },
+      })
     }
   }
 

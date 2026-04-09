@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PaymentSummary } from '@/components/dashboard/PaymentSummary'
 import { ParticipantRow } from '@/components/dashboard/ParticipantRow'
+import { WaitlistRow, type WaitlistEntry } from '@/components/dashboard/WaitlistRow'
 
 const FREE_PLAN_CAP = 48
 
@@ -19,13 +20,15 @@ interface Props {
   plan: string
   entryFee: number
   initialParticipants: Participant[]
+  initialWaitlist: WaitlistEntry[]
   organiserName: string
   organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialParticipants, organiserName, organiserEmail }: Props) {
+export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(initialWaitlist)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
@@ -42,6 +45,15 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
   function fillAsOrganiser() {
     setName(organiserName)
     setEmail(organiserEmail)
+  }
+
+  function handleWaitlistPromote(id: string, participant: Participant) {
+    setWaitlist(prev => prev.filter(e => e.id !== id))
+    setParticipants(prev => [...prev, participant])
+  }
+
+  function handleWaitlistRemove(id: string) {
+    setWaitlist(prev => prev.filter(e => e.id !== id))
   }
   const [chaseAllStatus, setChaseAllStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
@@ -254,6 +266,35 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
       {participants.length === 0 && (
         <div className="text-center py-12 text-mid text-sm">
           No participants yet. Add the first one above.
+        </div>
+      )}
+
+      {/* Reserve / waitlist */}
+      {waitlist.length > 0 && (
+        <div className="bg-white rounded-xl border border-amber-200 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-amber-100 bg-amber-50">
+            <div>
+              <h2 className="font-heading font-bold text-pitch tracking-tight">
+                Reserve list
+                <span className="ml-2 text-sm font-normal text-mid font-body">{waitlist.length}</span>
+              </h2>
+              <p className="text-xs text-amber-700 mt-0.5">
+                {atCap ? 'Sweepstake is full — remove a participant to promote someone.' : 'Promote to move someone into a confirmed spot.'}
+              </p>
+            </div>
+          </div>
+          <ul className="px-4 py-2 divide-y divide-[#E5EDEA]/60">
+            {waitlist.map(entry => (
+              <WaitlistRow
+                key={entry.id}
+                entry={entry}
+                sweepstakeId={sweepstakeId}
+                atCap={atCap}
+                onPromote={handleWaitlistPromote}
+                onRemove={handleWaitlistRemove}
+              />
+            ))}
+          </ul>
         </div>
       )}
     </div>

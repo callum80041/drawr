@@ -29,11 +29,18 @@ export default async function ParticipantsPage({ params }: Props) {
 
   if (!sweepstake || sweepstake.organiser_id !== organiser.id) notFound()
 
-  const { data: participants } = await supabase
-    .from('participants')
-    .select('id, name, email, paid')
-    .eq('sweepstake_id', id)
-    .order('created_at', { ascending: true })
+  const [{ data: participants }, { data: waitlist }] = await Promise.all([
+    supabase
+      .from('participants')
+      .select('id, name, email, paid')
+      .eq('sweepstake_id', id)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('waitlist')
+      .select('id, name, email, created_at')
+      .eq('sweepstake_id', id)
+      .order('created_at', { ascending: true }),
+  ])
 
   return (
     <ParticipantsClient
@@ -41,6 +48,7 @@ export default async function ParticipantsPage({ params }: Props) {
       plan={sweepstake.plan}
       entryFee={Number(sweepstake.entry_fee)}
       initialParticipants={participants ?? []}
+      initialWaitlist={waitlist ?? []}
       organiserName={organiser?.name ?? ''}
       organiserEmail={organiser?.email ?? ''}
     />

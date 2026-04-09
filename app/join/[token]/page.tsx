@@ -18,7 +18,7 @@ export default function JoinPage({ params }: Props) {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number } | null>(null)
+  const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number; waitlisted: boolean } | null>(null)
 
   const joinUrl = `${APP_URL}/join/${token}`
 
@@ -46,6 +46,7 @@ export default function JoinPage({ params }: Props) {
         name: data.participant.name,
         sweepstakeName: data.sweepstake.name,
         entryFee: data.sweepstake.entryFee,
+        waitlisted: !!data.waitlisted,
       })
       setStatus('success')
     } catch {
@@ -55,6 +56,8 @@ export default function JoinPage({ params }: Props) {
   }
 
   if (status === 'success' && successData) {
+    const isWaitlisted = successData.waitlisted
+
     return (
       <div className="min-h-screen bg-light flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">
@@ -64,19 +67,41 @@ export default function JoinPage({ params }: Props) {
               <p className="text-sm text-white/50 mt-1">World Cup 2026 Sweepstakes</p>
             </div>
             <div className="px-8 py-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-lime flex items-center justify-center mx-auto mb-4">
-                <svg width="28" height="22" viewBox="0 0 28 22" fill="none">
-                  <path d="M2 11l7 7L26 2" stroke="#1A2E22" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isWaitlisted ? 'bg-amber-100' : 'bg-lime'}`}>
+                {isWaitlisted ? (
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="11" stroke="#92400e" strokeWidth="2.5"/>
+                    <path d="M14 8v6l4 2" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="28" height="22" viewBox="0 0 28 22" fill="none">
+                    <path d="M2 11l7 7L26 2" stroke="#1A2E22" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
               </div>
-              <h1 className="text-2xl font-heading font-black text-pitch tracking-tight mb-2">You&apos;re in! ⚽</h1>
-              <p className="text-mid text-sm leading-relaxed mb-2">
-                Welcome to <strong className="text-pitch">{successData.sweepstakeName}</strong>, {successData.name}.
-              </p>
-              <p className="text-mid text-sm leading-relaxed">
-                Sit tight — you&apos;ll find out which team you&apos;ve drawn once the organiser runs the draw.
-                Fingers crossed for a decent one.
-              </p>
+
+              {isWaitlisted ? (
+                <>
+                  <h1 className="text-2xl font-heading font-black text-pitch tracking-tight mb-2">You&apos;re on the reserve list ⏳</h1>
+                  <p className="text-mid text-sm leading-relaxed mb-2">
+                    <strong className="text-pitch">{successData.sweepstakeName}</strong> is currently full, {successData.name}.
+                  </p>
+                  <p className="text-mid text-sm leading-relaxed">
+                    You&apos;re on the reserve list — if a spot opens up we&apos;ll email you straight away. Fingers crossed!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl font-heading font-black text-pitch tracking-tight mb-2">You&apos;re in! ⚽</h1>
+                  <p className="text-mid text-sm leading-relaxed mb-2">
+                    Welcome to <strong className="text-pitch">{successData.sweepstakeName}</strong>, {successData.name}.
+                  </p>
+                  <p className="text-mid text-sm leading-relaxed">
+                    Sit tight — you&apos;ll find out which team you&apos;ve drawn once the organiser runs the draw.
+                    Fingers crossed for a decent one.
+                  </p>
+                </>
+              )}
 
               {successData.entryFee > 0 && (
                 <div className="mt-5 bg-light rounded-xl px-5 py-4 text-left">

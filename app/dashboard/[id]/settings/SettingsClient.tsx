@@ -16,6 +16,7 @@ interface Props {
   initialMode: Mode
   initialPrizeType: PrizeType
   initialPayoutStructure: PayoutStructure
+  initialImageUrl: string | null
   drawDone: boolean
   status: string
 }
@@ -27,6 +28,7 @@ export function SettingsClient({
   initialMode,
   initialPrizeType,
   initialPayoutStructure,
+  initialImageUrl,
   drawDone,
   status,
 }: Props) {
@@ -34,6 +36,61 @@ export function SettingsClient({
   const supabase = createClient()
 
   const [name, setName] = useState(initialName)
+  const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadError('')
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) {
+      setUploadError('Please upload a JPEG, PNG, or WebP image.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image must be under 5 MB.')
+      return
+    }
+
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = `${sweepstakeId}/${Date.now()}.${ext}`
+
+    // Delete old image if exists
+    if (imageUrl) {
+      const oldPath = imageUrl.split('/sweepstake-images/')[1]
+      if (oldPath) await supabase.storage.from('sweepstake-images').remove([oldPath])
+    }
+
+    const { error: uploadErr } = await supabase.storage
+      .from('sweepstake-images')
+      .upload(path, file, { upsert: false })
+
+    if (uploadErr) {
+      setUploadError(uploadErr.message)
+      setUploading(false)
+      return
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from('sweepstake-images').getPublicUrl(path)
+
+    await supabase.from('sweepstakes').update({ image_url: publicUrl }).eq('id', sweepstakeId)
+    setImageUrl(publicUrl)
+    setUploading(false)
+    router.refresh()
+  }
+
+  async function handleRemovePhoto() {
+    if (!imageUrl) return
+    const oldPath = imageUrl.split('/sweepstake-images/')[1]
+    if (oldPath) await supabase.storage.from('sweepstake-images').remove([oldPath])
+    await supabase.from('sweepstakes').update({ image_url: null }).eq('id', sweepstakeId)
+    setImageUrl(null)
+    router.refresh()
+  }
   const [entryFee, setEntryFee] = useState(initialEntryFee > 0 ? String(initialEntryFee) : '')
   const [mode, setMode] = useState<Mode>(initialMode)
   const [prizeType, setPrizeType] = useState<PrizeType>(initialPrizeType)
@@ -101,6 +158,38 @@ export function SettingsClient({
 
       {/* Main settings form */}
       <form onSubmit={handleSave} className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
+
+          {/* Cover photo */}
+        <div className="p-6">
+          <p className="text-sm font-medium text-pitch mb-1">Cover photo <span className="text-mid font-normal">(optional)</span></p>
+          <p className="text-xs text-mid mb-4">Shown as a banner on your public leaderboard. JPEG, PNG or WebP, max 5 MB.</p>
+
+          {imageUrl ? (
+            <div className="space-y-3">
+              <img src={imageUrl} alt="Cover" className="w-full h-40 object-cover rounded-xl border border-[#E5EDEA]" />
+              <div className="flex gap-3">
+                <label className="cursor-pointer text-xs font-medium text-grass hover:underline">
+                  Change photo
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+                </label>
+                <button type="button" onClick={handleRemovePhoto} className="text-xs text-mid hover:text-red-500 transition-colors">
+                  Remove
+                </button>
+              </div>
+            </div>
+          ) : (
+            <label className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D1D9D5] rounded-xl px-6 py-10 cursor-pointer hover:border-grass hover:bg-grass/5 transition-colors ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-mid">
+                <path d="M6 22l6-8 5 6 3-4 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="21" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+              </svg>
+              <p className="text-sm text-mid">{uploading ? 'Uploading…' : 'Click to upload a photo'}</p>
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+            </label>
+          )}
+          {uploadError && <p className="text-xs text-red-500 mt-2">{uploadError}</p>}
+        </div>
 
         {/* Name */}
         <div className="p-6">
