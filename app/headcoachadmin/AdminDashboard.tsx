@@ -120,6 +120,7 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [bulkResult, setBulkResult] = useState<{ sent: number; failed: number } | null>(null)
   const [bulkError, setBulkError] = useState('')
+  const [emailPreviewVersion, setEmailPreviewVersion] = useState<'A' | 'B' | null>(null)
 
   async function handleBulkPreview() {
     setBulkStep('loading')
@@ -314,6 +315,34 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
                 </div>
               </div>
               {bulkError && <p className="px-5 py-3 text-xs text-red-600">{bulkError}</p>}
+
+              {/* Email preview */}
+              <div className="px-5 py-3 border-b border-[#E5EDEA] flex items-center gap-3">
+                <span className="text-xs text-mid">Preview email:</span>
+                <button
+                  onClick={() => setEmailPreviewVersion(emailPreviewVersion === 'A' ? null : 'A')}
+                  className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors ${emailPreviewVersion === 'A' ? 'bg-lime text-pitch' : 'bg-light text-mid hover:text-pitch'}`}
+                >
+                  Version A (with join link)
+                </button>
+                <button
+                  onClick={() => setEmailPreviewVersion(emailPreviewVersion === 'B' ? null : 'B')}
+                  className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors ${emailPreviewVersion === 'B' ? 'bg-amber-200 text-amber-900' : 'bg-light text-mid hover:text-pitch'}`}
+                >
+                  Version B (create CTA)
+                </button>
+              </div>
+              {emailPreviewVersion && (
+                <div className="border-b border-[#E5EDEA]">
+                  <iframe
+                    src={`/api/headcoachadmin/email-preview?version=${emailPreviewVersion}`}
+                    className="w-full"
+                    style={{ height: 600, border: 'none' }}
+                    title={`Email preview version ${emailPreviewVersion}`}
+                  />
+                </div>
+              )}
+
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[#E5EDEA] bg-light">
