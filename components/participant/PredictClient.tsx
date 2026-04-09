@@ -36,15 +36,19 @@ interface CommunityGroup {
 interface Props {
   sweepstakeId: string
   groups: Group[]
+  initialParticipant?: { id: string; name: string } | null
+  initialPicks?: Record<string, Pick>
 }
 
-export function PredictClient({ sweepstakeId, groups }: Props) {
+export function PredictClient({ sweepstakeId, groups, initialParticipant = null, initialPicks = {} }: Props) {
   const isPast = new Date() > DEADLINE
 
-  const [step, setStep] = useState<'email' | 'predict' | 'done'>(isPast ? 'done' : 'email')
+  const startStep = isPast ? 'done' : initialParticipant ? 'predict' : 'email'
+
+  const [step, setStep] = useState<'email' | 'predict' | 'done'>(startStep)
   const [email, setEmail] = useState('')
-  const [participant, setParticipant] = useState<{ id: string; name: string } | null>(null)
-  const [picks, setPicks] = useState<Record<string, Pick>>({})
+  const [participant, setParticipant] = useState<{ id: string; name: string } | null>(initialParticipant)
+  const [picks, setPicks] = useState<Record<string, Pick>>(initialPicks)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [communityPicks, setCommunityPicks] = useState<CommunityGroup[]>([])
