@@ -36,6 +36,18 @@ const navItems = [
     ),
     exact: false,
   },
+  {
+    href: '/dashboard/help',
+    label: 'Help & guide',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6.5 7c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5c0 1.5-2.5 2-2.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="9" cy="13.5" r="0.75" fill="currentColor" />
+      </svg>
+    ),
+    exact: false,
+  },
 ]
 
 export function Sidebar({ organiserName, userEmail }: SidebarProps) {
