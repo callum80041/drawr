@@ -14,14 +14,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing participantId or sweepstakeId' }, { status: 400 })
   }
 
+  const { data: organiser } = await supabase
+    .from('organisers')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!organiser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
   // Verify the organiser owns this sweepstake
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
     .select('id, name, share_token, organiser_id')
     .eq('id', sweepstakeId)
+    .eq('organiser_id', organiser.id)
     .single()
 
-  if (!sweepstake || sweepstake.organiser_id !== user.id) {
+  if (!sweepstake) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
