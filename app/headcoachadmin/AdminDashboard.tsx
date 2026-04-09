@@ -86,10 +86,36 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null) // organiserId awaiting confirm
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState('')
 
   async function handleLogout() {
     await fetch('/api/headcoachadmin', { method: 'DELETE' })
     router.refresh()
+  }
+
+  async function handleDelete(organiserId: string) {
+    setDeleting(organiserId)
+    setDeleteError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/delete-organiser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organiserId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setDeleteError(data.error ?? 'Failed to delete.')
+        setDeleting(null)
+        return
+      }
+      setConfirmDelete(null)
+      router.refresh()
+    } catch {
+      setDeleteError('Something went wrong.')
+      setDeleting(null)
+    }
   }
 
   const emailPct = stats.totalParticipants > 0
@@ -218,6 +244,38 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
                     </div>
                     <span className="text-mid text-xs ml-2">{isOpen ? '▲' : '▼'}</span>
                   </button>
+
+                  {/* Delete controls */}
+                  {confirmDelete === o.id ? (
+                    <div className="px-5 py-3 bg-red-50 border-t border-red-100 flex items-center gap-3 flex-wrap">
+                      <p className="text-xs text-red-700 flex-1">
+                        Delete <strong>{o.name}</strong> and all their sweepstakes, participants and assignments? This cannot be undone.
+                      </p>
+                      <button
+                        onClick={() => handleDelete(o.id)}
+                        disabled={deleting === o.id}
+                        className="text-xs font-semibold bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                      >
+                        {deleting === o.id ? 'Deleting…' : 'Yes, delete everything'}
+                      </button>
+                      <button
+                        onClick={() => { setConfirmDelete(null); setDeleteError('') }}
+                        className="text-xs text-mid hover:text-pitch transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      {deleteError && <p className="text-xs text-red-600 w-full">{deleteError}</p>}
+                    </div>
+                  ) : (
+                    <div className="px-5 pb-3 flex justify-end">
+                      <button
+                        onClick={() => { setConfirmDelete(o.id); setExpandedOrganiser(null) }}
+                        className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                      >
+                        Delete organiser
+                      </button>
+                    </div>
+                  )}
 
                   {/* Sweepstakes */}
                   {isOpen && (
