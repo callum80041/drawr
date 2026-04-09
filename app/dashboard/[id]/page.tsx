@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ShareButtons } from '@/components/dashboard/ShareButtons'
+import { EntryFeeEditor } from '@/components/dashboard/EntryFeeEditor'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -75,13 +76,13 @@ export default async function SweepstakeOverviewPage({ params }: Props) {
           { label: 'Participants', value: participantCount ?? 0 },
           { label: 'Paid', value: paidCount ?? 0 },
           { label: 'Teams assigned', value: assignmentCount ?? 0 },
-          { label: 'Entry fee', value: sweepstake.entry_fee > 0 ? `£${Number(sweepstake.entry_fee).toFixed(2)}` : '—' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl p-4 border border-[#E5EDEA]">
             <p className="text-2xl font-heading font-bold text-pitch">{s.value}</p>
             <p className="text-xs text-mid mt-0.5">{s.label}</p>
           </div>
         ))}
+        <EntryFeeEditor sweepstakeId={id} initialFee={Number(sweepstake.entry_fee ?? 0)} />
       </div>
 
       {/* Setup checklist */}
@@ -186,7 +187,7 @@ export default async function SweepstakeOverviewPage({ params }: Props) {
           <div>
             <dt className="text-xs text-mid uppercase tracking-wide mb-0.5">Entry fee</dt>
             <dd className="text-pitch">
-              {sweepstake.entry_fee > 0 ? `£${Number(sweepstake.entry_fee).toFixed(2)}` : 'Free'}
+              {sweepstake.entry_fee > 0 ? `£${Number(sweepstake.entry_fee).toFixed(2)} per participant` : 'Free'}
             </dd>
           </div>
         </dl>

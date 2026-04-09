@@ -98,7 +98,7 @@ export function CreateForm({ organiserId }: Props) {
       {/* Entry fee */}
       <div>
         <label htmlFor="entry-fee" className="block text-sm font-medium text-pitch mb-1.5">
-          Entry fee <span className="text-mid font-normal">(optional)</span>
+          Entry fee per participant <span className="text-mid font-normal">(optional)</span>
         </label>
         <div className="relative max-w-xs">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mid text-sm">£</span>
@@ -113,7 +113,7 @@ export function CreateForm({ organiserId }: Props) {
             className="w-full pl-7 pr-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
           />
         </div>
-        <p className="text-xs text-mid mt-1.5">Display only — payment collection is tracked manually.</p>
+        <p className="text-xs text-mid mt-1.5">How much each person pays to enter. You collect payments yourself — we just track who&apos;s paid.</p>
       </div>
 
       {/* Prize type */}
