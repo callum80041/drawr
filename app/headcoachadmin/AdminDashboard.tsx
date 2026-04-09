@@ -90,6 +90,30 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
   const [deleting, setDeleting] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState('')
 
+  // Reset draw
+  const [confirmResetDraw, setConfirmResetDraw] = useState<string | null>(null) // sweepstakeId
+  const [resettingDraw, setResettingDraw] = useState<string | null>(null)
+  const [resetDrawError, setResetDrawError] = useState('')
+
+  async function handleResetDraw(sweepstakeId: string) {
+    setResettingDraw(sweepstakeId)
+    setResetDrawError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/reset-draw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sweepstakeId }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setResetDrawError(data.error ?? 'Failed'); setResettingDraw(null); return }
+      setConfirmResetDraw(null)
+      router.refresh()
+    } catch {
+      setResetDrawError('Something went wrong.')
+      setResettingDraw(null)
+    }
+  }
+
   // Bulk email
   type Recipient = { id: string; name: string; email: string; version: 'A' | 'B'; joinUrl: string | null }
   const [bulkStep, setBulkStep] = useState<'idle' | 'loading' | 'preview' | 'sending' | 'done'>('idle')
@@ -465,7 +489,41 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
                                   </div>
                                 </div>
 
-                                {/* Participants table */}
+                                {/* Reset draw */}
+                                {s.draw_completed_at && (
+                                  confirmResetDraw === s.id ? (
+                                    <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
+                                      <p className="text-xs text-orange-800 flex-1">
+                                        This will delete all {s.participants.length} team assignments and reset the sweepstake to setup. Cannot be undone.
+                                      </p>
+                                      <button
+                                        onClick={() => handleResetDraw(s.id)}
+                                        disabled={resettingDraw === s.id}
+                                        className="text-xs font-semibold bg-orange-600 text-white px-3 py-1.5 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors shrink-0"
+                                      >
+                                        {resettingDraw === s.id ? 'Resetting…' : 'Yes, reset draw'}
+                                      </button>
+                                      <button
+                                        onClick={() => { setConfirmResetDraw(null); setResetDrawError('') }}
+                                        className="text-xs text-mid hover:text-pitch transition-colors shrink-0"
+                                      >
+                                        Cancel
+                                      </button>
+                                      {resetDrawError && <p className="text-xs text-red-600 w-full">{resetDrawError}</p>}
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-end">
+                                      <button
+                                        onClick={() => setConfirmResetDraw(s.id)}
+                                        className="text-xs text-orange-500 hover:text-orange-700 transition-colors"
+                                      >
+                                        Reset draw
+                                      </button>
+                                    </div>
+                                  )
+                                )}
+
+                              {/* Participants table */}
                                 {s.participants.length === 0 ? (
                                   <p className="text-xs text-mid italic px-1">No participants yet.</p>
                                 ) : (
