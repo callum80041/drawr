@@ -12,6 +12,7 @@ export function PublicTabs({ token }: { token: string }) {
     { href: `${base}/fixtures`,    label: 'Fixtures',    exact: false },
     { href: `${base}/groups`,      label: 'Groups',      exact: false },
     { href: `${base}/bracket`,     label: 'Bracket',     exact: false },
+    { href: `${base}/predict`,     label: 'Predict 🏆',  exact: false },
   ]
 
   return (
