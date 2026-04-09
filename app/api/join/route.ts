@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email'
+import { participantJoinedEmailHtml } from '@/lib/email/templates/participant-joined'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 export async function POST(req: NextRequest) {
   const { token, name, email, website } = await req.json()
@@ -26,10 +30,10 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createClient()
 
-  // Look up sweepstake by share token
+  // Look up sweepstake by share token (include organiser_id for notification)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, plan')
+    .select('id, name, status, entry_fee, plan, organiser_id')
     .eq('share_token', token)
     .single()
 
@@ -78,6 +82,42 @@ export async function POST(req: NextRequest) {
   if (insertError || !participant) {
     return NextResponse.json({ error: 'Failed to join. Please try again.' }, { status: 500 })
   }
+
+  // Fire organiser notification (non-blocking — don't fail the join if email errors)
+  ;(async () => {
+    try {
+      const service = await createServiceClient()
+
+      // Get organiser email (RLS blocks anon client, service client bypasses it)
+      const { data: organiser } = await service
+        .from('organisers')
+        .select('name, email')
+        .eq('id', sweepstake.organiser_id)
+        .single()
+
+      if (!organiser?.email) return
+
+      // Get fresh participant count
+      const { count } = await service
+        .from('participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('sweepstake_id', sweepstake.id)
+
+      await sendEmail({
+        to: organiser.email,
+        subject: `${participant.name} just joined ${sweepstake.name}`,
+        html: participantJoinedEmailHtml({
+          organiserName: organiser.name,
+          participantName: participant.name,
+          sweepstakeName: sweepstake.name,
+          participantCount: count ?? 1,
+          dashboardUrl: `${APP_URL}/dashboard/${sweepstake.id}/participants`,
+        }),
+      })
+    } catch {
+      // Best-effort — never block the join response
+    }
+  })()
 
   return NextResponse.json({
     ok: true,
