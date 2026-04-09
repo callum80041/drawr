@@ -143,7 +143,7 @@ export function PredictClient({ sweepstakeId, groups }: Props) {
               const total = g.picks.reduce((sum, p) => sum + p.count, 0)
               return (
                 <div key={g.groupName} className="bg-white rounded-xl border border-[#E5EDEA] p-5">
-                  <h3 className="font-heading font-bold text-pitch mb-3">Group {g.groupName}</h3>
+                  <h3 className="font-heading font-bold text-pitch mb-3">{g.groupName}</h3>
                   <div className="space-y-2">
                     {g.picks.map(pick => {
                       const pct = total > 0 ? Math.round((pick.count / total) * 100) : 0
@@ -235,7 +235,7 @@ export function PredictClient({ sweepstakeId, groups }: Props) {
             const selected = picks[group.name]
             return (
               <div key={group.name} className="bg-white rounded-xl border border-[#E5EDEA] p-5">
-                <h3 className="font-heading font-bold text-pitch mb-3">Group {group.name}</h3>
+                <h3 className="font-heading font-bold text-pitch mb-3">{group.name}</h3>
                 <div className="space-y-2">
                   {group.teams.map(team => {
                     const isSelected = selected?.teamId === team.id
@@ -309,7 +309,7 @@ export function PredictClient({ sweepstakeId, groups }: Props) {
             const pick = picks[group.name]
             return (
               <div key={group.name} className="bg-white rounded-xl border border-[#E5EDEA] px-4 py-3 flex items-center justify-between">
-                <span className="font-body text-sm font-medium text-mid">Group {group.name}</span>
+                <span className="font-body text-sm font-medium text-mid">{group.name}</span>
                 {pick ? (
                   <span className="font-body text-sm font-semibold text-pitch flex items-center gap-1.5">
                     {pick.teamFlag && <span>{pick.teamFlag}</span>}
@@ -333,7 +333,7 @@ export function PredictClient({ sweepstakeId, groups }: Props) {
               const total = g.picks.reduce((sum, p) => sum + p.count, 0)
               return (
                 <div key={g.groupName} className="bg-white rounded-xl border border-[#E5EDEA] p-5">
-                  <h4 className="font-heading font-bold text-pitch mb-3">Group {g.groupName}</h4>
+                  <h4 className="font-heading font-bold text-pitch mb-3">{g.groupName}</h4>
                   <div className="space-y-2">
                     {g.picks.map(pick => {
                       const pct = total > 0 ? Math.round((pick.count / total) * 100) : 0
