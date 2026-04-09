@@ -86,9 +86,46 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null) // organiserId awaiting confirm
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState('')
+
+  // Bulk email
+  type Recipient = { id: string; name: string; email: string; version: 'A' | 'B'; joinUrl: string | null }
+  const [bulkStep, setBulkStep] = useState<'idle' | 'loading' | 'preview' | 'sending' | 'done'>('idle')
+  const [recipients, setRecipients] = useState<Recipient[]>([])
+  const [bulkResult, setBulkResult] = useState<{ sent: number; failed: number } | null>(null)
+  const [bulkError, setBulkError] = useState('')
+
+  async function handleBulkPreview() {
+    setBulkStep('loading')
+    setBulkError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/bulk-email')
+      const data = await res.json()
+      if (!res.ok) { setBulkError(data.error ?? 'Failed'); setBulkStep('idle'); return }
+      setRecipients(data.recipients)
+      setBulkStep('preview')
+    } catch {
+      setBulkError('Failed to load preview.')
+      setBulkStep('idle')
+    }
+  }
+
+  async function handleBulkSend() {
+    setBulkStep('sending')
+    setBulkError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/bulk-email', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) { setBulkError(data.error ?? 'Failed'); setBulkStep('preview'); return }
+      setBulkResult({ sent: data.sent, failed: data.failed })
+      setBulkStep('done')
+    } catch {
+      setBulkError('Something went wrong.')
+      setBulkStep('preview')
+    }
+  }
 
   async function handleLogout() {
     await fetch('/api/headcoachadmin', { method: 'DELETE' })
@@ -205,6 +242,102 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
             <StatCard label="With email address"  value={stats.participantsWithEmail} sub={`${emailPct}% — eligible for notifications`} />
             <StatCard label="Avg per sweepstake"  value={stats.totalSweepstakes > 0 ? Math.round(stats.totalParticipants / stats.totalSweepstakes) : '—'} />
           </div>
+        </section>
+
+        {/* Bulk email */}
+        <section>
+          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">Bulk email</h2>
+
+          {bulkStep === 'idle' && (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] p-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-pitch mb-0.5">"A quick one from the dugout"</p>
+                <p className="text-xs text-mid">Bug-fix + settings update. Version A includes sweepstake join link, Version B has a create CTA.</p>
+              </div>
+              <button
+                onClick={handleBulkPreview}
+                className="shrink-0 bg-lime text-pitch font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors"
+              >
+                Preview send
+              </button>
+            </div>
+          )}
+
+          {bulkStep === 'loading' && (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] p-5 text-sm text-mid">Loading recipient list…</div>
+          )}
+
+          {bulkStep === 'preview' && (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#E5EDEA] flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-pitch">{recipients.length} recipients</p>
+                  <p className="text-xs text-mid mt-0.5">
+                    {recipients.filter(r => r.version === 'A').length} × Version A (with join link) &nbsp;·&nbsp;
+                    {recipients.filter(r => r.version === 'B').length} × Version B (create CTA)
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button onClick={() => setBulkStep('idle')} className="text-xs text-mid hover:text-pitch transition-colors">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkSend}
+                    className="bg-pitch text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-pitch/90 transition-colors"
+                  >
+                    Send to all {recipients.length} →
+                  </button>
+                </div>
+              </div>
+              {bulkError && <p className="px-5 py-3 text-xs text-red-600">{bulkError}</p>}
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-[#E5EDEA] bg-light">
+                    <th className="text-left px-5 py-2.5 font-medium text-mid">Name</th>
+                    <th className="text-left px-5 py-2.5 font-medium text-mid">Email</th>
+                    <th className="text-center px-5 py-2.5 font-medium text-mid">Version</th>
+                    <th className="text-left px-5 py-2.5 font-medium text-mid">Join link</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5EDEA]/60">
+                  {recipients.map(r => (
+                    <tr key={r.id} className="hover:bg-light/50">
+                      <td className="px-5 py-2.5 font-medium text-pitch">{r.name}</td>
+                      <td className="px-5 py-2.5 text-mid">{r.email}</td>
+                      <td className="px-5 py-2.5 text-center">
+                        <span className={`inline-block px-2 py-0.5 rounded-full font-semibold ${r.version === 'A' ? 'bg-lime/30 text-pitch' : 'bg-amber-100 text-amber-800'}`}>
+                          {r.version}
+                        </span>
+                      </td>
+                      <td className="px-5 py-2.5 text-mid font-mono truncate max-w-[180px]">
+                        {r.joinUrl ?? <span className="text-[#C0CFC8]">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {bulkStep === 'sending' && (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] p-5 text-sm text-mid">
+              Sending… this may take a moment.
+            </div>
+          )}
+
+          {bulkStep === 'done' && bulkResult && (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] p-5 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-pitch">
+                  ✓ {bulkResult.sent} sent{bulkResult.failed > 0 ? `, ${bulkResult.failed} failed` : ''}
+                </p>
+                <p className="text-xs text-mid mt-0.5">Email sent successfully.</p>
+              </div>
+              <button onClick={() => { setBulkStep('idle'); setBulkResult(null) }} className="text-xs text-mid hover:text-pitch transition-colors">
+                Dismiss
+              </button>
+            </div>
+          )}
         </section>
 
         {/* All organisers — drill-down */}
