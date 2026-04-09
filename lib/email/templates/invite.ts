@@ -23,7 +23,7 @@ export function inviteEmailHtml({
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
-      \${emailHeader}
+      ${emailHeader}
 
       <!-- Body -->
       <tr>
