@@ -23,7 +23,7 @@ export default async function SettingsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, assignment_mode, prize_type, payout_structure, image_url')
+    .select('id, name, status, entry_fee, assignment_mode, prize_type, payout_structure')
     .eq('id', id)
     .eq('organiser_id', organiser.id)
     .single()
@@ -43,7 +43,7 @@ export default async function SettingsPage({ params }: Props) {
       initialMode={sweepstake.assignment_mode ?? 'random'}
       initialPrizeType={sweepstake.prize_type ?? 'money'}
       initialPayoutStructure={sweepstake.payout_structure ?? 'winner'}
-      initialImageUrl={sweepstake.image_url ?? null}
+      initialImageUrl={null}
       drawDone={(assignmentCount ?? 0) > 0}
       status={sweepstake.status}
     />

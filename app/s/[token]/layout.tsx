@@ -56,7 +56,7 @@ export default async function PublicLayout({ children, params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, tournament_name, share_token, image_url')
+    .select('id, name, status, tournament_name, share_token')
     .eq('share_token', token)
     .single()
 
@@ -67,17 +67,6 @@ export default async function PublicLayout({ children, params }: Props) {
   return (
     <div className="min-h-screen bg-light flex flex-col">
       {isDemo && <DemoBar token={token} />}
-      {/* Cover photo banner */}
-      {sweepstake.image_url && (
-        <div className="w-full h-40 md:h-56 overflow-hidden">
-          <img
-            src={sweepstake.image_url}
-            alt={`${sweepstake.name} cover`}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
       {/* Header */}
       <header className="bg-pitch px-4 md:px-8 pt-5 pb-0">
         <div className="max-w-4xl mx-auto">

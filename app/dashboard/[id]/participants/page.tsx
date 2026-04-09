@@ -29,7 +29,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   if (!sweepstake || sweepstake.organiser_id !== organiser.id) notFound()
 
-  const [{ data: participants }, { data: waitlist }] = await Promise.all([
+  const [{ data: participants }, waitlistResult] = await Promise.all([
     supabase
       .from('participants')
       .select('id, name, email, paid')
@@ -41,6 +41,8 @@ export default async function ParticipantsPage({ params }: Props) {
       .eq('sweepstake_id', id)
       .order('created_at', { ascending: true }),
   ])
+  // waitlist table may not exist yet if migration hasn't been run
+  const waitlist = waitlistResult.error ? [] : (waitlistResult.data ?? [])
 
   return (
     <ParticipantsClient
