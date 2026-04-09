@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    href: '/blog/how-to-run-a-sweepstake',
+    tag: 'Setup guide',
+    title: 'How to run a sweepstake: the complete guide',
+    desc: 'From creating it to sharing the leaderboard — everything you need, step by step.',
+  },
+  {
     href: '/blog/world-cup-2026-office-sweepstake',
     tag: 'Office sweepstake',
     title: 'World Cup 2026 office sweepstake: the complete guide',

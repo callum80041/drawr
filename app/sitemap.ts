@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: APP_URL, changeFrequency: 'weekly', priority: 1 },
     { url: `${APP_URL}/how-it-works`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${APP_URL}/blog`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${APP_URL}/blog/how-to-run-a-sweepstake`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${APP_URL}/blog/world-cup-2026-office-sweepstake`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${APP_URL}/blog/sweepstake-rules`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${APP_URL}/blog/world-cup-2026-teams`, changeFrequency: 'monthly', priority: 0.8 },
