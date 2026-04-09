@@ -28,9 +28,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
   }
 
+  // Use anon client for public reads, service client for the privileged insert
   const supabase = await createClient()
+  const service = await createServiceClient()
 
-  // Look up sweepstake by share token (include organiser_id for notification)
+  // Look up sweepstake by share token (public_read RLS allows this)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
     .select('id, name, status, entry_fee, plan, organiser_id')
@@ -68,7 +70,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { data: participant, error: insertError } = await supabase
+  // INSERT via service client — anon role has no INSERT policy on participants
+  const { data: participant, error: insertError } = await service
     .from('participants')
     .insert({
       sweepstake_id: sweepstake.id,
@@ -86,8 +89,6 @@ export async function POST(req: NextRequest) {
   // Fire organiser notification (non-blocking — don't fail the join if email errors)
   ;(async () => {
     try {
-      const service = await createServiceClient()
-
       // Get organiser email (RLS blocks anon client, service client bypasses it)
       const { data: organiser } = await service
         .from('organisers')
