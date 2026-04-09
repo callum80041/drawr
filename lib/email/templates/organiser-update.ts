@@ -1,3 +1,4 @@
+import { emailHeader } from './_header'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 function escapeHtml(str: string): string {
@@ -36,14 +37,7 @@ export function organiserUpdateEmailHtml({
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
-
-      <!-- Header -->
-      <tr>
-        <td style="background:#1A2E22;padding:28px 32px;">
-          <p style="margin:0;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Drawr 🎲</p>
-          <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">World Cup 2026 Sweepstakes</p>
-        </td>
-      </tr>
+      \${emailHeader}
 
       <!-- Body -->
       <tr>
