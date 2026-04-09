@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
     .upsert(rows, { onConflict: 'sweepstake_id,participant_id,group_name' })
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to save predictions. Please try again.' }, { status: 500 })
+    console.error('[predictions/save]', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })
