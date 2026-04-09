@@ -52,6 +52,11 @@ export function MarketingNav() {
           </Link>
         </li>
         <li>
+          <Link href="/login" className="text-sm text-white/60 hover:text-white transition-colors">
+            Sign in
+          </Link>
+        </li>
+        <li>
           <a
             href="#reserve"
             className="text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
@@ -61,10 +66,10 @@ export function MarketingNav() {
         </li>
       </ul>
 
-      {/* Mobile: demo link + CTA */}
+      {/* Mobile: sign in + CTA */}
       <div className="md:hidden flex items-center gap-3">
-        <Link href="/s/demo2026" className="text-sm text-white/60 hover:text-white transition-colors">
-          Demo
+        <Link href="/login" className="text-sm text-white/60 hover:text-white transition-colors">
+          Sign in
         </Link>
         <a
           href="#reserve"

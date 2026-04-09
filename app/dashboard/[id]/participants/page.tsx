@@ -15,7 +15,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   const { data: organiser } = await supabase
     .from('organisers')
-    .select('id')
+    .select('id, name, email')
     .eq('user_id', user.id)
     .single()
 
@@ -41,6 +41,8 @@ export default async function ParticipantsPage({ params }: Props) {
       plan={sweepstake.plan}
       entryFee={Number(sweepstake.entry_fee)}
       initialParticipants={participants ?? []}
+      organiserName={organiser?.name ?? ''}
+      organiserEmail={organiser?.email ?? ''}
     />
   )
 }

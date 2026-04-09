@@ -19,9 +19,11 @@ interface Props {
   plan: string
   entryFee: number
   initialParticipants: Participant[]
+  organiserName: string
+  organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialParticipants }: Props) {
+export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialParticipants, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
   const [name, setName] = useState('')
@@ -32,6 +34,15 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
   const cap = plan === 'free' ? FREE_PLAN_CAP : Infinity
   const atCap = participants.length >= cap
   const paidCount = participants.filter(p => p.paid).length
+
+  const alreadyJoined = organiserEmail
+    ? participants.some(p => p.email?.toLowerCase() === organiserEmail.toLowerCase())
+    : false
+
+  function fillAsOrganiser() {
+    setName(organiserName)
+    setEmail(organiserEmail)
+  }
   const [chaseAllStatus, setChaseAllStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const unpaidWithEmail = participants.filter(p => !p.paid && p.email).length
@@ -132,7 +143,21 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
 
       {/* Add participant form */}
       <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
-        <h2 className="font-heading font-bold text-pitch tracking-tight mb-4">Add participant</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-heading font-bold text-pitch tracking-tight">Add participant</h2>
+          {!atCap && !alreadyJoined && organiserName && (
+            <button
+              type="button"
+              onClick={fillAsOrganiser}
+              className="text-xs font-medium text-grass hover:underline"
+            >
+              + Add myself
+            </button>
+          )}
+          {alreadyJoined && (
+            <span className="text-xs text-mid">✓ You&apos;re already in</span>
+          )}
+        </div>
         <form onSubmit={handleAdd} className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-2">
             <input
