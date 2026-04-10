@@ -27,7 +27,7 @@ export async function sendEmail({
 
   // Fire-and-forget log — don't let logging failures block email delivery
   try {
-    const supabase = createServiceClient()
+    const supabase = await createServiceClient()
     await supabase.from('email_log').insert({
       to_email:  to,
       subject,
