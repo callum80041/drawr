@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'How to Run a World Cup Sweepstake | playdrawr',
-  description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live standings, leaderboard — shared with one link. Free for up to 48 people. No spreadsheets needed.',
+  title: 'How to Run a Sweepstake | playdrawr',
+  description: 'Run a World Cup 2026 or Eurovision 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring — shared with one link. Free for up to 48 people.',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -35,36 +35,52 @@ export default function HowItWorksPage() {
       <Link href="/" className="text-sm text-grass hover:underline mb-8 block">← Back to playdrawr</Link>
 
       <h1 className="font-heading text-4xl font-black text-pitch tracking-tight mb-4 leading-tight">
-        How to run a World Cup sweepstake (the easy way)
+        How to run a sweepstake (the easy way)
       </h1>
-      <p className="text-lg text-mid mb-12 leading-relaxed">
-        Every office, pub, and group chat runs a sweepstake when a major tournament comes around. But running one properly — fairly assigning teams, tracking the standings, chasing payments, keeping the leaderboard updated through eight weeks of matches — is a lot more work than it looks. This is how to do it right.
+      <p className="text-lg text-mid mb-10 leading-relaxed">
+        Whether it&apos;s the World Cup or Eurovision, every office, pub, and group chat loves a sweepstake. But running one properly — fairly assigning teams or countries, tracking the standings, chasing payments, keeping the leaderboard updated — is more work than it looks. Here&apos;s how to do it right.
       </p>
+
+      {/* Tournament cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        <div className="rounded-xl border border-[#E5EDEA] bg-light p-5">
+          <p className="text-xl mb-2">⚽</p>
+          <p className="font-heading font-bold text-pitch mb-1">FIFA World Cup 2026</p>
+          <p className="text-sm text-mid leading-relaxed">USA, Canada &amp; Mexico · June–July 2026 · 48 teams · Group stage + knockout rounds</p>
+          <Link href="/worldcup" className="inline-block mt-3 text-xs font-semibold text-grass hover:underline">World Cup sweepstake guide →</Link>
+        </div>
+        <div className="rounded-xl border border-[#E5EDEA] bg-light p-5">
+          <p className="text-xl mb-2">🎤</p>
+          <p className="font-heading font-bold text-pitch mb-1">Eurovision Song Contest 2026</p>
+          <p className="text-sm text-mid leading-relaxed">Vienna, Austria · 13–17 May 2026 · 35 countries · Semi-finals + Grand Final</p>
+          <Link href="/eurovision" className="inline-block mt-3 text-xs font-semibold text-grass hover:underline">Eurovision sweepstake guide →</Link>
+        </div>
+      </div>
 
       <Section title="What is a sweepstake?">
         <p>
-          A sweepstake is a competition where participants are randomly assigned a competitor — in this case, one of the 48 nations playing in the 2026 World Cup. Everyone pays an equal entry fee (or it runs for free), and whoever is assigned the team that wins the tournament takes the pot.
+          A sweepstake is a competition where participants are randomly assigned a competitor — a team or a country — and then follow that entry through the tournament. Everyone pays an equal entry fee (or it runs for free), and whoever is assigned the winner at the end takes the pot.
         </p>
         <p>
-          The random draw is the whole point. It levels the playing field completely — a football obsessive is no more likely to draw England than someone who doesn't know the offside rule. That's why sweepstakes work across an entire office, not just the football fans.
+          The random draw is the whole point. It levels the playing field completely — a die-hard fan is no more likely to draw the winner than someone who barely follows the competition. That&apos;s why sweepstakes work across an entire office, not just the enthusiasts.
         </p>
       </Section>
 
       <Section title="How many people can enter?">
         <p>
-          With 48 teams in the 2026 World Cup, you can run a sweepstake for up to 48 people — one team each. With larger groups, participants can be assigned multiple teams, meaning more than one person can win based on who draws the eventual champions.
+          It depends on the tournament. The World Cup has 48 teams and Eurovision has 35 countries — so you can run a sweepstake for up to that many people with one entry each. With larger groups, participants can be assigned multiple entries, so more than one person can win.
         </p>
         <p>
-          Most office sweepstakes run with between 10 and 50 people. playdrawr handles any size group automatically — the draw assigns teams evenly across however many participants you add.
+          Most sweepstakes run with between 10 and 50 people. playdrawr handles any group size automatically — the draw assigns teams or countries evenly across however many participants you add.
         </p>
       </Section>
 
       <Section title="Setting the entry fee">
         <p>
-          The entry fee is entirely up to you. Most UK office sweepstakes run at £2–£5 per person. With 48 entries at £5, that's a £240 pot. You don't have to charge anything at all — many workplaces run a free sweepstake with a non-cash prize from the company.
+          The entry fee is entirely up to you. Most UK office sweepstakes run at £2–£5 per person. There&apos;s no right answer — the sweepstake works just as well with a token prize as with a bigger pot. What makes it engaging is the shared stake in the tournament, not the money.
         </p>
         <p>
-          There's no right answer. The sweepstake works just as well with a £10 prize as with a £500 one — what makes it engaging is the shared stake in the tournament, not the amount of money.
+          You can also run it completely free — many workplaces do a non-cash prize or just bragging rights.
         </p>
       </Section>
 
@@ -72,39 +88,84 @@ export default function HowItWorksPage() {
         <h2 className="font-heading text-2xl font-bold text-pitch tracking-tight mb-6">Step by step</h2>
         <div className="space-y-6">
           <Step num={1} title="Create your sweepstake">
-            Go to playdrawr.co.uk and create a free account. Name your sweepstake — usually something like "[Company name] World Cup 2026" — and set your entry fee if you're collecting one. Takes under two minutes.
+            Go to playdrawr.co.uk and create a free account. Choose your tournament — World Cup or Eurovision — name your sweepstake, and set an entry fee if you&apos;re collecting one. Takes under two minutes.
           </Step>
           <Step num={2} title="Add your participants">
-            Add everyone's name. You can add email addresses too if you want playdrawr to send them their team assignment directly. With 48 World Cup nations, you can have up to 48 participants on the free plan — one team each.
+            Add everyone by name. You can add email addresses too if you want playdrawr to send them their assignment directly. The free plan supports up to 48 participants — anyone beyond that joins a reserve list automatically.
           </Step>
           <Step num={3} title="Run the draw">
-            Hit the draw button. playdrawr uses a cryptographically fair randomisation to assign all 48 World Cup teams across your participants. You can re-run the draw as many times as you like before confirming it.
+            Hit the draw button. playdrawr randomly assigns all teams or countries across your participants. You can re-run as many times as you like before confirming — once confirmed, assignments are locked.
           </Step>
           <Step num={4} title="Share the link">
-            Once you confirm the draw, playdrawr generates a shareable link. Send it to everyone — they can see their assigned teams, the full group stage standings, the knockout bracket, and the live leaderboard. No login needed for participants.
+            Once you confirm the draw, playdrawr generates a shareable leaderboard link. Send it to everyone — they can see their assignment and the live standings. No login needed for participants.
           </Step>
           <Step num={5} title="Let the tournament do the rest">
-            playdrawr updates automatically from live match data. Group stage standings, knockout results, and the leaderboard update as results come in — you don't need to do anything.
+            playdrawr updates automatically from live results. Standings and the leaderboard update as results come in — you don&apos;t need to do anything.
           </Step>
         </div>
       </div>
 
+      {/* Scoring section */}
+      <Section title="How scoring works">
+        <p>Points are awarded automatically as the tournament progresses. Each tournament has its own system:</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 not-prose">
+          <div className="rounded-xl border border-[#E5EDEA] overflow-hidden text-sm">
+            <div className="bg-pitch px-4 py-2.5 flex items-center gap-2">
+              <span>⚽</span>
+              <span className="font-semibold text-white">World Cup</span>
+            </div>
+            <ul className="divide-y divide-[#E5EDEA]">
+              {[
+                ['Group win', '3 pts'], ['Group draw', '1 pt'],
+                ['Round of 16', '+5 pts'], ['Quarter-final', '+8 pts'],
+                ['Semi-final', '+12 pts'], ['Runner-up', '+15 pts'], ['Winner 🏆', '+25 pts'],
+              ].map(([label, pts]) => (
+                <li key={label} className="flex justify-between px-4 py-2 text-mid">
+                  <span>{label}</span><span className="font-semibold text-pitch">{pts}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl border border-[#E5EDEA] overflow-hidden text-sm">
+            <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: '#1B0744' }}>
+              <span>🎤</span>
+              <span className="font-semibold text-white">Eurovision</span>
+            </div>
+            <ul className="divide-y divide-[#E5EDEA]">
+              {[
+                ['Reaches Grand Final', '10 pts'],
+                ['Finishes top 3', '+20 pts'],
+                ['Wins Eurovision 🏆', '+50 pts'],
+              ].map(([label, pts]) => (
+                <li key={label} className="flex justify-between px-4 py-2 text-mid">
+                  <span>{label}</span><span className="font-semibold text-pitch">{pts}</span>
+                </li>
+              ))}
+              <li className="px-4 py-2 bg-[#F5F0FF]">
+                <span className="text-xs text-mid">Auto-qualified countries start with 10 pts. Max: 60 pts.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
       <Section title="Tracking payments">
         <p>
-          playdrawr has built-in payment tracking. Mark each participant as paid or unpaid with a single click. See the total pot collected and how much is still outstanding. No money moves through the platform — you collect however you normally would (cash, bank transfer, whatever works for your group) and playdrawr just helps you keep track of who's sorted and who still owes.
+          playdrawr has built-in payment tracking. Mark each participant as paid or unpaid with a single click. See the total pot collected and how much is still outstanding. No money moves through the platform — you collect however you normally would, and playdrawr just helps you keep track of who&apos;s sorted and who still owes.
         </p>
       </Section>
 
       <Section title="The rules">
-        <p>Keep the sweepstake rules simple:</p>
+        <p>Keep it simple:</p>
         <ul className="list-disc list-inside space-y-1 text-sm">
           <li>One entry fee per person, paid before the draw</li>
-          <li>Teams are assigned randomly — no swaps or preferences</li>
-          <li>Whoever's team wins the tournament wins the pot</li>
-          <li>If a participant has multiple teams, their best-performing team counts</li>
+          <li>Teams or countries are assigned randomly — no swaps or preferences</li>
+          <li>Whoever&apos;s entry wins the tournament wins the pot</li>
+          <li>If a participant has multiple entries, their best-performing one counts</li>
         </ul>
         <p>
-          playdrawr's leaderboard tracks points throughout the tournament (group stage wins, knockout progression, reaching the final, winning it) so you can follow who's ahead even before a winner is decided.
+          playdrawr&apos;s leaderboard tracks points throughout so you can follow who&apos;s ahead even before a winner is decided.
         </p>
       </Section>
 
@@ -125,8 +186,9 @@ export default function HowItWorksPage() {
         <p className="text-sm font-semibold text-pitch mb-3">Related guides</p>
         <ul className="space-y-2">
           {[
+            { href: '/blog/eurovision-sweepstake-guide', label: 'The complete Eurovision sweepstake guide' },
+            { href: '/blog/world-cup-2026-office-sweepstake', label: 'The complete World Cup office sweepstake guide' },
             { href: '/blog/sweepstake-rules', label: 'Sweepstake rules: how to run one fairly' },
-            { href: '/blog/world-cup-2026-office-sweepstake', label: 'The complete office sweepstake guide' },
             { href: '/blog/sweepstake-prize-ideas', label: 'Sweepstake prize ideas beyond cash' },
           ].map(l => (
             <li key={l.href}>

@@ -4,7 +4,7 @@ const steps = [
   {
     number: '1',
     title: 'Create your sweepstake',
-    body: 'From your dashboard, hit "New sweepstake". Give it a name, set an entry fee (optional), choose whether you\'re playing for a money pot or physical prizes, and pick your assignment mode.',
+    body: 'From your dashboard, hit "New sweepstake". Give it a name, choose your tournament (World Cup or Eurovision), set an optional entry fee, and pick your assignment mode.',
   },
   {
     number: '2',
@@ -14,7 +14,7 @@ const steps = [
   {
     number: '3',
     title: 'Run the draw',
-    body: 'Once everyone is in, go to the Draw tab and hit "Run draw". Teams are assigned randomly (or manually if you chose that mode). Each participant gets a confirmation email with their team. This step is permanent — teams can\'t be reshuffled afterwards.',
+    body: 'Once everyone is in, go to the Draw tab and hit "Run draw". Teams or countries are assigned randomly (or manually if you chose that mode). Each participant gets a confirmation email with their assignment. This step is permanent — assignments can\'t be reshuffled afterwards.',
   },
   {
     number: '4',
@@ -29,6 +29,10 @@ const steps = [
 ]
 
 const faqs = [
+  {
+    q: 'Which tournaments does Drawr support?',
+    a: 'Currently FIFA World Cup 2026 and Eurovision Song Contest 2026. Each has its own scoring system — World Cup uses match results through the knockout stages, Eurovision uses a qualification bonus plus the actual Grand Final jury and televote points.',
+  },
   {
     q: 'Can I enter myself as a participant?',
     a: 'Yes — on the Participants tab, click "Add myself" in the top-right corner of the add-participant form. It pre-fills your name and email so you\'re in with one tap.',
@@ -47,11 +51,11 @@ const faqs = [
   },
   {
     q: 'What\'s the difference between assignment modes?',
-    a: 'Random: teams are drawn at random when you run the draw. Auto: participants are assigned as they join (first come, first served). Manual: you assign each team yourself.',
+    a: 'Random: teams or countries are drawn at random when you run the draw. Auto: participants are assigned as they join (first come, first served). Manual: you assign each team or country yourself.',
   },
   {
     q: 'Can I change settings after the draw is run?',
-    a: 'Most settings (name, entry fee, prize type, payout structure) can be changed any time. Assignment mode is locked once the draw has been run, since teams are already allocated.',
+    a: 'Most settings (name, entry fee, prize type, payout structure) can be changed any time. Assignment mode is locked once the draw has been run, since teams or countries are already allocated.',
   },
   {
     q: 'How does the top-3 payout work?',
@@ -91,26 +95,44 @@ export default function HelpPage() {
 
       {/* Scoring explainer */}
       <section className="mb-12">
-        <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-3">How scoring works</h2>
-        <div className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
-          <div className="p-5">
-            <p className="text-sm text-mid leading-relaxed">
-              Drawr tracks tournament progress and awards points based on how far your assigned team advances. The further your team goes, the more points you earn — so even if your team is knocked out early, you still score points for every round they won.
-            </p>
-          </div>
-          <div className="p-5">
-            <p className="text-sm font-medium text-pitch mb-2">Typical point structure</p>
-            <ul className="space-y-1.5 text-sm text-mid">
-              <li className="flex justify-between"><span>Group stage win</span><span className="font-medium text-pitch">3 pts</span></li>
-              <li className="flex justify-between"><span>Group stage draw</span><span className="font-medium text-pitch">1 pt</span></li>
-              <li className="flex justify-between"><span>Round of 16</span><span className="font-medium text-pitch">+5 pts</span></li>
-              <li className="flex justify-between"><span>Quarter-final</span><span className="font-medium text-pitch">+8 pts</span></li>
-              <li className="flex justify-between"><span>Semi-final</span><span className="font-medium text-pitch">+12 pts</span></li>
-              <li className="flex justify-between"><span>Runner-up</span><span className="font-medium text-pitch">+15 pts</span></li>
-              <li className="flex justify-between"><span>Winner 🏆</span><span className="font-medium text-pitch">+20 pts</span></li>
+        <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-1">How scoring works</h2>
+        <p className="text-sm text-mid mb-4">Each tournament has its own scoring system. Points are awarded automatically as results come in.</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* World Cup */}
+          <div className="bg-white rounded-xl border border-[#E5EDEA] overflow-hidden">
+            <div className="bg-pitch px-4 py-3 flex items-center gap-2">
+              <span className="text-base">⚽</span>
+              <p className="font-heading font-bold text-white text-sm">World Cup 2026</p>
+            </div>
+            <ul className="divide-y divide-[#E5EDEA] text-sm">
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Group stage win</span><span className="font-semibold text-pitch">3 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Group stage draw</span><span className="font-semibold text-pitch">1 pt</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Reach Round of 16</span><span className="font-semibold text-pitch">+5 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Reach Quarter-final</span><span className="font-semibold text-pitch">+8 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Reach Semi-final</span><span className="font-semibold text-pitch">+12 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Runner-up</span><span className="font-semibold text-pitch">+15 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Win the World Cup 🏆</span><span className="font-semibold text-pitch">+25 pts</span></li>
             </ul>
-            <p className="text-xs text-mid mt-3">Points may vary slightly by tournament format.</p>
           </div>
+
+          {/* Eurovision */}
+          <div className="bg-white rounded-xl border border-[#E5EDEA] overflow-hidden">
+            <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#1B0744' }}>
+              <span className="text-base">🎤</span>
+              <p className="font-heading font-bold text-white text-sm">Eurovision 2026</p>
+            </div>
+            <ul className="divide-y divide-[#E5EDEA] text-sm">
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Qualifies for Grand Final</span><span className="font-semibold text-pitch">10 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Finishes top 3</span><span className="font-semibold text-pitch">+20 pts</span></li>
+              <li className="flex justify-between px-4 py-2.5"><span className="text-mid">Wins Eurovision 🏆</span><span className="font-semibold text-pitch">+50 pts</span></li>
+              <li className="px-4 py-2.5 bg-[#F5F0FF]">
+                <p className="text-xs text-mid leading-relaxed">Auto-qualified countries (Big 5 + host) start with 10 pts. Max possible: 60 pts.</p>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </section>
 
@@ -128,11 +150,11 @@ export default function HelpPage() {
             </li>
             <li className="flex gap-2">
               <span className="text-grass shrink-0">✓</span>
-              Use "Mark all paid" to bulk-confirm everyone at once.
+              Use &ldquo;Mark all paid&rdquo; to bulk-confirm everyone at once.
             </li>
             <li className="flex gap-2">
               <span className="text-grass shrink-0">✓</span>
-              "Chase all unpaid" sends a friendly payment reminder email to everyone who hasn&apos;t paid yet (requires their email address).
+              &ldquo;Chase all unpaid&rdquo; sends a friendly payment reminder email to everyone who hasn&apos;t paid yet (requires their email address).
             </li>
             <li className="flex gap-2">
               <span className="text-grass shrink-0">✓</span>
