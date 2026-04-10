@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { computeEurovisionPoints, EUROVISION_SEMI_BONUS } from '@/lib/scoring'
+import { EUROVISION_SONGS } from '@/lib/eurovision-songs'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -158,14 +159,22 @@ export default async function GrandFinalPage({ params }: Props) {
                     )}
                   </div>
 
-                  {/* Flag + name */}
+                  {/* Flag + name + song */}
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-2xl">{c.flag ?? '🏳️'}</span>
+                    <span className="text-2xl shrink-0">{c.flag ?? '🏳️'}</span>
                     <div className="min-w-0">
                       <p className="font-medium text-sm truncate" style={{ color: BG }}>{c.name}</p>
-                      {c.semi_final === null && (
-                        <p className="text-xs" style={{ color: 'rgba(4,2,65,0.4)' }}>Auto-qualified</p>
-                      )}
+                      {(() => {
+                        const song = EUROVISION_SONGS[c.id]
+                        return song ? (
+                          <a href={song.spotifyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 mt-0.5 group">
+                            <svg width="10" height="10" viewBox="0 0 24 24" className="shrink-0"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.35 8.8 6.3 9.75c-.5.15-1-.15-1.15-.6-.15-.5.15-1 .6-1.15 3.55-1.05 9.4-.85 13.1 1.35.45.25.6.85.35 1.3-.25.35-.85.5-1.3.25zm-.1 2.8c-.25.35-.7.5-1.05.25-2.7-1.65-6.8-2.15-9.95-1.15-.4.1-.85-.1-.95-.5-.1-.4.1-.85.5-.95 3.65-1.1 8.15-.55 11.25 1.35.3.15.45.65.2 1zm-1.2 2.75c-.2.3-.55.4-.85.2-2.35-1.45-5.3-1.75-8.8-.95-.35.1-.65-.15-.75-.45-.1-.35.15-.65.45-.75 3.8-.85 7.1-.5 9.7 1.1.35.15.4.55.25.85z" fill="white"/></svg>
+                            <span className="text-xs truncate group-hover:underline" style={{ color: 'rgba(4,2,65,0.4)' }}>{song.title} · {song.artist}</span>
+                          </a>
+                        ) : c.semi_final === null ? (
+                          <p className="text-xs" style={{ color: 'rgba(4,2,65,0.4)' }}>Auto-qualified</p>
+                        ) : null
+                      })()}
                     </div>
                   </div>
 

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { EUROVISION_SONGS } from '@/lib/eurovision-songs'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -94,19 +95,30 @@ export default async function SemiFinalsPage({ params }: Props) {
           <div className="px-5 py-3 border-b" style={{ borderColor: 'rgba(90,34,169,0.1)' }}>
             <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#16a34a' }}>✓ Qualified for Grand Final</p>
             <div className="space-y-2">
-              {qualified.map(c => (
-                <div key={c.id} className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{c.flag ?? '🏳️'}</span>
-                    <span className="font-medium text-sm" style={{ color: BG }}>{c.name}</span>
+              {qualified.map(c => {
+                const song = EUROVISION_SONGS[c.id]
+                return (
+                  <div key={c.id} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-xl shrink-0">{c.flag ?? '🏳️'}</span>
+                      <div className="min-w-0">
+                        <span className="font-medium text-sm" style={{ color: BG }}>{c.name}</span>
+                        {song && (
+                          <a href={song.spotifyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 mt-0.5 group">
+                            <svg width="10" height="10" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.35 8.8 6.3 9.75c-.5.15-1-.15-1.15-.6-.15-.5.15-1 .6-1.15 3.55-1.05 9.4-.85 13.1 1.35.45.25.6.85.35 1.3-.25.35-.85.5-1.3.25zm-.1 2.8c-.25.35-.7.5-1.05.25-2.7-1.65-6.8-2.15-9.95-1.15-.4.1-.85-.1-.95-.5-.1-.4.1-.85.5-.95 3.65-1.1 8.15-.55 11.25 1.35.3.15.45.65.2 1zm-1.2 2.75c-.2.3-.55.4-.85.2-2.35-1.45-5.3-1.75-8.8-.95-.35.1-.65-.15-.75-.45-.1-.35.15-.65.45-.75 3.8-.85 7.1-.5 9.7 1.1.35.15.4.55.25.85z" fill="white"/></svg>
+                            <span className="text-xs group-hover:underline truncate" style={{ color: 'rgba(4,2,65,0.4)' }}>{song.title} · {song.artist}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {teamParticipant[c.id] && (
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0" style={{ background: 'rgba(90,34,169,0.1)', color: PURPLE }}>
+                        {teamParticipant[c.id]}
+                      </span>
+                    )}
                   </div>
-                  {teamParticipant[c.id] && (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(90,34,169,0.1)', color: PURPLE }}>
-                      {teamParticipant[c.id]}
-                    </span>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
@@ -138,19 +150,30 @@ export default async function SemiFinalsPage({ params }: Props) {
           <div className="px-5 py-3">
             <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'rgba(4,2,65,0.4)' }}>Yet to compete</p>
             <div className="space-y-2">
-              {pending.map(c => (
-                <div key={c.id} className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{c.flag ?? '🏳️'}</span>
-                    <span className="text-sm" style={{ color: 'rgba(4,2,65,0.6)' }}>{c.name}</span>
+              {pending.map(c => {
+                const song = EUROVISION_SONGS[c.id]
+                return (
+                  <div key={c.id} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-xl shrink-0">{c.flag ?? '🏳️'}</span>
+                      <div className="min-w-0">
+                        <span className="text-sm" style={{ color: 'rgba(4,2,65,0.6)' }}>{c.name}</span>
+                        {song && (
+                          <a href={song.spotifyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 mt-0.5 group">
+                            <svg width="10" height="10" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.35 8.8 6.3 9.75c-.5.15-1-.15-1.15-.6-.15-.5.15-1 .6-1.15 3.55-1.05 9.4-.85 13.1 1.35.45.25.6.85.35 1.3-.25.35-.85.5-1.3.25zm-.1 2.8c-.25.35-.7.5-1.05.25-2.7-1.65-6.8-2.15-9.95-1.15-.4.1-.85-.1-.95-.5-.1-.4.1-.85.5-.95 3.65-1.1 8.15-.55 11.25 1.35.3.15.45.65.2 1zm-1.2 2.75c-.2.3-.55.4-.85.2-2.35-1.45-5.3-1.75-8.8-.95-.35.1-.65-.15-.75-.45-.1-.35.15-.65.45-.75 3.8-.85 7.1-.5 9.7 1.1.35.15.4.55.25.85z" fill="white"/></svg>
+                            <span className="text-xs group-hover:underline truncate" style={{ color: 'rgba(4,2,65,0.35)' }}>{song.title} · {song.artist}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {teamParticipant[c.id] && (
+                      <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(90,34,169,0.08)', color: PURPLE }}>
+                        {teamParticipant[c.id]}
+                      </span>
+                    )}
                   </div>
-                  {teamParticipant[c.id] && (
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(90,34,169,0.08)', color: PURPLE }}>
-                      {teamParticipant[c.id]}
-                    </span>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
