@@ -28,7 +28,7 @@ export function EurovisionBanner() {
             style={{ background: 'rgba(241,15,89,0.15)', border: '1px solid rgba(241,15,89,0.4)', color: '#F10F59' }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F10F59' }} />
-            Coming May 2026
+            Coming April 2026
           </div>
 
           {/* Eurovision logo */}
@@ -85,7 +85,7 @@ export function EurovisionBanner() {
           {/* Quick stats */}
           <div className="flex gap-6 text-center">
             <div>
-              <p className="font-heading font-bold text-2xl" style={{ color: '#F10F59' }}>~37</p>
+              <p className="font-heading font-bold text-2xl" style={{ color: '#F10F59' }}>35</p>
               <p className="text-xs text-white/40">countries</p>
             </div>
             <div>
@@ -93,7 +93,7 @@ export function EurovisionBanner() {
               <p className="text-xs text-white/40">winner</p>
             </div>
             <div>
-              <p className="font-heading font-bold text-2xl text-white">May</p>
+              <p className="font-heading font-bold text-2xl text-white">April</p>
               <p className="text-xs text-white/40">2026</p>
             </div>
           </div>

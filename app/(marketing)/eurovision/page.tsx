@@ -62,7 +62,7 @@ export default function EurovisionPage() {
           <span
             style={{ width: 8, height: 8, borderRadius: '50%', background: PINK, display: 'inline-block', flexShrink: 0 }}
           />
-          Coming to playdrawr · May 2026
+          Coming to playdrawr · April 2026
         </div>
 
         {/* H1 */}
