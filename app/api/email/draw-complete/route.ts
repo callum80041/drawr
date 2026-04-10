@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
         await sendEmail({
           to: p.email!,
           subject: `Your country for ${sweepstake.name} has been drawn!`,
+          template: 'draw-complete-eurovision',
           html: drawCompleteEurovisionEmailHtml({
             participantName: p.name,
             sweepstakeName: sweepstake.name,
@@ -104,6 +105,7 @@ export async function POST(req: NextRequest) {
         await sendEmail({
           to: p.email!,
           subject: `Your team for ${sweepstake.name} has been drawn!`,
+          template: 'draw-complete',
           html: drawCompleteEmailHtml({
             participantName: p.name,
             sweepstakeName: sweepstake.name,

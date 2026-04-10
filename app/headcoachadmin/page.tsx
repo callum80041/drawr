@@ -62,6 +62,7 @@ export default async function HeadCoachAdminPage() {
     { count: participantsWithEmail },
     { data: recentOrganisers },
     { data: organiserDetails },
+    { data: emailLog },
     analytics,
   ] = await Promise.all([
     supabase.from('organisers').select('*', { count: 'exact', head: true }),
@@ -78,6 +79,11 @@ export default async function HeadCoachAdminPage() {
         participants ( id, name, email, paid, created_at )
       )
     `).order('created_at', { ascending: false }),
+    supabase
+      .from('email_log')
+      .select('id, to_email, subject, template, resend_id, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200),
     fetchVercelAnalytics(),
   ])
 
@@ -102,6 +108,7 @@ export default async function HeadCoachAdminPage() {
       }}
       recentOrganisers={recentOrganisers ?? []}
       organiserDetails={organiserDetails ?? []}
+      emailLog={emailLog ?? []}
       analytics={analytics}
     />
   )

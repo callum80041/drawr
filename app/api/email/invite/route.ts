@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
   await sendEmail({
     to: participant.email,
     subject: `You've been added to ${sweepstake.name}`,
+    template: 'invite',
     html: inviteEmailHtml({
       participantName: participant.name,
       sweepstakeName: sweepstake.name,

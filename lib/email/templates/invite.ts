@@ -56,6 +56,18 @@ export function inviteEmailHtml({
         </td>
       </tr>
 
+      <!-- Create your own promo -->
+      <tr>
+        <td style="background:#F0FAF4;padding:16px 32px;border-top:1px solid #E5EDEA;text-align:center;">
+          <p style="margin:0 0 6px;font-size:12px;color:#5A7265;line-height:1.5;">
+            Running your own group? Set up a sweepstake in 3 minutes — free.
+          </p>
+          <a href="${APP_URL}/signup" style="font-size:12px;font-weight:600;color:#1A2E22;text-decoration:none;border-bottom:1px solid #1A2E22;">
+            Create your sweepstake at playdrawr.co.uk →
+          </a>
+        </td>
+      </tr>
+
       <!-- Footer -->
       <tr>
         <td style="background:#F5F9F6;padding:16px 32px;border-top:1px solid #E5EDEA;">

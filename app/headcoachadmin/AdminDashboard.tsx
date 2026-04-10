@@ -57,10 +57,20 @@ interface AnalyticsData {
   topPages: { data?: { path: string; total: number }[] } | null
 }
 
+interface EmailLogEntry {
+  id: string
+  to_email: string
+  subject: string
+  template: string | null
+  resend_id: string | null
+  created_at: string
+}
+
 interface Props {
   stats: Stats
   recentOrganisers: Organiser[]
   organiserDetails: OrganiserDetail[]
+  emailLog: EmailLogEntry[]
   analytics: AnalyticsData | null
 }
 
@@ -82,7 +92,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, recentOrganisers, organiserDetails, analytics }: Props) {
+export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emailLog, analytics }: Props) {
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
@@ -599,6 +609,60 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, anal
               )
             })}
           </div>
+        </section>
+
+        {/* Email log */}
+        <section>
+          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-1">Emails sent</h2>
+          <p className="text-xs text-mid mb-4">Last 200 transactional emails — logged from the moment this feature was deployed.</p>
+          {emailLog.length === 0 ? (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] px-5 py-8 text-center text-sm text-mid">
+              No emails logged yet. Emails will appear here as they are sent.
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#E5EDEA] bg-light flex items-center justify-between">
+                <p className="text-xs font-medium text-mid uppercase tracking-wide">Email log</p>
+                <p className="text-xs text-mid">{emailLog.length} shown</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-[#E5EDEA]">
+                      <th className="text-left px-4 py-2.5 font-medium text-mid">Sent</th>
+                      <th className="text-left px-4 py-2.5 font-medium text-mid">To</th>
+                      <th className="text-left px-4 py-2.5 font-medium text-mid">Subject</th>
+                      <th className="text-left px-4 py-2.5 font-medium text-mid">Template</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E5EDEA]/60">
+                    {emailLog.map(e => (
+                      <tr key={e.id} className="hover:bg-light/50">
+                        <td className="px-4 py-2.5 text-mid whitespace-nowrap tabular-nums">
+                          {new Date(e.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {' '}
+                          <span className="text-[#C0CFC8]">
+                            {new Date(e.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-pitch font-medium">{e.to_email}</td>
+                        <td className="px-4 py-2.5 text-mid max-w-[220px] truncate">{e.subject}</td>
+                        <td className="px-4 py-2.5">
+                          {e.template ? (
+                            <span className="inline-block px-2 py-0.5 rounded-full bg-lime/20 text-pitch font-medium">
+                              {e.template}
+                            </span>
+                          ) : (
+                            <span className="text-[#C0CFC8]">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Recent signups */}
