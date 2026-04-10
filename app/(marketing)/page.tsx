@@ -7,6 +7,7 @@ import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 import { HeroEmailForm } from '@/components/marketing/HeroEmailForm'
 import { HeroDrawAnimation } from '@/components/marketing/HeroDrawAnimation'
+import { EurovisionBanner } from '@/components/marketing/EurovisionBanner'
 
 export const revalidate = 300 // revalidate every 5 min so signup count stays fresh
 
@@ -255,6 +256,9 @@ export default async function LandingPage() {
           ))}
         </div>
       </div>
+
+      {/* ── EUROVISION BANNER ─────────────────────────────────── */}
+      <EurovisionBanner />
 
       {/* ── HOW IT WORKS ──────────────────────────────────────── */}
       <section id="how" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
