@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       team_id: number
       qualified: boolean
       final_position: number | null
+      grand_final_points: number | null
     }>
   }
 
@@ -46,11 +47,12 @@ export async function POST(req: NextRequest) {
   const service = await createServiceClient()
 
   const rows = results.map(r => ({
-    sweepstake_id: sweepstakeId,
-    team_id: r.team_id,
-    qualified: r.qualified,
-    final_position: r.final_position ?? null,
-    updated_at: new Date().toISOString(),
+    sweepstake_id:      sweepstakeId,
+    team_id:            r.team_id,
+    qualified:          r.qualified,
+    final_position:     r.final_position     ?? null,
+    grand_final_points: r.grand_final_points ?? null,
+    updated_at:         new Date().toISOString(),
   }))
 
   const { error } = await service

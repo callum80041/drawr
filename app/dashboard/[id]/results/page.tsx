@@ -42,11 +42,15 @@ export default async function ResultsPage({ params }: Props) {
   // Fetch existing results
   const { data: existing } = await supabase
     .from('eurovision_results')
-    .select('team_id, qualified, final_position')
+    .select('team_id, qualified, final_position, grand_final_points')
     .eq('sweepstake_id', id)
 
   const existingMap = Object.fromEntries(
-    (existing ?? []).map(r => [r.team_id, { qualified: r.qualified, final_position: r.final_position }])
+    (existing ?? []).map(r => [r.team_id, {
+      qualified:          r.qualified,
+      final_position:     r.final_position,
+      grand_final_points: r.grand_final_points,
+    }])
   )
 
   return (

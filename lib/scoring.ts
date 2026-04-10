@@ -22,25 +22,32 @@ export const ROUND_LABELS: Record<string, string> = {
 }
 
 // ── Eurovision scoring ───────────────────────────────────────────────────────
-export const EUROVISION_POINTS = {
-  REACH_FINAL:     10,  // Country qualifies from semi (or is auto-qualified)
-  POSITION_WINNER: 50,  // Grand Final 1st place
-  POSITION_TOP3:   20,  // Grand Final 2nd or 3rd
-  POSITION_TOP10:  10,  // Grand Final 4th–10th
-  POSITION_REST:    5,  // Grand Final 11th–26th
-} as const
+// Scoring follows the actual Eurovision Grand Final points system:
+//   • Qualifying from a semi-final earns a flat bonus
+//   • In the Grand Final, your sweepstake score = your country's real combined
+//     jury + public televote points (same drama as watching the scoreboard)
+//
+// Auto-qualified countries (Big 5 + host) earn the qualification bonus
+// automatically since they skip the semi-finals.
+
+export const EUROVISION_SEMI_BONUS = 10  // pts for reaching the Grand Final
 
 export function computeEurovisionPoints(result: {
   qualified: boolean
-  final_position: number | null
+  final_position: number | null   // kept for display, not used for scoring
+  grand_final_points?: number | null
 }): number {
   if (!result.qualified) return 0
-  let pts = EUROVISION_POINTS.REACH_FINAL
-  const pos = result.final_position
-  if (pos === null) return pts
-  if (pos === 1)       pts += EUROVISION_POINTS.POSITION_WINNER
-  else if (pos <= 3)   pts += EUROVISION_POINTS.POSITION_TOP3
-  else if (pos <= 10)  pts += EUROVISION_POINTS.POSITION_TOP10
-  else                 pts += EUROVISION_POINTS.POSITION_REST
+  // Flat bonus for qualifying (or being auto-qualified)
+  let pts = EUROVISION_SEMI_BONUS
+  // Add real Grand Final points if available
+  if (result.grand_final_points != null) {
+    pts += result.grand_final_points
+  }
   return pts
 }
+
+/** @deprecated Use EUROVISION_SEMI_BONUS + grand_final_points directly */
+export const EUROVISION_POINTS = {
+  REACH_FINAL: EUROVISION_SEMI_BONUS,
+} as const

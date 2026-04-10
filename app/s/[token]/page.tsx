@@ -38,10 +38,10 @@ export default async function LeaderboardPage({ params }: Props) {
   if (isEurovision) {
     const { data: euResults } = await supabase
       .from('eurovision_results')
-      .select('team_id, qualified, final_position')
+      .select('team_id, qualified, final_position, grand_final_points')
       .eq('sweepstake_id', sweepstake.id)
     euScoreByTeam = Object.fromEntries(
-      (euResults ?? []).map(r => [r.team_id, { qualified: r.qualified, final_position: r.final_position }])
+      (euResults ?? []).map(r => [r.team_id, { qualified: r.qualified, final_position: r.final_position, grand_final_points: r.grand_final_points }])
     )
   }
 

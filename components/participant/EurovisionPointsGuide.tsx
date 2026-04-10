@@ -1,49 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { EUROVISION_POINTS } from '@/lib/scoring'
-
-const ROWS = [
-  {
-    pts: EUROVISION_POINTS.REACH_FINAL,
-    result: 'Reaches Grand Final',
-    note: 'Your country qualifies from their semi-final (or is already auto-qualified as a Big 5 country or Austria).',
-  },
-  {
-    pts: EUROVISION_POINTS.POSITION_TOP10,
-    result: '4th–10th in the Final',
-    note: 'Solid performance. Not quite a trophy, but the scoreboard is looking healthy.',
-  },
-  {
-    pts: EUROVISION_POINTS.POSITION_TOP3,
-    result: '2nd or 3rd in the Final',
-    note: "Close, so close. They'll be back. Probably.",
-  },
-  {
-    pts: EUROVISION_POINTS.POSITION_WINNER,
-    result: 'Wins Eurovision',
-    note: 'Twelve points. The big one. Your country hosts next year and you collect the prize pot.',
-  },
-]
-
-const MAX_POINTS = EUROVISION_POINTS.REACH_FINAL + EUROVISION_POINTS.POSITION_WINNER
+import { EUROVISION_SEMI_BONUS } from '@/lib/scoring'
 
 export function EurovisionPointsGuide() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="rounded-xl border border-[#E5EDEA] bg-white overflow-hidden">
+    <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(90,34,169,0.15)', background: '#fff' }}>
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-light/50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-gray-50"
       >
         <div className="flex items-center gap-2.5">
           <span className="text-lg">🎤</span>
-          <span className="font-heading font-bold text-pitch text-sm">How does scoring work?</span>
-          <span className="text-xs text-mid hidden sm:block">(no musical knowledge required)</span>
+          <span className="font-heading font-bold text-sm" style={{ color: '#040241' }}>How does scoring work?</span>
+          <span className="text-xs hidden sm:block" style={{ color: 'rgba(4,2,65,0.4)' }}>(no musical knowledge required)</span>
         </div>
         <svg
-          className={`text-mid transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          style={{ color: 'rgba(4,2,65,0.4)' }}
           width="16" height="16" viewBox="0 0 16 16" fill="none"
         >
           <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -51,45 +27,47 @@ export function EurovisionPointsGuide() {
       </button>
 
       {open && (
-        <div className="px-5 pb-5 space-y-5 border-t border-[#E5EDEA]">
-          <p className="text-sm text-mid pt-4 leading-relaxed">
-            Simple: your country earns points, you earn points. No jury politics, no televote conspiracy theories.
-            Just maths and whatever Switzerland submits.
+        <div className="px-5 pb-5 space-y-4 border-t" style={{ borderColor: 'rgba(90,34,169,0.1)' }}>
+          <p className="text-sm pt-4 leading-relaxed" style={{ color: 'rgba(4,2,65,0.6)' }}>
+            We follow the actual Eurovision scoring system — your sweepstake points are your country&apos;s real Grand Final score, just like watching the show.
           </p>
 
-          <div>
-            <p className="text-xs font-medium text-mid uppercase tracking-wider mb-2">Points — cumulative</p>
-            <div className="space-y-1">
-              {ROWS.map(row => (
-                <div key={row.result} className="flex items-start gap-3 py-2 border-b border-[#E5EDEA]/60 last:border-0">
-                  <div className="flex items-center gap-2 min-w-[160px] shrink-0">
-                    <span className="font-heading font-bold text-pitch text-sm w-7 text-right tabular-nums">
-                      {row.pts}
-                    </span>
-                    <span className="text-xs text-mid">pts</span>
-                    <span className="text-sm font-medium text-pitch">— {row.result}</span>
-                  </div>
-                  <p className="text-xs text-mid leading-relaxed">{row.note}</p>
-                </div>
-              ))}
+          <div className="space-y-3">
+            {/* Step 1 */}
+            <div className="rounded-xl p-4" style={{ background: 'rgba(90,34,169,0.06)', border: '1px solid rgba(90,34,169,0.12)' }}>
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-medium text-sm" style={{ color: '#040241' }}>Step 1 — Reach the Grand Final</p>
+                <span className="font-heading font-bold text-sm" style={{ color: '#5A22A9' }}>+{EUROVISION_SEMI_BONUS} pts</span>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(4,2,65,0.55)' }}>
+                Your country qualifies from their semi-final (or is already auto-qualified as a Big 5 country or Austria the host). Flat bonus — everyone who makes it gets this.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="rounded-xl p-4" style={{ background: 'rgba(241,15,89,0.06)', border: '1px solid rgba(241,15,89,0.15)' }}>
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-medium text-sm" style={{ color: '#040241' }}>Step 2 — Grand Final points</p>
+                <span className="font-heading font-bold text-sm" style={{ color: '#F10F59' }}>+ real points</span>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(4,2,65,0.55)' }}>
+                Your country&apos;s actual combined jury + public televote score from the Grand Final is added directly to your total. The same scoreboard you watch on TV — no position-based approximations.
+              </p>
+            </div>
+
+            {/* Example */}
+            <div className="rounded-xl p-4" style={{ background: '#F5F9F6', border: '1px solid #E5EDEA' }}>
+              <p className="text-xs font-medium mb-2" style={{ color: '#040241' }}>Example</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(4,2,65,0.6)' }}>
+                Your country qualifies from Semi-Final 1 ✓ (+{EUROVISION_SEMI_BONUS} pts), then scores 423 points in the Grand Final — your leaderboard total is <strong style={{ color: '#040241' }}>{EUROVISION_SEMI_BONUS + 423} points</strong>. If they get nul points in the final, you still have {EUROVISION_SEMI_BONUS}.
+              </p>
             </div>
           </div>
 
-          <div className="bg-light rounded-lg px-4 py-3 flex items-start gap-2.5">
-            <span className="text-base shrink-0">✨</span>
-            <p className="text-xs text-mid leading-relaxed">
-              <strong className="text-pitch">Auto-qualified countries</strong> (UK, France, Germany, Spain, Italy &amp; Austria as host)
-              skip the semi-finals and go straight to the Grand Final — they automatically earn the <strong className="text-pitch">Reaches Final</strong> points.
-            </p>
-          </div>
-
-          <div className="bg-lime/10 border border-lime/30 rounded-lg px-4 py-3 space-y-1.5">
-            <p className="text-xs font-medium text-pitch">🏆 Does the Eurovision winner always win the sweepstake?</p>
-            <p className="text-xs text-mid leading-relaxed">
-              Almost certainly, yes. With{' '}
-              <strong className="text-pitch">{MAX_POINTS} points</strong> on offer for a winning country,
-              the person who drew that nation is almost certainly taking the prize.
-              Unless they drew the UK. We say this with love.
+          <div className="rounded-xl px-4 py-3 flex items-start gap-2.5" style={{ background: 'rgba(90,34,169,0.06)' }}>
+            <span className="text-base shrink-0">📺</span>
+            <p className="text-xs leading-relaxed" style={{ color: 'rgba(4,2,65,0.6)' }}>
+              <strong style={{ color: '#040241' }}>Why this scoring?</strong> In Eurovision, the distance between 1st and 2nd can be hundreds of points — or just one. Copying the real scoring means the Saturday night leaderboard is exactly as dramatic for your sweepstake as it is on TV.
             </p>
           </div>
         </div>

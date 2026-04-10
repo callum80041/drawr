@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { computeEurovisionPoints } from '@/lib/scoring'
+import { computeEurovisionPoints, EUROVISION_SEMI_BONUS } from '@/lib/scoring'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -43,7 +43,7 @@ export default async function GrandFinalPage({ params }: Props) {
       .order('name'),
     supabase
       .from('eurovision_results')
-      .select('team_id, qualified, final_position')
+      .select('team_id, qualified, final_position, grand_final_points')
       .eq('sweepstake_id', sweepstake.id),
     supabase
       .from('assignments')
@@ -68,16 +68,21 @@ export default async function GrandFinalPage({ params }: Props) {
   // Countries that qualified (auto + semi qualifiers)
   const qualifiedCountries = countries
     .filter(c => resultMap[c.id]?.qualified)
-    .map(c => ({
-      ...c,
-      final_position: resultMap[c.id]?.final_position ?? null,
-      pts: computeEurovisionPoints(resultMap[c.id] ?? { qualified: true, final_position: null }),
-    }))
+    .map(c => {
+      const r = resultMap[c.id] ?? { qualified: true, final_position: null, grand_final_points: null }
+      return {
+        ...c,
+        final_position:     r.final_position     ?? null,
+        grand_final_points: r.grand_final_points ?? null,
+        pts: computeEurovisionPoints(r),
+      }
+    })
     .sort((a, b) => {
-      if (a.final_position === null && b.final_position === null) return 0
+      // Sort by final position if available, otherwise by points desc
+      if (a.final_position !== null && b.final_position !== null) return a.final_position - b.final_position
+      if (a.final_position === null && b.final_position === null) return b.pts - a.pts
       if (a.final_position === null) return 1
-      if (b.final_position === null) return -1
-      return a.final_position - b.final_position
+      return -1
     })
 
   // Auto-qualified countries not yet in results (no result row yet)
@@ -172,14 +177,23 @@ export default async function GrandFinalPage({ params }: Props) {
                   )}
 
                   {/* Points */}
-                  {pos && (
-                    <div className="text-right shrink-0 ml-2">
-                      <span className="font-heading font-bold text-sm" style={{ color: isWinner ? PINK : BG }}>
-                        {c.pts}
-                      </span>
-                      <span className="text-xs ml-0.5" style={{ color: 'rgba(4,2,65,0.4)' }}>pts</span>
-                    </div>
-                  )}
+                  <div className="text-right shrink-0 ml-2 min-w-[60px]">
+                    {c.grand_final_points != null ? (
+                      <>
+                        <div>
+                          <span className="font-heading font-bold text-sm" style={{ color: isWinner ? PINK : BG }}>
+                            {c.grand_final_points}
+                          </span>
+                          <span className="text-xs ml-0.5" style={{ color: 'rgba(4,2,65,0.35)' }}>🎤pts</span>
+                        </div>
+                        <div className="text-xs" style={{ color: isWinner ? PINK : PURPLE }}>
+                          +{EUROVISION_SEMI_BONUS} = <strong>{c.pts}</strong>
+                        </div>
+                      </>
+                    ) : pos ? (
+                      <span className="text-xs" style={{ color: 'rgba(4,2,65,0.35)' }}>awaiting</span>
+                    ) : null}
+                  </div>
                 </li>
               )
             })}
@@ -213,21 +227,19 @@ export default async function GrandFinalPage({ params }: Props) {
       )}
 
       {/* Scoring reminder */}
-      <div className="rounded-xl px-4 py-4 text-sm space-y-2" style={{ background: BG }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: PINK }}>Points guide</p>
-        {[
-          { label: 'Reaches Grand Final', pts: 10 },
-          { label: '4th–10th place',      pts: 10, extra: '+10' },
-          { label: '2nd or 3rd place',    pts: 20, extra: '+20' },
-          { label: '🏆 Winner',           pts: 50, extra: '+50' },
-        ].map(row => (
-          <div key={row.label} className="flex justify-between">
-            <span style={{ color: 'rgba(255,255,255,0.65)' }}>{row.label}</span>
-            <span className="font-heading font-bold" style={{ color: row.extra === '+50' ? PINK : LIME }}>
-              {row.extra ?? `${row.pts} pts`}
-            </span>
-          </div>
-        ))}
+      <div className="rounded-xl px-4 py-4 text-sm space-y-3" style={{ background: BG }}>
+        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: PINK }}>How scoring works</p>
+        <div className="flex justify-between items-start">
+          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Reaches Grand Final</span>
+          <span className="font-heading font-bold" style={{ color: LIME }}>+{EUROVISION_SEMI_BONUS} pts</span>
+        </div>
+        <div className="flex justify-between items-start">
+          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Grand Final score (jury + public)</span>
+          <span className="font-heading font-bold" style={{ color: PINK }}>+ actual pts</span>
+        </div>
+        <p className="text-xs pt-1" style={{ color: 'rgba(255,255,255,0.35)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 8 }}>
+          Your sweepstake score = qualification bonus + your country&apos;s real combined jury and televote points from the Grand Final. Just like the show — the drama is the same.
+        </p>
       </div>
     </div>
   )
