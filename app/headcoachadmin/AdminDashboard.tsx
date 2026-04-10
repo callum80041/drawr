@@ -124,6 +124,9 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
     }
   }
 
+  // Template preview
+  const [previewTemplate, setPreviewTemplate] = useState<string | null>(null)
+
   // Bulk email
   type Recipient = { id: string; name: string; email: string; version: 'A' | 'B'; joinUrl: string | null }
   const [bulkStep, setBulkStep] = useState<'idle' | 'loading' | 'preview' | 'sending' | 'done'>('idle')
@@ -401,6 +404,77 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
               </button>
             </div>
           )}
+        </section>
+
+        {/* Email template previews */}
+        <section>
+          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-1">Email templates</h2>
+          <p className="text-xs text-mid mb-4">Click any template to preview it with sample data.</p>
+
+          {(() => {
+            const templates = [
+              { id: 'welcome',                  label: 'Welcome',                    desc: 'New organiser signup',         tag: 'organiser' },
+              { id: 'sweepstake-created',       label: 'Sweepstake created',         desc: 'Organiser confirmation',       tag: 'organiser' },
+              { id: 'participant-joined',       label: 'Participant joined',          desc: 'Notifies organiser of signup', tag: 'organiser' },
+              { id: 'invite',                   label: 'Participant invite',          desc: 'Added to sweepstake',          tag: 'participant' },
+              { id: 'draw-complete',            label: 'Draw complete (WC)',          desc: 'World Cup team assigned',      tag: 'participant' },
+              { id: 'draw-complete-eurovision', label: 'Draw complete (Eurovision)',  desc: 'Eurovision country assigned',  tag: 'participant' },
+              { id: 'payment-chase',            label: 'Payment chase',              desc: 'Entry fee reminder',           tag: 'participant' },
+              { id: 'waitlist-promoted',        label: 'Waitlist promoted',          desc: 'Reserve list → confirmed',     tag: 'participant' },
+              { id: 'organiser-update',         label: 'Organiser update (bulk)',     desc: 'Campaign email (version A)',   tag: 'campaign' },
+            ]
+
+            const tagColour: Record<string, string> = {
+              organiser:   'bg-blue-50 text-blue-700',
+              participant: 'bg-lime/20 text-pitch',
+              campaign:    'bg-amber-100 text-amber-800',
+            }
+
+            return (
+              <div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+                  {templates.map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => setPreviewTemplate(previewTemplate === t.id ? null : t.id)}
+                      className={`text-left rounded-xl border p-4 transition-all ${
+                        previewTemplate === t.id
+                          ? 'border-grass bg-[#F0FAF4] ring-1 ring-grass'
+                          : 'border-[#E5EDEA] bg-white hover:border-grass/50 hover:bg-light/60'
+                      }`}
+                    >
+                      <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 ${tagColour[t.tag]}`}>
+                        {t.tag}
+                      </span>
+                      <p className="text-sm font-semibold text-pitch leading-tight mb-0.5">{t.label}</p>
+                      <p className="text-xs text-mid">{t.desc}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {previewTemplate && (
+                  <div className="rounded-xl border border-[#E5EDEA] overflow-hidden">
+                    <div className="px-4 py-2.5 bg-light border-b border-[#E5EDEA] flex items-center justify-between">
+                      <p className="text-xs font-medium text-mid">
+                        Preview — <span className="text-pitch font-semibold">{templates.find(t => t.id === previewTemplate)?.label}</span>
+                        {' '}(sample data)
+                      </p>
+                      <button onClick={() => setPreviewTemplate(null)} className="text-xs text-mid hover:text-pitch transition-colors">
+                        Close ✕
+                      </button>
+                    </div>
+                    <iframe
+                      key={previewTemplate}
+                      src={`/api/headcoachadmin/email-preview?template=${previewTemplate}`}
+                      className="w-full"
+                      style={{ height: 700, border: 'none' }}
+                      title={`Email preview: ${previewTemplate}`}
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })()}
         </section>
 
         {/* All organisers — drill-down */}
