@@ -24,7 +24,7 @@ export default async function SweepstakeLayout({ children, params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, plan, organiser_id')
+    .select('id, name, status, plan, organiser_id, sweepstake_type')
     .eq('id', id)
     .single()
 
@@ -54,7 +54,7 @@ export default async function SweepstakeLayout({ children, params }: Props) {
             {sweepstake.status}
           </span>
         </div>
-        <SweepstakeTabs id={id} />
+        <SweepstakeTabs id={id} sweepstakeType={sweepstake.sweepstake_type ?? 'worldcup'} />
       </div>
 
       <div className="flex-1 p-6 md:p-8">

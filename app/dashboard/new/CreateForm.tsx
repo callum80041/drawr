@@ -8,6 +8,28 @@ import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSel
 type Mode = 'random' | 'auto' | 'manual'
 type PrizeType = 'money' | 'prizes'
 type PayoutStructure = 'winner' | 'top_3'
+type TournamentType = 'worldcup' | 'eurovision'
+
+const TOURNAMENTS: { value: TournamentType; emoji: string; label: string; sub: string; count: string; tournamentId: number; tournamentName: string }[] = [
+  {
+    value: 'worldcup',
+    emoji: '⚽',
+    label: 'FIFA World Cup 2026',
+    sub: 'Canada · Mexico · USA',
+    count: '48 teams',
+    tournamentId: 1,
+    tournamentName: 'FIFA World Cup 2026',
+  },
+  {
+    value: 'eurovision',
+    emoji: '🎤',
+    label: 'Eurovision Song Contest 2026',
+    sub: 'Vienna, Austria',
+    count: '35 countries',
+    tournamentId: 2,
+    tournamentName: 'Eurovision Song Contest 2026',
+  },
+]
 
 interface Props {
   organiserId: string
@@ -22,6 +44,7 @@ export function CreateForm({ organiserId }: Props) {
   const [mode, setMode] = useState<Mode>('random')
   const [prizeType, setPrizeType] = useState<PrizeType>('money')
   const [payoutStructure, setPayoutStructure] = useState<PayoutStructure>('winner')
+  const [tournament, setTournament] = useState<TournamentType>('worldcup')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -30,13 +53,16 @@ export function CreateForm({ organiserId }: Props) {
     setError('')
     setLoading(true)
 
+    const t = TOURNAMENTS.find(t => t.value === tournament)!
+
     const { data, error: insertError } = await supabase
       .from('sweepstakes')
       .insert({
         organiser_id: organiserId,
         name: name.trim(),
-        tournament_id: 1,
-        tournament_name: 'FIFA World Cup 2026',
+        tournament_id: t.tournamentId,
+        tournament_name: t.tournamentName,
+        sweepstake_type: tournament,
         entry_fee: entryFee ? parseFloat(entryFee) : 0,
         assignment_mode: mode,
         prize_type: prizeType,
@@ -82,17 +108,28 @@ export function CreateForm({ organiserId }: Props) {
         />
       </div>
 
-      {/* Tournament — hardcoded for now */}
+      {/* Tournament */}
       <div>
-        <label className="block text-sm font-medium text-pitch mb-1.5">Tournament</label>
-        <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] bg-light text-sm text-mid">
-          <span>🏆</span>
-          <span>FIFA World Cup 2026</span>
-          <span className="ml-auto text-xs bg-lime/30 text-pitch px-2 py-0.5 rounded-full font-medium">
-            48 teams
-          </span>
+        <label className="block text-sm font-medium text-pitch mb-3">Tournament</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {TOURNAMENTS.map(t => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setTournament(t.value)}
+              className={`text-left p-4 rounded-xl border-2 transition-all ${
+                tournament === t.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
+              }`}
+            >
+              <span className="text-2xl mb-2 block">{t.emoji}</span>
+              <p className="text-sm font-medium text-pitch mb-0.5">{t.label}</p>
+              <p className="text-xs text-mid">{t.sub}</p>
+              <span className="inline-block mt-2 text-xs bg-lime/30 text-pitch px-2 py-0.5 rounded-full font-medium">
+                {t.count}
+              </span>
+            </button>
+          ))}
         </div>
-        <p className="text-xs text-mid mt-1.5">More tournaments will be added over time.</p>
       </div>
 
       {/* Entry fee */}

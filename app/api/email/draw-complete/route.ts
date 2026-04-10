@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email'
 import { drawCompleteEmailHtml } from '@/lib/email/templates/draw-complete'
+import { drawCompleteEurovisionEmailHtml } from '@/lib/email/templates/draw-complete-eurovision'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   // Verify ownership
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, organiser_id')
+    .select('id, name, share_token, organiser_id, sweepstake_type, tournament_id')
     .eq('id', sweepstakeId)
     .eq('organiser_id', organiser.id)
     .single()
@@ -33,6 +34,9 @@ export async function POST(req: NextRequest) {
   if (!sweepstake) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+
+  const isEurovision = sweepstake.sweepstake_type === 'eurovision'
+  const tournamentId = sweepstake.tournament_id ?? 1
 
   // Fetch participants with emails + their assignments
   const [{ data: participants }, { data: assignments }, { data: teams }] = await Promise.all([
@@ -47,8 +51,8 @@ export async function POST(req: NextRequest) {
       .eq('sweepstake_id', sweepstakeId),
     supabase
       .from('teams')
-      .select('id, name, flag, group_name')
-      .eq('tournament_id', 1),
+      .select('id, name, flag, group_name, semi_final')
+      .eq('tournament_id', tournamentId),
   ])
 
   if (!participants?.length) {
@@ -67,25 +71,47 @@ export async function POST(req: NextRequest) {
   const results = await Promise.allSettled(
     participants.map(async p => {
       const myAssignments = assignmentsByParticipant[p.id] ?? []
-      const myTeams = myAssignments.map(a => {
-        const team = teamMap.get(a.team_id)
-        return {
-          name: a.team_name,
-          flag: a.team_flag,
-          group_name: team?.group_name ?? null,
-        }
-      })
+      const team = teamMap.get(myAssignments[0]?.team_id)
 
-      await sendEmail({
-        to: p.email!,
-        subject: `Your team for ${sweepstake.name} has been drawn!`,
-        html: drawCompleteEmailHtml({
-          participantName: p.name,
-          sweepstakeName: sweepstake.name,
-          shareToken: sweepstake.share_token,
-          teams: myTeams,
-        }),
-      })
+      if (isEurovision) {
+        const myCountries = myAssignments.map(a => {
+          const t = teamMap.get(a.team_id)
+          return {
+            name: a.team_name,
+            flag: a.team_flag,
+            semi_final: t?.semi_final ?? null,
+          }
+        })
+        await sendEmail({
+          to: p.email!,
+          subject: `Your country for ${sweepstake.name} has been drawn!`,
+          html: drawCompleteEurovisionEmailHtml({
+            participantName: p.name,
+            sweepstakeName: sweepstake.name,
+            shareToken: sweepstake.share_token,
+            countries: myCountries,
+          }),
+        })
+      } else {
+        const myTeams = myAssignments.map(a => {
+          const t = teamMap.get(a.team_id)
+          return {
+            name: a.team_name,
+            flag: a.team_flag,
+            group_name: t?.group_name ?? null,
+          }
+        })
+        await sendEmail({
+          to: p.email!,
+          subject: `Your team for ${sweepstake.name} has been drawn!`,
+          html: drawCompleteEmailHtml({
+            participantName: p.name,
+            sweepstakeName: sweepstake.name,
+            shareToken: sweepstake.share_token,
+            teams: myTeams,
+          }),
+        })
+      }
       return p.email
     })
   )
