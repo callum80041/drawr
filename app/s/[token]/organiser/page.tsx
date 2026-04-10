@@ -12,11 +12,13 @@ export default async function DemoOrganiserPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, status, entry_fee, prize_type, payout_structure, assignment_mode, draw_completed_at, tournament_name, plan')
+    .select('id, name, share_token, status, entry_fee, prize_type, payout_structure, assignment_mode, draw_completed_at, tournament_name, tournament_id, sweepstake_type, plan')
     .eq('share_token', token)
     .single()
 
   if (!sweepstake) notFound()
+
+  const tournamentId = sweepstake.tournament_id ?? 1
 
   const [participantsRes, assignmentsRes, teamsRes] = await Promise.all([
     supabase
@@ -31,7 +33,7 @@ export default async function DemoOrganiserPage({ params }: Props) {
     supabase
       .from('teams')
       .select('id, name, flag, group_name')
-      .eq('tournament_id', 1)
+      .eq('tournament_id', tournamentId)
       .order('name'),
   ])
 

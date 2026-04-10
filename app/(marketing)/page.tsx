@@ -300,23 +300,31 @@ export default async function LandingPage() {
                 <span className="text-lime">No sign-up needed.</span>
               </h2>
               <p className="text-white/50 font-light leading-relaxed mb-6">
-                We&apos;ve set up a demo sweepstake with 48 participants — one per World Cup team. Browse the live leaderboard, see the draw results, and get a feel for exactly what your group will see.
+                We&apos;ve set up two live demo sweepstakes — pick your tournament and see exactly what your group will get. No sign-up, no strings.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <p className="text-xs font-medium tracking-widest uppercase text-white/30 mb-3">Choose a demo</p>
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
                 <a
                   href="/s/demo2026"
                   className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
                 >
-                  View demo leaderboard
+                  ⚽ World Cup 2026
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </a>
                 <a
-                  href="#reserve"
-                  className="inline-flex items-center justify-center gap-2 bg-white/8 border border-white/15 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-white/12 transition-colors"
+                  href="/s/demoeurovision"
+                  className="inline-flex items-center justify-center gap-2 bg-[#F10F59] text-white font-semibold text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
                 >
-                  Set up yours free
+                  🎤 Eurovision 2026
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </a>
               </div>
+              <a
+                href="#reserve"
+                className="inline-flex items-center justify-center gap-2 bg-white/8 border border-white/15 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-white/12 transition-colors"
+              >
+                Set up yours free
+              </a>
             </div>
 
             {/* Mini animation */}

@@ -6,7 +6,7 @@ import { Wordmark } from '@/components/brand/Wordmark'
 import { PublicTabs } from '@/components/participant/PublicTabs'
 import { DemoBar } from '@/components/participant/DemoBar'
 
-const DEMO_TOKEN = 'demo2026'
+const DEMO_TOKENS = new Set(['demo2026', 'demoeurovision'])
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 interface Props {
@@ -62,7 +62,7 @@ export default async function PublicLayout({ children, params }: Props) {
 
   if (!sweepstake) notFound()
 
-  const isDemo = sweepstake.share_token === DEMO_TOKEN
+  const isDemo = DEMO_TOKENS.has(sweepstake.share_token)
 
   return (
     <div className="min-h-screen bg-light flex flex-col">

@@ -1,18 +1,18 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-const DEMO_TOKEN = 'demo2026'
+const DEMO_TOKENS = new Set(['demo2026', 'demoeurovision'])
 
 interface Props {
   children: React.ReactNode
   params: Promise<{ token: string }>
 }
 
-// This layout only renders for the demo token — no auth required
+// This layout only renders for demo tokens — no auth required
 export default async function OrganiserDemoLayout({ children, params }: Props) {
   const { token } = await params
 
-  if (token !== DEMO_TOKEN) notFound()
+  if (!DEMO_TOKENS.has(token)) notFound()
 
   // Verify the sweepstake exists (public read RLS is fine here)
   const supabase = await createClient()
