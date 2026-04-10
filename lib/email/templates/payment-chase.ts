@@ -7,12 +7,14 @@ export function paymentChaseEmailHtml({
   organiserName,
   entryFee,
   shareToken,
+  isEurovision = false,
 }: {
   participantName: string
   sweepstakeName: string
   organiserName: string
   entryFee: number
   shareToken: string
+  isEurovision?: boolean
 }) {
   const link = `${APP_URL}/s/${shareToken}`
   const amount = entryFee > 0 ? `£${entryFee.toFixed(2)}` : null
@@ -62,7 +64,7 @@ export function paymentChaseEmailHtml({
           </table>
           `}
 
-          <a href="${link}" style="display:block;text-align:center;background:#C8F04D;color:#1A2E22;font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
+          <a href="${link}" style="display:block;text-align:center;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
             View the leaderboard →
           </a>
 

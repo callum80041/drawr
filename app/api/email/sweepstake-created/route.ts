@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   // Fetch sweepstake + organiser (RLS ensures the user owns it)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, organiser_id')
+    .select('id, name, share_token, organiser_id, sweepstake_type')
     .eq('id', sweepstakeId)
     .single()
 
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       sweepstakeName: sweepstake.name,
       joinLink: `${APP_URL}/join/${sweepstake.share_token}`,
       leaderboardLink: `${APP_URL}/s/${sweepstake.share_token}`,
+      isEurovision: sweepstake.sweepstake_type === 'eurovision',
     }),
   })
 

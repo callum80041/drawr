@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   // Verify the organiser owns this sweepstake
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, organiser_id')
+    .select('id, name, share_token, organiser_id, sweepstake_type')
     .eq('id', sweepstakeId)
     .eq('organiser_id', organiser.id)
     .single()
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
       participantName: participant.name,
       sweepstakeName: sweepstake.name,
       shareToken: sweepstake.share_token,
+      isEurovision: sweepstake.sweepstake_type === 'eurovision',
     }),
   })
 

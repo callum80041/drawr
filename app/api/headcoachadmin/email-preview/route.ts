@@ -21,13 +21,26 @@ const SAMPLE = {
   dashboardUrl:    `${APP_URL}/dashboard`,
 }
 
-function buildHtml(template: string, version: string): string | null {
+const SAMPLE_EV = {
+  name:            'Alex Johnson',
+  organiserName:   'Sarah Mitchell',
+  sweepstakeName:  'The Office Eurovision 2026',
+  shareToken:      'demoeurovision',
+  joinUrl:         `${APP_URL}/join/demoeurovision`,
+  leaderboardUrl:  `${APP_URL}/s/demoeurovision`,
+  dashboardUrl:    `${APP_URL}/dashboard`,
+}
+
+function buildHtml(template: string, version: string, isEurovision: boolean): string | null {
+  const s = isEurovision ? SAMPLE_EV : SAMPLE
+
   switch (template) {
     case 'invite':
       return inviteEmailHtml({
-        participantName: SAMPLE.name,
-        sweepstakeName:  SAMPLE.sweepstakeName,
-        shareToken:      SAMPLE.shareToken,
+        participantName: s.name,
+        sweepstakeName:  s.sweepstakeName,
+        shareToken:      s.shareToken,
+        isEurovision,
       })
 
     case 'draw-complete':
@@ -54,39 +67,43 @@ function buildHtml(template: string, version: string): string | null {
 
     case 'payment-chase':
       return paymentChaseEmailHtml({
-        participantName: SAMPLE.name,
-        sweepstakeName:  SAMPLE.sweepstakeName,
-        organiserName:   SAMPLE.organiserName,
+        participantName: s.name,
+        sweepstakeName:  s.sweepstakeName,
+        organiserName:   s.organiserName,
         entryFee:        5,
-        shareToken:      SAMPLE.shareToken,
+        shareToken:      s.shareToken,
+        isEurovision,
       })
 
     case 'sweepstake-created':
       return sweepstakeCreatedEmailHtml({
-        organiserName:    SAMPLE.organiserName,
-        sweepstakeName:   SAMPLE.sweepstakeName,
-        joinLink:         SAMPLE.joinUrl,
-        leaderboardLink:  SAMPLE.leaderboardUrl,
+        organiserName:    s.organiserName,
+        sweepstakeName:   s.sweepstakeName,
+        joinLink:         s.joinUrl,
+        leaderboardLink:  s.leaderboardUrl,
+        isEurovision,
       })
 
     case 'participant-joined':
       return participantJoinedEmailHtml({
-        organiserName:    SAMPLE.organiserName,
-        participantName:  SAMPLE.name,
-        sweepstakeName:   SAMPLE.sweepstakeName,
+        organiserName:    s.organiserName,
+        participantName:  s.name,
+        sweepstakeName:   s.sweepstakeName,
         participantCount: 14,
-        dashboardUrl:     SAMPLE.dashboardUrl,
+        dashboardUrl:     s.dashboardUrl,
+        isEurovision,
       })
 
     case 'welcome':
-      return welcomeEmailHtml({ name: SAMPLE.organiserName })
+      return welcomeEmailHtml({ name: s.organiserName })
 
     case 'waitlist-promoted':
       return waitlistPromotedEmailHtml({
-        name:           SAMPLE.name,
-        sweepstakeName: SAMPLE.sweepstakeName,
-        shareToken:     SAMPLE.shareToken,
+        name:           s.name,
+        sweepstakeName: s.sweepstakeName,
+        shareToken:     s.shareToken,
         entryFee:       5,
+        isEurovision,
       })
 
     case 'organiser-update':
@@ -107,10 +124,11 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Unauthorised', { status: 401 })
   }
 
-  const template = req.nextUrl.searchParams.get('template') ?? 'organiser-update'
-  const version  = req.nextUrl.searchParams.get('version')  ?? 'A'
+  const template    = req.nextUrl.searchParams.get('template') ?? 'organiser-update'
+  const version     = req.nextUrl.searchParams.get('version')  ?? 'A'
+  const isEurovision = req.nextUrl.searchParams.get('variant') === 'eurovision'
 
-  const html = buildHtml(template, version)
+  const html = buildHtml(template, version, isEurovision)
   if (!html) {
     return new NextResponse('Unknown template', { status: 400 })
   }

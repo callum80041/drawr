@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   // Look up sweepstake by share token (public_read RLS allows this)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, plan, organiser_id')
+    .select('id, name, status, entry_fee, plan, organiser_id, sweepstake_type')
     .eq('share_token', token)
     .single()
 
@@ -143,6 +143,7 @@ export async function POST(req: NextRequest) {
           sweepstakeName: sweepstake.name,
           participantCount: count ?? 1,
           dashboardUrl: `${APP_URL}/dashboard/${sweepstake.id}/participants`,
+          isEurovision: sweepstake.sweepstake_type === 'eurovision',
         }),
       })
     } catch {

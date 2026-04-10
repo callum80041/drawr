@@ -412,16 +412,25 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
           <p className="text-xs text-mid mb-4">Click any template to preview it with sample data.</p>
 
           {(() => {
-            const templates = [
-              { id: 'welcome',                  label: 'Welcome',                    desc: 'New organiser signup',         tag: 'organiser' },
-              { id: 'sweepstake-created',       label: 'Sweepstake created',         desc: 'Organiser confirmation',       tag: 'organiser' },
-              { id: 'participant-joined',       label: 'Participant joined',          desc: 'Notifies organiser of signup', tag: 'organiser' },
-              { id: 'invite',                   label: 'Participant invite',          desc: 'Added to sweepstake',          tag: 'participant' },
-              { id: 'draw-complete',            label: 'Draw complete (WC)',          desc: 'World Cup team assigned',      tag: 'participant' },
-              { id: 'draw-complete-eurovision', label: 'Draw complete (Eurovision)',  desc: 'Eurovision country assigned',  tag: 'participant' },
-              { id: 'payment-chase',            label: 'Payment chase',              desc: 'Entry fee reminder',           tag: 'participant' },
-              { id: 'waitlist-promoted',        label: 'Waitlist promoted',          desc: 'Reserve list → confirmed',     tag: 'participant' },
-              { id: 'organiser-update',         label: 'Organiser update (bulk)',     desc: 'Campaign email (version A)',   tag: 'campaign' },
+            type TemplateEntry = { key: string; id: string; variant?: string; label: string; desc: string; tag: string }
+            const templates: TemplateEntry[] = [
+              // Organiser emails
+              { key: 'welcome',                        id: 'welcome',            label: 'Welcome',                      desc: 'New organiser signup',              tag: 'organiser' },
+              { key: 'sweepstake-created-wc',          id: 'sweepstake-created', label: 'Sweepstake created ⚽',        desc: 'Organiser confirmation — World Cup', tag: 'organiser' },
+              { key: 'sweepstake-created-ev',          id: 'sweepstake-created', variant: 'eurovision', label: 'Sweepstake created 🎤', desc: 'Organiser confirmation — Eurovision', tag: 'organiser' },
+              { key: 'participant-joined-wc',          id: 'participant-joined', label: 'Participant joined ⚽',        desc: 'Notifies organiser — World Cup',     tag: 'organiser' },
+              { key: 'participant-joined-ev',          id: 'participant-joined', variant: 'eurovision', label: 'Participant joined 🎤', desc: 'Notifies organiser — Eurovision',  tag: 'organiser' },
+              // Participant emails
+              { key: 'invite-wc',                      id: 'invite',             label: 'Invite ⚽',                    desc: 'Added to sweepstake — World Cup',   tag: 'participant' },
+              { key: 'invite-ev',                      id: 'invite',             variant: 'eurovision', label: 'Invite 🎤', desc: 'Added to sweepstake — Eurovision', tag: 'participant' },
+              { key: 'draw-complete',                  id: 'draw-complete',      label: 'Draw complete ⚽',             desc: 'World Cup team assigned',           tag: 'participant' },
+              { key: 'draw-complete-eurovision',       id: 'draw-complete-eurovision', label: 'Draw complete 🎤',       desc: 'Eurovision country assigned',       tag: 'participant' },
+              { key: 'payment-chase-wc',               id: 'payment-chase',      label: 'Payment chase ⚽',             desc: 'Entry fee reminder — World Cup',    tag: 'participant' },
+              { key: 'payment-chase-ev',               id: 'payment-chase',      variant: 'eurovision', label: 'Payment chase 🎤', desc: 'Entry fee reminder — Eurovision', tag: 'participant' },
+              { key: 'waitlist-promoted-wc',           id: 'waitlist-promoted',  label: 'Waitlist promoted ⚽',         desc: 'Reserve → confirmed — World Cup',   tag: 'participant' },
+              { key: 'waitlist-promoted-ev',           id: 'waitlist-promoted',  variant: 'eurovision', label: 'Waitlist promoted 🎤', desc: 'Reserve → confirmed — Eurovision', tag: 'participant' },
+              // Campaign
+              { key: 'organiser-update',               id: 'organiser-update',   label: 'Organiser update (bulk)',      desc: 'Campaign email (version A)',        tag: 'campaign' },
             ]
 
             const tagColour: Record<string, string> = {
@@ -430,15 +439,21 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
               campaign:    'bg-amber-100 text-amber-800',
             }
 
+            const previewSrc = (t: TemplateEntry) => {
+              const params = new URLSearchParams({ template: t.id })
+              if (t.variant) params.set('variant', t.variant)
+              return `/api/headcoachadmin/email-preview?${params}`
+            }
+
             return (
               <div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
                   {templates.map(t => (
                     <button
-                      key={t.id}
-                      onClick={() => setPreviewTemplate(previewTemplate === t.id ? null : t.id)}
+                      key={t.key}
+                      onClick={() => setPreviewTemplate(previewTemplate === t.key ? null : t.key)}
                       className={`text-left rounded-xl border p-4 transition-all ${
-                        previewTemplate === t.id
+                        previewTemplate === t.key
                           ? 'border-grass bg-[#F0FAF4] ring-1 ring-grass'
                           : 'border-[#E5EDEA] bg-white hover:border-grass/50 hover:bg-light/60'
                       }`}
@@ -452,26 +467,30 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
                   ))}
                 </div>
 
-                {previewTemplate && (
-                  <div className="rounded-xl border border-[#E5EDEA] overflow-hidden">
-                    <div className="px-4 py-2.5 bg-light border-b border-[#E5EDEA] flex items-center justify-between">
-                      <p className="text-xs font-medium text-mid">
-                        Preview — <span className="text-pitch font-semibold">{templates.find(t => t.id === previewTemplate)?.label}</span>
-                        {' '}(sample data)
-                      </p>
-                      <button onClick={() => setPreviewTemplate(null)} className="text-xs text-mid hover:text-pitch transition-colors">
-                        Close ✕
-                      </button>
+                {previewTemplate && (() => {
+                  const t = templates.find(x => x.key === previewTemplate)
+                  if (!t) return null
+                  return (
+                    <div className="rounded-xl border border-[#E5EDEA] overflow-hidden">
+                      <div className="px-4 py-2.5 bg-light border-b border-[#E5EDEA] flex items-center justify-between">
+                        <p className="text-xs font-medium text-mid">
+                          Preview — <span className="text-pitch font-semibold">{t.label}</span>
+                          {' '}(sample data)
+                        </p>
+                        <button onClick={() => setPreviewTemplate(null)} className="text-xs text-mid hover:text-pitch transition-colors">
+                          Close ✕
+                        </button>
+                      </div>
+                      <iframe
+                        key={previewTemplate}
+                        src={previewSrc(t)}
+                        className="w-full"
+                        style={{ height: 700, border: 'none' }}
+                        title={`Email preview: ${t.label}`}
+                      />
                     </div>
-                    <iframe
-                      key={previewTemplate}
-                      src={`/api/headcoachadmin/email-preview?template=${previewTemplate}`}
-                      className="w-full"
-                      style={{ height: 700, border: 'none' }}
-                      title={`Email preview: ${previewTemplate}`}
-                    />
-                  </div>
-                )}
+                  )
+                })()}
               </div>
             )
           })()}

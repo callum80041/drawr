@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, entry_fee, plan')
+    .select('id, name, share_token, entry_fee, plan, sweepstake_type')
     .eq('id', sweepstakeId)
     .eq('organiser_id', organiser.id)
     .single()
@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
           sweepstakeName: sweepstake.name,
           shareToken: sweepstake.share_token,
           entryFee: Number(sweepstake.entry_fee ?? 0),
+          isEurovision: sweepstake.sweepstake_type === 'eurovision',
         }),
       })
     } catch { /* best-effort */ }
