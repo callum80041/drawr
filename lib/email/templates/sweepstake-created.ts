@@ -1,4 +1,4 @@
-import { emailHeader } from './_header'
+import { emailHeader, emailHeaderEurovision } from './_header'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 export function sweepstakeCreatedEmailHtml({
@@ -14,6 +14,16 @@ export function sweepstakeCreatedEmailHtml({
   leaderboardLink: string
   isEurovision?: boolean
 }) {
+  const header = isEurovision ? emailHeaderEurovision : emailHeader
+  const pageBg = isEurovision ? '#EEE8FF' : '#F5F9F6'
+  const sectionBg = isEurovision ? '#E6DCFF' : '#F5F9F6'
+  const border = isEurovision ? '#CFC3F0' : '#E5EDEA'
+  const accent = isEurovision ? '#F10F59' : '#C8F04D'
+  const accentText = isEurovision ? '#ffffff' : '#1A2E22'
+  const stepColor = isEurovision ? '#F10F59' : '#C8F04D'
+  const footerBg = isEurovision ? '#1B0744' : '#F5F9F6'
+  const footerText = isEurovision ? 'rgba(255,255,255,0.4)' : '#8EA899'
+
   const thing = isEurovision ? 'country' : 'team'
   const things = isEurovision ? 'countries' : 'teams'
   const drawEmoji = isEurovision ? '🎤' : '🎲'
@@ -28,11 +38,11 @@ export function sweepstakeCreatedEmailHtml({
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Your sweepstake is ready</title>
 </head>
-<body style="margin:0;padding:0;background:#F5F9F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
+<body style="margin:0;padding:0;background:${pageBg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${pageBg};padding:40px 16px;">
   <tr><td align="center">
-    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
-      ${emailHeader}
+    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid ${border};overflow:hidden;">
+      ${header}
 
       <!-- Body -->
       <tr>
@@ -46,42 +56,42 @@ export function sweepstakeCreatedEmailHtml({
           </p>
 
           <!-- Join link box -->
-          <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:16px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;background:${sectionBg};border-radius:12px;margin-bottom:16px;">
             <tr><td style="padding:20px 24px;">
               <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">Self-signup link — share with participants</p>
               <p style="margin:0 0 14px;font-size:13px;color:#1A2E22;word-break:break-all;font-family:monospace;">${joinLink}</p>
-              <a href="${joinLink}" style="display:inline-block;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:13px;text-decoration:none;padding:10px 18px;border-radius:8px;letter-spacing:-0.1px;">
+              <a href="${joinLink}" style="display:inline-block;background:${accent};color:${accentText};font-weight:700;font-size:13px;text-decoration:none;padding:10px 18px;border-radius:8px;letter-spacing:-0.1px;">
                 Preview sign-up page →
               </a>
             </td></tr>
           </table>
 
           <!-- How it works steps -->
-          <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;background:${sectionBg};border-radius:12px;margin-bottom:24px;">
             <tr><td style="padding:20px 24px;">
               <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#1A2E22;text-transform:uppercase;letter-spacing:0.06em;">How participants sign up</p>
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">1.</span>
+                    <span style="color:${stepColor};font-weight:700;margin-right:10px;">1.</span>
                     They click the link above (or you send it via WhatsApp, email, etc.)
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">2.</span>
+                    <span style="color:${stepColor};font-weight:700;margin-right:10px;">2.</span>
                     They enter their name and email — that's it
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">3.</span>
+                    <span style="color:${stepColor};font-weight:700;margin-right:10px;">3.</span>
                     They appear instantly in your dashboard
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">4.</span>
+                    <span style="color:${stepColor};font-weight:700;margin-right:10px;">4.</span>
                     ${step4}
                   </td>
                 </tr>
@@ -102,8 +112,8 @@ export function sweepstakeCreatedEmailHtml({
 
       <!-- Footer -->
       <tr>
-        <td style="background:#F5F9F6;padding:16px 32px;border-top:1px solid #E5EDEA;">
-          <p style="margin:0;font-size:11px;color:#8EA899;text-align:center;">
+        <td style="background:${footerBg};padding:16px 32px;border-top:1px solid ${border};">
+          <p style="margin:0;font-size:11px;color:${footerText};text-align:center;">
             Drawr · playdrawr.co.uk · We will never share your details with anyone. No spam, ever.
           </p>
         </td>

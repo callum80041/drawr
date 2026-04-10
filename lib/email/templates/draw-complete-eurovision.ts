@@ -1,4 +1,4 @@
-import { emailHeader } from './_header'
+import { emailHeaderEurovision, spotifyBlock } from './_header'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 interface CountryAssignment {
@@ -26,7 +26,7 @@ export function drawCompleteEurovisionEmailHtml({
 
   const countryRows = countries.map(c => `
     <tr>
-      <td style="padding:10px 16px;border-bottom:1px solid #E5EDEA;">
+      <td style="padding:10px 16px;border-bottom:1px solid #CFC3F0;">
         <span style="font-size:22px;margin-right:10px;">${c.flag ?? '🏳️'}</span>
         <span style="font-size:15px;font-weight:700;color:#1A2E22;">${escapeHtml(c.name)}</span>
         <span style="font-size:12px;color:#8EA899;margin-left:8px;">${semiLabel(c.semi_final)}</span>
@@ -44,11 +44,11 @@ export function drawCompleteEurovisionEmailHtml({
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Your country has been drawn!</title>
 </head>
-<body style="margin:0;padding:0;background:#F5F9F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
+<body style="margin:0;padding:0;background:#EEE8FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#EEE8FF;padding:40px 16px;">
   <tr><td align="center">
-    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
-      ${emailHeader}
+    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #CFC3F0;overflow:hidden;">
+      ${emailHeaderEurovision}
 
       <!-- Hero country -->
       <tr>
@@ -76,17 +76,19 @@ export function drawCompleteEurovisionEmailHtml({
           </p>
 
           ${countries.length > 1 ? `
-          <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #E5EDEA;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #CFC3F0;border-radius:12px;overflow:hidden;margin-bottom:24px;">
             <tr>
-              <td style="background:#F5F9F6;padding:10px 16px;border-bottom:1px solid #E5EDEA;">
+              <td style="background:#E6DCFF;padding:10px 16px;border-bottom:1px solid #CFC3F0;">
                 <p style="margin:0;font-size:11px;font-weight:600;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">Your countries</p>
               </td>
             </tr>
             ${countryRows}
           </table>` : ''}
 
+          ${spotifyBlock}
+
           <!-- Scoring reminder -->
-          <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;background:#E6DCFF;border-radius:12px;margin-bottom:24px;">
             <tr>
               <td style="padding:16px 20px;">
                 <p style="margin:0 0 8px;font-size:11px;font-weight:600;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">How scoring works</p>
@@ -111,11 +113,11 @@ export function drawCompleteEurovisionEmailHtml({
 
       <!-- Create your own promo -->
       <tr>
-        <td style="background:#F0FAF4;padding:16px 32px;border-top:1px solid #E5EDEA;text-align:center;">
-          <p style="margin:0 0 6px;font-size:12px;color:#5A7265;line-height:1.5;">
+        <td style="background:#2A0E5A;padding:16px 32px;border-top:1px solid #CFC3F0;text-align:center;">
+          <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5;">
             Running your own group? Set up a sweepstake in 3 minutes — free.
           </p>
-          <a href="${APP_URL}/signup" style="font-size:12px;font-weight:600;color:#1A2E22;text-decoration:none;border-bottom:1px solid #1A2E22;">
+          <a href="${APP_URL}/signup" style="font-size:12px;font-weight:600;color:#ffffff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.5);">
             Create your sweepstake at playdrawr.co.uk →
           </a>
         </td>
@@ -123,8 +125,8 @@ export function drawCompleteEurovisionEmailHtml({
 
       <!-- Footer -->
       <tr>
-        <td style="background:#F5F9F6;padding:16px 32px;border-top:1px solid #E5EDEA;">
-          <p style="margin:0;font-size:11px;color:#8EA899;text-align:center;">
+        <td style="background:#1B0744;padding:16px 32px;border-top:1px solid #CFC3F0;">
+          <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);text-align:center;">
             playdrawr · playdrawr.co.uk · We will never share your details with anyone. No spam, ever.
           </p>
         </td>

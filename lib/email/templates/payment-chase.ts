@@ -1,4 +1,4 @@
-import { emailHeader } from './_header'
+import { emailHeader, emailHeaderEurovision } from './_header'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 export function paymentChaseEmailHtml({
@@ -18,6 +18,14 @@ export function paymentChaseEmailHtml({
 }) {
   const link = `${APP_URL}/s/${shareToken}`
   const amount = entryFee > 0 ? `£${entryFee.toFixed(2)}` : null
+  const header = isEurovision ? emailHeaderEurovision : emailHeader
+  const pageBg = isEurovision ? '#EEE8FF' : '#F5F9F6'
+  const sectionBg = isEurovision ? '#E6DCFF' : '#F5F9F6'
+  const border = isEurovision ? '#CFC3F0' : '#E5EDEA'
+  const accent = isEurovision ? '#F10F59' : '#C8F04D'
+  const accentText = isEurovision ? '#ffffff' : '#1A2E22'
+  const footerBg = isEurovision ? '#1B0744' : '#F5F9F6'
+  const footerText = isEurovision ? 'rgba(255,255,255,0.4)' : '#8EA899'
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -26,11 +34,11 @@ export function paymentChaseEmailHtml({
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Quick reminder about your sweepstake entry</title>
 </head>
-<body style="margin:0;padding:0;background:#F5F9F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
+<body style="margin:0;padding:0;background:${pageBg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${pageBg};padding:40px 16px;">
   <tr><td align="center">
-    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
-      ${emailHeader}
+    <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid ${border};overflow:hidden;">
+      ${header}
 
       <!-- Body -->
       <tr>
@@ -44,7 +52,7 @@ export function paymentChaseEmailHtml({
           </p>
 
           ${amount ? `
-          <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;background:${sectionBg};border-radius:12px;margin-bottom:24px;">
             <tr>
               <td style="padding:20px 24px;">
                 <p style="margin:0 0 4px;font-size:11px;font-weight:600;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">Amount owed</p>
@@ -54,7 +62,7 @@ export function paymentChaseEmailHtml({
             </tr>
           </table>
           ` : `
-          <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;background:${sectionBg};border-radius:12px;margin-bottom:24px;">
             <tr>
               <td style="padding:20px 24px;">
                 <p style="margin:0 0 4px;font-size:11px;font-weight:600;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">Your sweepstake</p>
@@ -64,7 +72,7 @@ export function paymentChaseEmailHtml({
           </table>
           `}
 
-          <a href="${link}" style="display:block;text-align:center;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
+          <a href="${link}" style="display:block;text-align:center;background:${accent};color:${accentText};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
             View the leaderboard →
           </a>
 
@@ -77,8 +85,8 @@ export function paymentChaseEmailHtml({
 
       <!-- Footer -->
       <tr>
-        <td style="background:#F5F9F6;padding:16px 32px;border-top:1px solid #E5EDEA;">
-          <p style="margin:0;font-size:11px;color:#8EA899;text-align:center;">
+        <td style="background:${footerBg};padding:16px 32px;border-top:1px solid ${border};">
+          <p style="margin:0;font-size:11px;color:${footerText};text-align:center;">
             Drawr · playdrawr.co.uk · Sent on behalf of ${escapeHtml(organiserName)}.
           </p>
         </td>
