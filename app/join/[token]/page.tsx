@@ -24,7 +24,7 @@ export default function JoinPage({ params }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim() || !email.trim()) return
+    if (!name.trim()) return
     setStatus('submitting')
     setErrorMsg('')
 
@@ -64,7 +64,7 @@ export default function JoinPage({ params }: Props) {
           <div className="bg-white rounded-2xl border border-[#E5EDEA] overflow-hidden">
             <div className="bg-pitch px-8 py-7">
               <p className="text-2xl font-heading font-black text-white tracking-tight">Drawr 🎲</p>
-              <p className="text-sm text-white/50 mt-1">World Cup 2026 Sweepstakes</p>
+              <p className="text-sm text-white/50 mt-1">Sweepstake</p>
             </div>
             <div className="px-8 py-8 text-center">
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isWaitlisted ? 'bg-amber-100' : 'bg-lime'}`}>
@@ -92,13 +92,13 @@ export default function JoinPage({ params }: Props) {
                 </>
               ) : (
                 <>
-                  <h1 className="text-2xl font-heading font-black text-pitch tracking-tight mb-2">You&apos;re in! ⚽</h1>
+                  <h1 className="text-2xl font-heading font-black text-pitch tracking-tight mb-2">You&apos;re in! 🎉</h1>
                   <p className="text-mid text-sm leading-relaxed mb-2">
                     Welcome to <strong className="text-pitch">{successData.sweepstakeName}</strong>, {successData.name}.
                   </p>
                   <p className="text-mid text-sm leading-relaxed">
-                    Sit tight — you&apos;ll find out which team you&apos;ve drawn once the organiser runs the draw.
-                    Fingers crossed for a decent one.
+                    Sit tight — you&apos;ll find out your draw once the organiser runs it.
+                    Fingers crossed for a good one.
                   </p>
                 </>
               )}
@@ -146,7 +146,7 @@ export default function JoinPage({ params }: Props) {
           {/* Header */}
           <div className="bg-pitch px-8 py-7">
             <p className="text-2xl font-heading font-black text-white tracking-tight">Drawr 🎲</p>
-            <p className="text-sm text-white/50 mt-1">World Cup 2026 Sweepstakes</p>
+            <p className="text-sm text-white/50 mt-1">Sweepstake</p>
           </div>
 
           {/* Form */}
@@ -188,18 +188,19 @@ export default function JoinPage({ params }: Props) {
 
               <div>
                 <label className="block text-xs font-semibold text-pitch uppercase tracking-wide mb-1.5">
-                  Email address <span className="text-red-400">*</span>
+                  Email address <span className="text-mid font-normal normal-case">(optional)</span>
                 </label>
                 <input
                   type="email"
-                  required
                   placeholder="e.g. jamie@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   disabled={status === 'submitting'}
                   className="w-full px-4 py-3 rounded-xl border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:opacity-60"
                 />
-                <p className="text-xs text-mid mt-1.5">Used to verify your entry. No spam, ever.</p>
+                <p className="text-xs text-mid mt-1.5">
+                  No spam — only used to send you your draw result and leaderboard updates.
+                </p>
               </div>
 
               {/* 18+ confirmation */}
@@ -232,7 +233,7 @@ export default function JoinPage({ params }: Props) {
 
               <button
                 type="submit"
-                disabled={status === 'submitting' || !name.trim() || !email.trim() || !ageConfirmed}
+                disabled={status === 'submitting' || !name.trim() || !ageConfirmed}
                 className="w-full bg-lime text-pitch font-bold text-base py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === 'submitting' ? 'Joining…' : 'Join sweepstake →'}

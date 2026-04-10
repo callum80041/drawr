@@ -14,6 +14,8 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [checkEmail, setCheckEmail] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
 
   const supabase = createClient()
 
@@ -28,7 +30,7 @@ export default function SignupPage() {
 
     setLoading(true)
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -41,11 +43,25 @@ export default function SignupPage() {
 
     if (error) {
       setError(error.message)
-    } else {
-      // Supabase may auto-confirm or require email confirmation depending on project settings.
-      // Redirect to dashboard; middleware will handle unauthenticated state.
-      setCheckEmail(true)
+      return
     }
+
+    // If Supabase returned a session immediately (email confirmation disabled),
+    // skip the "check your email" screen and go straight to the dashboard.
+    if (data.session) {
+      router.push('/dashboard')
+      return
+    }
+
+    setCheckEmail(true)
+  }
+
+  async function handleResend() {
+    setResending(true)
+    setResent(false)
+    await supabase.auth.resend({ type: 'signup', email })
+    setResending(false)
+    setResent(true)
   }
 
   if (checkEmail) {
@@ -56,13 +72,38 @@ export default function SignupPage() {
             <Wordmark size="lg" variant="light" />
           </div>
           <div className="bg-white rounded-2xl p-8 text-center">
-            <div className="text-3xl mb-3">📬</div>
+            <div className="text-4xl mb-4">📬</div>
             <h1 className="font-heading text-xl font-bold text-pitch mb-2">Check your email</h1>
-            <p className="text-sm text-mid">
-              We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+            <p className="text-sm text-mid mb-1">
+              We sent a confirmation link to
             </p>
-            <Link href="/login" className="block mt-6 text-sm text-grass hover:underline">
-              Back to sign in
+            <p className="text-sm font-semibold text-pitch mb-4">{email}</p>
+            <p className="text-sm text-mid mb-6">
+              Click the link in the email to activate your account and you&apos;ll land straight in your dashboard — no extra steps.
+            </p>
+
+            <div className="bg-light rounded-xl px-4 py-3 mb-6 text-left space-y-1.5">
+              <p className="text-xs font-semibold text-pitch">Not seeing it?</p>
+              <p className="text-xs text-mid">Check your spam or junk folder.</p>
+              <p className="text-xs text-mid">
+                The email comes from <span className="font-medium text-pitch">hello@playdrawr.co.uk</span>
+              </p>
+            </div>
+
+            {resent ? (
+              <p className="text-sm text-grass font-medium mb-4">✓ Resent — check your inbox again</p>
+            ) : (
+              <button
+                onClick={handleResend}
+                disabled={resending}
+                className="text-sm text-grass hover:underline disabled:opacity-50 mb-4 block mx-auto"
+              >
+                {resending ? 'Sending…' : 'Resend confirmation email'}
+              </button>
+            )}
+
+            <Link href="/login" className="block text-sm text-mid hover:text-pitch transition-colors">
+              ← Back to sign in
             </Link>
           </div>
         </div>

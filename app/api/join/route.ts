@@ -18,14 +18,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing token or name' }, { status: 400 })
   }
 
-  if (!email?.trim()) {
-    return NextResponse.json({ error: 'Email is required to verify your entry.' }, { status: 400 })
-  }
-
-  // Basic email format check
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email.trim())) {
-    return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
+  // Email is optional — but if provided it must be a valid format
+  if (email?.trim()) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email.trim())) {
+      return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
+    }
   }
 
   // Use anon client for public reads, service client for the privileged insert
@@ -47,15 +45,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'This sweepstake is complete — no new entries.' }, { status: 400 })
   }
 
-  // Check for duplicate email in this sweepstake
-  const { count: dupeCount } = await supabase
-    .from('participants')
-    .select('*', { count: 'exact', head: true })
-    .eq('sweepstake_id', sweepstake.id)
-    .eq('email', email.trim().toLowerCase())
+  // Check for duplicate email in this sweepstake (only if email provided)
+  if (email?.trim()) {
+    const { count: dupeCount } = await supabase
+      .from('participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('sweepstake_id', sweepstake.id)
+      .eq('email', email.trim().toLowerCase())
 
-  if ((dupeCount ?? 0) > 0) {
-    return NextResponse.json({ error: 'That email address has already been used to join this sweepstake.' }, { status: 400 })
+    if ((dupeCount ?? 0) > 0) {
+      return NextResponse.json({ error: 'That email address has already been used to join this sweepstake.' }, { status: 400 })
+    }
   }
 
   // Free plan cap — if full, add to waitlist instead of blocking
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         .insert({
           sweepstake_id: sweepstake.id,
           name: name.trim(),
-          email: email.trim().toLowerCase(),
+          email: email?.trim() ? email.trim().toLowerCase() : null,
         })
         .select('id, name, email')
         .single()
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     .insert({
       sweepstake_id: sweepstake.id,
       name: name.trim(),
-      email: email.trim().toLowerCase(),
+      email: email?.trim() ? email.trim().toLowerCase() : null,
       paid: false,
     })
     .select('id, name, email')
