@@ -13,11 +13,14 @@ export default async function PredictPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, tournament_id')
+    .select('id, tournament_id, sweepstake_type')
     .eq('share_token', token)
     .single()
 
   if (!sweepstake) notFound()
+
+  // Predict is World Cup only
+  if (sweepstake.sweepstake_type === 'eurovision') notFound()
 
   const tournamentId = sweepstake.tournament_id ?? 1
 

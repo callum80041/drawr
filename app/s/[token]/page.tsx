@@ -86,11 +86,15 @@ export default async function LeaderboardPage({ params }: Props) {
     })
     .sort((a, b) => b.points - a.points)
 
+  const BG_EV    = '#040241'
+  const PINK_EV  = '#F10F59'
+  const PURPLE_EV = '#5A22A9'
+
   if (ranked.length === 0) {
     return (
-      <div className="text-center py-16 text-mid">
+      <div className="text-center py-16" style={isEurovision ? { color: 'rgba(4,2,65,0.5)' } : { color: undefined }}>
         <p className="text-4xl mb-3">{isEurovision ? '🎤' : '🏆'}</p>
-        <p className="font-medium text-pitch">The draw hasn&apos;t happened yet.</p>
+        <p className="font-medium" style={isEurovision ? { color: BG_EV } : { color: undefined }}>The draw hasn&apos;t happened yet.</p>
         <p className="text-sm mt-1">Check back soon.</p>
       </div>
     )
@@ -106,43 +110,66 @@ export default async function LeaderboardPage({ params }: Props) {
             ? p.teams.map(t => euScoreByTeam[t.team_id] ?? null)
             : []
 
+          const isFirst = i === 0
+
           return (
             <div
               key={p.id}
-              className={`bg-white rounded-xl border px-4 py-3 flex items-center gap-3 ${
-                i === 0 ? 'border-gold/40' : 'border-[#E5EDEA]'
-              }`}
+              className="rounded-xl px-4 py-3 flex items-center gap-3"
+              style={isEurovision
+                ? {
+                    background: isFirst ? 'rgba(241,15,89,0.06)' : '#fff',
+                    border: `1px solid ${isFirst ? 'rgba(241,15,89,0.25)' : 'rgba(90,34,169,0.12)'}`,
+                  }
+                : {
+                    background: '#fff',
+                    border: `1px solid ${isFirst ? 'rgba(218,165,32,0.4)' : '#E5EDEA'}`,
+                  }
+              }
             >
               {/* Rank */}
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                i === 0 ? 'bg-gold text-white' :
-                i === 1 ? 'bg-[#C0C0C0] text-white' :
-                i === 2 ? 'bg-[#CD7F32] text-white' :
-                'bg-light text-mid'
-              }`}>
+              <span
+                className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                style={
+                  i === 0 ? { background: isEurovision ? PINK_EV    : '#D4AF37', color: '#fff' } :
+                  i === 1 ? { background: '#C0C0C0', color: '#fff' } :
+                  i === 2 ? { background: '#CD7F32', color: '#fff' } :
+                  isEurovision
+                    ? { background: 'rgba(90,34,169,0.1)', color: PURPLE_EV }
+                    : { background: '#F5F9F6', color: '#5A7265' }
+                }
+              >
                 {i + 1}
               </span>
 
               {/* Name + countries/teams */}
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-pitch text-sm">{p.name}</p>
+                <p className="font-medium text-sm" style={isEurovision ? { color: BG_EV } : { color: '#1A2E22' }}>{p.name}</p>
                 {p.teams.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {p.teams.map((t, ti) => {
                       const euResult = isEurovision ? euResults[ti] : null
                       const qualified = euResult?.qualified ?? false
-                      const eliminated = isEurovision && euResult !== null && !qualified
+                      const hasResult = euResult !== null && euResult !== undefined
+                      const eliminated = isEurovision && hasResult && !qualified
 
                       return (
                         <span
                           key={t.team_id}
-                          className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
-                            eliminated
-                              ? 'bg-red-50 text-red-400 line-through'
-                              : qualified
-                              ? 'bg-lime/20 text-pitch'
-                              : 'bg-light text-mid'
-                          }`}
+                          className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
+                          style={
+                            isEurovision
+                              ? eliminated
+                                ? { background: 'rgba(241,15,89,0.08)', color: '#9ca3af', textDecoration: 'line-through' }
+                                : qualified
+                                ? { background: 'rgba(90,34,169,0.12)', color: PURPLE_EV }
+                                : { background: 'rgba(90,34,169,0.06)', color: 'rgba(4,2,65,0.5)' }
+                              : eliminated
+                                ? { background: '#FEF2F2', color: '#F87171', textDecoration: 'line-through' }
+                                : qualified
+                                ? { background: 'rgba(200,240,77,0.2)', color: '#1A2E22' }
+                                : { background: '#F5F9F6', color: '#5A7265' }
+                          }
                         >
                           {t.team_flag && <span>{t.team_flag}</span>}
                           {t.team_name}
@@ -154,8 +181,8 @@ export default async function LeaderboardPage({ params }: Props) {
               </div>
 
               {/* Points */}
-              <span className="font-heading font-bold text-pitch text-lg shrink-0">
-                {p.points} <span className="text-xs font-normal text-mid">pts</span>
+              <span className="font-heading font-bold text-lg shrink-0" style={isEurovision ? { color: isFirst ? PINK_EV : BG_EV } : { color: '#1A2E22' }}>
+                {p.points} <span className="text-xs font-normal" style={isEurovision ? { color: 'rgba(4,2,65,0.4)' } : { color: '#5A7265' }}>pts</span>
               </span>
             </div>
           )
