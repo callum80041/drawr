@@ -7,13 +7,17 @@ export function participantJoinedEmailHtml({
   sweepstakeName,
   participantCount,
   dashboardUrl,
+  isEurovision = false,
 }: {
   organiserName: string
   participantName: string
   sweepstakeName: string
   participantCount: number
   dashboardUrl: string
+  isEurovision?: boolean
 }) {
+  const emoji = isEurovision ? '🎤' : '⚽'
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +35,7 @@ export function participantJoinedEmailHtml({
       <tr>
         <td style="padding:32px;">
           <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#1A2E22;letter-spacing:-0.3px;">
-            New sign-up ⚽
+            New sign-up ${emoji}
           </p>
           <p style="margin:0 0 24px;font-size:15px;color:#5A7265;line-height:1.6;">
             Hey ${escapeHtml(organiserName)}, <strong style="color:#1A2E22;">${escapeHtml(participantName)}</strong> just joined
@@ -39,7 +43,7 @@ export function participantJoinedEmailHtml({
             You now have <strong style="color:#1A2E22;">${participantCount} participant${participantCount === 1 ? '' : 's'}</strong> signed up.
           </p>
 
-          <a href="${dashboardUrl}" style="display:block;text-align:center;background:#C8F04D;color:#1A2E22;font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
+          <a href="${dashboardUrl}" style="display:block;text-align:center;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
             View participants →
           </a>
 

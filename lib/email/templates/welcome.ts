@@ -9,7 +9,7 @@ export function welcomeEmailHtml({ name }: { name: string }) {
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Welcome to Drawr</title>
+<title>Welcome to playdrawr</title>
 </head>
 <body style="margin:0;padding:0;background:#F5F9F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F9F6;padding:40px 16px;">
@@ -21,13 +21,28 @@ export function welcomeEmailHtml({ name }: { name: string }) {
       <tr>
         <td style="padding:32px;">
           <p style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1A2E22;letter-spacing:-0.3px;">
-            Welcome to Drawr, ${escapeHtml(name)}! ⚽
+            Welcome to playdrawr, ${escapeHtml(name)}! 🎉
           </p>
           <p style="margin:0 0 20px;font-size:15px;color:#5A7265;line-height:1.6;">
-            You're all set to run your World Cup 2026 sweepstake. Add your participants,
-            set an entry fee if you want, and when you're ready — hit the draw button and
-            watch the chaos unfold.
+            You're all set to run a sweepstake. Whether it's the World Cup 2026 ⚽ or Eurovision 2026 🎤 —
+            add your participants, set an entry fee if you want, and when you're ready, hit the draw button.
           </p>
+
+          <!-- Tournament options -->
+          <table cellpadding="0" cellspacing="0" style="width:100%;border-radius:12px;margin-bottom:20px;overflow:hidden;border:1px solid #E5EDEA;">
+            <tr>
+              <td style="padding:16px 20px;border-bottom:1px solid #E5EDEA;">
+                <p style="margin:0;font-size:14px;font-weight:700;color:#1A2E22;">⚽ World Cup 2026</p>
+                <p style="margin:4px 0 0;font-size:13px;color:#5A7265;">48 teams · Group stage + knockout · USA, Canada, Mexico · June–July 2026</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 20px;">
+                <p style="margin:0;font-size:14px;font-weight:700;color:#1A2E22;">🎤 Eurovision 2026</p>
+                <p style="margin:4px 0 0;font-size:13px;color:#5A7265;">35 countries · Semi-finals + Grand Final · Vienna, Austria · May 2026</p>
+              </td>
+            </tr>
+          </table>
 
           <!-- What happens next -->
           <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
@@ -43,19 +58,19 @@ export function welcomeEmailHtml({ name }: { name: string }) {
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
                     <span style="color:#C8F04D;font-weight:700;margin-right:10px;">2.</span>
-                    Run the draw — teams are assigned randomly, one by one
+                    Run the draw — teams or countries assigned randomly
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
                     <span style="color:#C8F04D;font-weight:700;margin-right:10px;">3.</span>
-                    Everyone gets their team emailed to them automatically
+                    Everyone gets their assignment emailed automatically
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
                     <span style="color:#C8F04D;font-weight:700;margin-right:10px;">4.</span>
-                    Sit back. Watch the tournament. Collect the prize pot.
+                    Sit back. Watch the action. Collect the prize pot.
                   </td>
                 </tr>
               </table>
@@ -66,14 +81,12 @@ export function welcomeEmailHtml({ name }: { name: string }) {
             Go to your dashboard →
           </a>
 
-          <!-- No spam note -->
           <table cellpadding="0" cellspacing="0" style="width:100%;margin-top:24px;background:#F5F9F6;border-radius:10px;">
             <tr><td style="padding:16px 20px;">
               <p style="margin:0;font-size:13px;color:#5A7265;line-height:1.6;">
                 <strong style="color:#1A2E22;">One more thing —</strong> we're not going to clog up your inbox.
-                We'll only ever drop you a line when there's actually something worth knowing:
-                a leaderboard shake-up after matchday, or your sweepstake reaching a big moment.
-                No newsletters. No "just checking in." Just football. ⚽
+                We'll only email you when there's something worth knowing.
+                No newsletters. No "just checking in."
               </p>
             </td></tr>
           </table>

@@ -5,12 +5,21 @@ export function inviteEmailHtml({
   participantName,
   sweepstakeName,
   shareToken,
+  isEurovision = false,
 }: {
   participantName: string
   sweepstakeName: string
   shareToken: string
+  isEurovision?: boolean
 }) {
   const link = `${APP_URL}/s/${shareToken}`
+  const emoji = isEurovision ? '🎤' : '⚽'
+  const tagline = isEurovision
+    ? 'Once the draw is run, you\'ll be assigned a country — then it\'s fingers crossed until the final vote.'
+    : 'Once the draw is run, you\'ll be assigned a team — then it\'s fingers crossed until the final whistle.'
+  const signoff = isEurovision
+    ? 'No account needed — just bookmark the link above.<br/>May your country serve up three minutes of pure drama.'
+    : 'No account needed — just bookmark the link above.<br/>Good luck. You\'re going to need it. Or maybe not. That\'s the beauty of a sweepstake.'
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -29,11 +38,11 @@ export function inviteEmailHtml({
       <tr>
         <td style="padding:32px;">
           <p style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1A2E22;letter-spacing:-0.3px;">
-            You're in the sweepstake! ⚽
+            You're in the sweepstake! ${emoji}
           </p>
           <p style="margin:0 0 24px;font-size:15px;color:#5A7265;line-height:1.6;">
             Hey ${escapeHtml(participantName)}, you've been added to <strong style="color:#1A2E22;">${escapeHtml(sweepstakeName)}</strong>.
-            Once the draw is run, you'll be assigned a team — then it's fingers crossed until the final whistle.
+            ${tagline}
           </p>
 
           <table cellpadding="0" cellspacing="0" style="width:100%;background:#F5F9F6;border-radius:12px;margin-bottom:24px;">
@@ -45,13 +54,12 @@ export function inviteEmailHtml({
             </tr>
           </table>
 
-          <a href="${link}" style="display:block;text-align:center;background:#C8F04D;color:#1A2E22;font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
+          <a href="${link}" style="display:block;text-align:center;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
             View the leaderboard →
           </a>
 
           <p style="margin:20px 0 0;font-size:12px;color:#8EA899;text-align:center;line-height:1.5;">
-            No account needed — just bookmark the link above.<br/>
-            Good luck. You're going to need it. Or maybe not. That's the beauty of a sweepstake.
+            ${signoff}
           </p>
         </td>
       </tr>

@@ -6,13 +6,16 @@ export function waitlistPromotedEmailHtml({
   sweepstakeName,
   shareToken,
   entryFee,
+  isEurovision = false,
 }: {
   name: string
   sweepstakeName: string
   shareToken: string
   entryFee: number
+  isEurovision?: boolean
 }) {
   const leaderboardLink = `${APP_URL}/s/${shareToken}`
+  const assignedThing = isEurovision ? 'a country' : 'a team'
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -35,7 +38,7 @@ export function waitlistPromotedEmailHtml({
           </p>
           <p style="margin:0 0 24px;font-size:15px;color:#5A7265;line-height:1.6;">
             A spot opened up in <strong style="color:#1A2E22;">${escapeHtml(sweepstakeName)}</strong> and you&apos;ve
-            been moved from the reserve list to a confirmed place. You&apos;ll be assigned a team when the organiser runs the draw.
+            been moved from the reserve list to a confirmed place. You&apos;ll be assigned ${assignedThing} when the organiser runs the draw.
           </p>
 
           ${entryFee > 0 ? `
@@ -48,7 +51,7 @@ export function waitlistPromotedEmailHtml({
           </table>
           ` : ''}
 
-          <a href="${leaderboardLink}" style="display:block;text-align:center;background:#C8F04D;color:#1A2E22;font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
+          <a href="${leaderboardLink}" style="display:block;text-align:center;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:15px;text-decoration:none;padding:14px 24px;border-radius:12px;letter-spacing:-0.2px;">
             View the leaderboard →
           </a>
         </td>

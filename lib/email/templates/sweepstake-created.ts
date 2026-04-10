@@ -6,12 +6,21 @@ export function sweepstakeCreatedEmailHtml({
   sweepstakeName,
   joinLink,
   leaderboardLink,
+  isEurovision = false,
 }: {
   organiserName: string
   sweepstakeName: string
   joinLink: string
   leaderboardLink: string
+  isEurovision?: boolean
 }) {
+  const thing = isEurovision ? 'country' : 'team'
+  const things = isEurovision ? 'countries' : 'teams'
+  const drawEmoji = isEurovision ? '🎤' : '🎲'
+  const step4 = isEurovision
+    ? `When everyone's in — run the draw and assign ${things} ${drawEmoji}`
+    : `When everyone's in — run the draw ${drawEmoji}`
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +50,7 @@ export function sweepstakeCreatedEmailHtml({
             <tr><td style="padding:20px 24px;">
               <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#5A7265;text-transform:uppercase;letter-spacing:0.08em;">Self-signup link — share with participants</p>
               <p style="margin:0 0 14px;font-size:13px;color:#1A2E22;word-break:break-all;font-family:monospace;">${joinLink}</p>
-              <a href="${joinLink}" style="display:inline-block;background:#C8F04D;color:#1A2E22;font-weight:700;font-size:13px;text-decoration:none;padding:10px 18px;border-radius:8px;letter-spacing:-0.1px;">
+              <a href="${joinLink}" style="display:inline-block;background:${isEurovision ? '#F10F59' : '#C8F04D'};color:${isEurovision ? '#ffffff' : '#1A2E22'};font-weight:700;font-size:13px;text-decoration:none;padding:10px 18px;border-radius:8px;letter-spacing:-0.1px;">
                 Preview sign-up page →
               </a>
             </td></tr>
@@ -54,26 +63,26 @@ export function sweepstakeCreatedEmailHtml({
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:#C8F04D;font-weight:700;margin-right:10px;">1.</span>
+                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">1.</span>
                     They click the link above (or you send it via WhatsApp, email, etc.)
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:#C8F04D;font-weight:700;margin-right:10px;">2.</span>
+                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">2.</span>
                     They enter their name and email — that's it
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:#C8F04D;font-weight:700;margin-right:10px;">3.</span>
+                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">3.</span>
                     They appear instantly in your dashboard
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:5px 0;font-size:14px;color:#5A7265;line-height:1.5;">
-                    <span style="color:#C8F04D;font-weight:700;margin-right:10px;">4.</span>
-                    When everyone's in — run the draw 🎲
+                    <span style="color:${isEurovision ? '#F10F59' : '#C8F04D'};font-weight:700;margin-right:10px;">4.</span>
+                    ${step4}
                   </td>
                 </tr>
               </table>
@@ -84,7 +93,6 @@ export function sweepstakeCreatedEmailHtml({
             Go to your dashboard →
           </a>
 
-          <!-- Leaderboard note -->
           <p style="margin:20px 0 0;font-size:12px;color:#8EA899;text-align:center;line-height:1.6;">
             Your public leaderboard (for after the draw) is at:<br/>
             <a href="${leaderboardLink}" style="color:#5A7265;">${leaderboardLink}</a>
