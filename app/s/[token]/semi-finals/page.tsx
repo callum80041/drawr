@@ -193,7 +193,7 @@ export default async function SemiFinalsPage({ params }: Props) {
       <div className="rounded-xl px-4 py-3 text-sm" style={{ background: 'rgba(241,15,89,0.07)', border: '1px solid rgba(241,15,89,0.15)' }}>
         <p className="font-semibold text-xs uppercase tracking-widest mb-1" style={{ color: PINK }}>Auto-qualified</p>
         <p style={{ color: BG, opacity: 0.7 }}>
-          The Big 5 (UK, France, Germany, Spain, Italy) and host Austria skip the semi-finals and go straight to the Grand Final on Saturday 16 May 2026.
+          The Big 5 (UK, France, Germany, Italy — Spain withdrew this year) and host Austria skip the semi-finals and go straight to the Grand Final on Saturday 16 May 2026.
         </p>
       </div>
 

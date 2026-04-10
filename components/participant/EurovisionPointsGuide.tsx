@@ -40,7 +40,7 @@ export function EurovisionPointsGuide() {
                 <span className="font-heading font-bold text-sm" style={{ color: '#5A22A9' }}>+{EUROVISION_SEMI_BONUS} pts</span>
               </div>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(4,2,65,0.55)' }}>
-                Your country qualifies from their semi-final (or is already auto-qualified as a Big 5 country or Austria the host). Flat bonus — everyone who makes it gets this.
+                Your country qualifies from their semi-final (or is already auto-qualified as a Big 4 country — UK, France, Germany, Italy — or Austria as host). Flat bonus — everyone who makes it gets this.
               </p>
             </div>
 
