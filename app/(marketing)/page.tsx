@@ -151,12 +151,27 @@ export default async function LandingPage() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
-          <p className="text-sm text-white/50">
-            <span className="text-white font-semibold">{organiserCount.toLocaleString()}</span>
-            {' '}organisers already signed up
-          </p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
+            <p className="text-sm text-white/50">
+              <span className="text-white font-semibold">{organiserCount.toLocaleString()}</span>
+              {' '}organisers already signed up
+            </p>
+          </div>
+          <a
+            href="https://www.producthunt.com/products/playdrawr-sweepstakes-made-simple?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-playdrawr-sweepstakes-made-simple"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="Playdrawr: Sweepstakes Made Simple - Sweepstakes sorted in minutes, not spreadsheets | Product Hunt"
+              width={250}
+              height={54}
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1120910&theme=dark&t=1775864125705"
+            />
+          </a>
         </div>
       </section>
 
