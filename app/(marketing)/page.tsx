@@ -1,30 +1,25 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
-import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 import { HeroEmailForm } from '@/components/marketing/HeroEmailForm'
 import { HeroDrawAnimation } from '@/components/marketing/HeroDrawAnimation'
-import { EurovisionBanner } from '@/components/marketing/EurovisionBanner'
 
-export const revalidate = 300 // revalidate every 5 min so signup count stays fresh
+export const revalidate = 300
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
-
-// Offset added to real organiser count for social proof display
 const SIGNUP_OFFSET = 30
 
 export const metadata: Metadata = {
-  title: 'playdrawr — Free World Cup 2026 Sweepstake',
-  description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
+  title: 'playdrawr — Free Sweepstake Tool for World Cup & Eurovision 2026',
+  description: 'Run a World Cup 2026 or Eurovision 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
   other: {
     'google-adsense-account': 'ca-pub-4502089642412261',
   },
   openGraph: {
-    title: 'playdrawr — Free World Cup 2026 Sweepstake',
-    description: 'Run a World Cup 2026 sweepstake in minutes. Random draw, live leaderboard, automatic scoring. Free forever.',
+    title: 'playdrawr — Free Sweepstake Tool for World Cup & Eurovision 2026',
+    description: 'Run a World Cup or Eurovision sweepstake in minutes. Free forever.',
     url: APP_URL,
     siteName: 'playdrawr',
     images: [{ url: `${APP_URL}/api/og/home`, width: 1200, height: 630 }],
@@ -32,42 +27,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'playdrawr — Free World Cup 2026 Sweepstake',
-    description: 'Run a World Cup 2026 sweepstake in minutes. Free forever.',
+    title: 'playdrawr — Free Sweepstake Tool',
+    description: 'World Cup 2026 or Eurovision 2026 sweepstake in minutes. Free forever.',
     images: [`${APP_URL}/api/og/home`],
   },
-}
-
-async function getUpcomingFixtures() {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('matches')
-    .select(`id, kickoff, round, venue_city, home_team_id, home_team_name, away_team_id, away_team_name`)
-    .eq('tournament_id', 1)
-    .eq('status', 'NS')
-    .order('kickoff', { ascending: true })
-    .limit(5)
-
-  if (!data?.length) return []
-
-  const teamIds = [...new Set([
-    ...data.map(m => m.home_team_id),
-    ...data.map(m => m.away_team_id),
-  ])].filter(Boolean) as number[]
-
-  const { data: teams } = teamIds.length
-    ? await supabase.from('teams').select('id, flag, logo_url').in('id', teamIds)
-    : { data: [] }
-
-  const teamMap = Object.fromEntries((teams ?? []).map(t => [t.id, t]))
-
-  return data.map(m => ({
-    ...m,
-    home_flag: m.home_team_id ? teamMap[m.home_team_id]?.flag ?? null : null,
-    home_logo: m.home_team_id ? teamMap[m.home_team_id]?.logo_url ?? null : null,
-    away_flag: m.away_team_id ? teamMap[m.away_team_id]?.flag ?? null : null,
-    away_logo: m.away_team_id ? teamMap[m.away_team_id]?.logo_url ?? null : null,
-  }))
 }
 
 async function getOrganiserCount(): Promise<number> {
@@ -82,195 +45,174 @@ async function getOrganiserCount(): Promise<number> {
   }
 }
 
-function toBST(dateStr: string) {
-  const d = new Date(dateStr)
-  return new Date(d.getTime() + 60 * 60 * 1000)
-}
-
-function fmtKickoff(dateStr: string) {
-  const bst = toBST(dateStr)
-  const date = bst.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-  const time = bst.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-  return `${date} · ${time} BST`
-}
-
-// ── DATA ──────────────────────────────────────────────────────────────────────
-
-const stats = [
-  { value: '3 min', label: 'to set up now, while you\'re thinking about it' },
-  { value: '48',    label: 'World Cup teams pre-loaded and ready' },
-  { value: '£0',    label: 'completely free, no credit card needed' },
-  { value: '8 wks', label: 'of automatic results and leaderboard updates' },
-]
-
 const steps = [
-  { num: '01', title: 'Create your sweepstake', desc: 'Name it, set your entry fee if you want one, and invite participants via a link. Takes under a minute.' },
-  { num: '02', title: 'Run the draw', desc: 'Hit the button. All 48 World Cup teams are randomly assigned — fair, instant, no arguments.' },
-  { num: '03', title: 'Share with your group', desc: 'Send one link to the office, the pub group chat, or the family WhatsApp. No accounts needed.' },
-  { num: '04', title: 'Track it all summer', desc: 'Live scores, group standings, knockout bracket and payment tracking update automatically for 8 weeks.' },
-]
-
-const features = [
-  { icon: '⚡', title: 'Instant random draw', desc: 'Cryptographically fair distribution of all 48 teams across any number of participants.' },
-  { icon: '📡', title: 'Live scores & standings', desc: 'Group tables and knockout results update automatically from official data. No manual entry.' },
-  { icon: '💷', title: 'Payment tracking', desc: 'Mark participants paid or unpaid. See your collected pot at a glance. No chasing.' },
-  { icon: '🔗', title: 'Shareable participant view', desc: 'One link, no login required. Everyone sees their teams, standings, and the leaderboard.' },
-  { icon: '🏆', title: 'Automatic leaderboard', desc: 'Points calculated in real time as results come in. Group wins, knockout rounds, and the final.' },
-  { icon: '📊', title: 'Group & bracket view', desc: 'Full group stage tables with P W D L GD Pts. Qualified positions highlighted automatically.' },
+  { num: '01', title: 'Create your sweepstake', desc: 'Name it, pick your tournament, set an optional entry fee, and invite participants via a link.' },
+  { num: '02', title: 'Run the draw', desc: 'One button. Teams or countries assigned at random — fair, instant, no arguments.' },
+  { num: '03', title: 'Share with your group', desc: 'Send one link to the office, pub group chat, or family WhatsApp. No accounts needed.' },
+  { num: '04', title: 'Watch it run itself', desc: 'Scores, standings and the leaderboard update automatically. You just watch.' },
 ]
 
 const testimonials = [
-  { text: '"Finally sorted our office sweepstake without a single WhatsApp argument about who got which team. Sent one link, everyone was in within the hour."', author: 'Sarah M.', role: '🏢 Office Manager, Manchester' },
-  { text: '"Been running the pub sweepstake on a scrap of paper for years. This is embarrassingly better. Takes me five minutes and the leaderboard updates itself."', author: 'Dave K.', role: '🍺 Pub landlord, Leeds' },
-  { text: '"The payment tracking alone saved me chasing the lads for weeks. Everyone can see who\'s paid — sorts it out immediately."', author: 'Jamie T.', role: '⚽ Five-a-side organiser, Bristol' },
+  { text: '"Finally sorted our office sweepstake without a single WhatsApp argument about who got which team."', author: 'Sarah M.', role: '🏢 Office Manager, Manchester' },
+  { text: '"Been running the pub sweepstake on a scrap of paper for years. This is embarrassingly better."', author: 'Dave K.', role: '🍺 Pub landlord, Leeds' },
+  { text: '"The payment tracking alone saved me chasing the lads for weeks. Everyone can see who\'s paid."', author: 'Jamie T.', role: '⚽ Five-a-side organiser, Bristol' },
 ]
 
-// ── LANDING PAGE ──────────────────────────────────────────────────────────────
-
 export default async function LandingPage() {
-  const [upcomingFixtures, organiserCount] = await Promise.all([
-    getUpcomingFixtures(),
-    getOrganiserCount(),
-  ])
+  const organiserCount = await getOrganiserCount()
 
   return (
     <div className="bg-pitch text-white overflow-x-hidden">
 
-      {/* ── COUNTDOWN BANNER (below fixed nav) ───────────────── */}
-      <div className="pt-16">
-        <CountdownBanner />
-      </div>
-
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
         id="reserve"
-        className="relative flex flex-col items-center justify-center text-center px-6 pt-16 pb-20 overflow-hidden"
+        className="relative flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden"
       >
-        {/* Subtle pitch line + glow */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/[0.02]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_60%,rgba(200,240,70,0.05)_0%,transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_60%,rgba(200,240,70,0.04)_0%,transparent_70%)]" />
         </div>
 
-        {/* Eyebrow pill */}
-        <div className="animate-fade-up-1 inline-flex items-center gap-2 bg-lime/10 border border-lime/25 rounded-full px-4 py-1.5 mb-8">
-          <span className="eyebrow-dot w-1.5 h-1.5 rounded-full bg-lime" />
-          <span className="text-xs font-medium tracking-widest uppercase text-lime">World Cup 2026 — Free sweepstake tool</span>
+        {/* Eyebrow */}
+        <div className="inline-flex items-center gap-2 bg-white/8 border border-white/15 rounded-full px-4 py-1.5 mb-8">
+          <span className="text-xs font-medium tracking-widest uppercase text-white/60">2026 Sweepstake Tool</span>
         </div>
 
-        {/* Headline */}
-        <h1 className="animate-fade-up-2 font-heading font-bold leading-tight tracking-tight text-[clamp(36px,7vw,88px)] mb-5 max-w-3xl">
-          Your World Cup sweepstake.<br />
-          <span className="text-lime">Set up in 3 minutes.</span>
+        <h1 className="font-heading font-bold leading-tight tracking-tight text-[clamp(36px,6vw,80px)] mb-5 max-w-3xl">
+          Your sweepstake.<br />
+          <span className="text-lime">Pick your tournament.</span>
         </h1>
 
-        {/* Subheading */}
-        <p className="animate-fade-up-3 max-w-xl text-lg text-white/60 leading-relaxed mb-6">
-          Whether it&apos;s the office, the pub, the five-a-side group or the family WhatsApp — run your own sweepstake with a free draw, live leaderboard, and one link to share with everyone.
+        <p className="max-w-xl text-lg text-white/60 leading-relaxed mb-10">
+          World Cup 2026 or Eurovision 2026 — run a fair draw, share one link with your group, and let the leaderboard do the rest. Free forever.
         </p>
 
-        {/* Use case pills */}
-        <div className="animate-fade-up-3 flex flex-wrap justify-center gap-2 mb-10">
-          {['🏢 Office', '🍺 Pub', '⚽ Five-a-side', '👨‍👩‍👧 Family', '🎮 Online group'].map(label => (
-            <span key={label} className="text-xs font-medium bg-white/8 border border-white/15 text-white/70 px-3 py-1.5 rounded-full">
-              {label}
-            </span>
-          ))}
+        {/* Tournament cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mb-10">
+
+          {/* World Cup card */}
+          <Link
+            href="/worldcup"
+            className="group relative rounded-2xl p-6 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl"
+            style={{ background: 'rgba(200,240,70,0.06)', border: '1px solid rgba(200,240,70,0.2)' }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <Image
+                src="/fifa_logo_white.png"
+                alt="FIFA World Cup 2026"
+                width={100}
+                height={38}
+                className="object-contain"
+                style={{ opacity: 0.85 }}
+                unoptimized
+              />
+              <svg className="w-4 h-4 text-lime/40 group-hover:text-lime transition-colors mt-1" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <p className="font-heading font-bold text-lg text-white mb-1">World Cup 2026</p>
+            <p className="text-sm text-white/50 mb-4">USA · Canada · Mexico · June–July 2026</p>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs bg-lime/10 text-lime px-2.5 py-1 rounded-full">48 teams</span>
+              <span className="text-xs bg-white/8 text-white/50 px-2.5 py-1 rounded-full">Live scores</span>
+              <span className="text-xs bg-white/8 text-white/50 px-2.5 py-1 rounded-full">Group stage + knockout</span>
+            </div>
+          </Link>
+
+          {/* Eurovision card */}
+          <Link
+            href="/eurovision"
+            className="group relative rounded-2xl p-6 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl"
+            style={{ background: 'rgba(241,15,89,0.06)', border: '1px solid rgba(241,15,89,0.2)' }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <img
+                src="/eurovision-logo-white.svg"
+                alt="Eurovision Song Contest 2026"
+                style={{ height: 38, opacity: 0.9 }}
+              />
+              <svg className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors mt-1" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <p className="font-heading font-bold text-lg text-white mb-1">Eurovision 2026</p>
+            <p className="text-sm text-white/50 mb-4">Vienna, Austria · May 2026</p>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(241,15,89,0.15)', color: '#F10F59' }}>35 countries</span>
+              <span className="text-xs bg-white/8 text-white/50 px-2.5 py-1 rounded-full">Real scoring</span>
+              <span className="text-xs bg-white/8 text-white/50 px-2.5 py-1 rounded-full">Semi-finals + Final</span>
+            </div>
+          </Link>
         </div>
 
-        {/* Email form */}
-        <div className="animate-fade-up-4 w-full max-w-md mb-5">
+        {/* Email form CTA */}
+        <div className="w-full max-w-md mb-5">
           <HeroEmailForm variant="hero" />
         </div>
 
         {/* Social proof */}
-        <div className="animate-fade-up-5 flex items-center justify-center gap-2 mb-16">
-          <span className="live-dot w-2 h-2 rounded-full bg-lime shrink-0" />
+        <div className="flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
           <p className="text-sm text-white/50">
             <span className="text-white font-semibold">{organiserCount.toLocaleString()}</span>
-            {' '}organisers have already reserved their draw this week
-          </p>
-        </div>
-
-        {/* Scroll-to-demo nudge */}
-        <a
-          href="#demo"
-          className="animate-fade-up-6 inline-flex items-center gap-2 text-xs text-white/40 hover:text-white/70 transition-colors mb-8"
-        >
-          <span>Watch a live draw</span>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="mt-px">
-            <path d="M6 2v8M2.5 6.5 6 10l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </a>
-
-        {/* Live mock draw animation */}
-        <div id="demo" className="animate-fade-up-6 w-full max-w-sm md:max-w-2xl scroll-mt-24">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="live-dot w-1.5 h-1.5 rounded-full bg-lime shrink-0" />
-            <p className="text-xs font-medium tracking-widest uppercase text-lime/80">Live demo — watch the draw run</p>
-          </div>
-          <HeroDrawAnimation />
-          <p className="text-center text-xs text-white/30 mt-3">
-            This is what your group sees when you hit draw — 48 teams, randomly assigned, instantly.
+            {' '}organisers already signed up
           </p>
         </div>
       </section>
 
-      {/* ── UPCOMING FIXTURES STRIP ───────────────────────────── */}
-      {upcomingFixtures.length > 0 && (
-        <div className="w-full max-w-2xl mx-auto mt-4 px-4">
-          <p className="text-xs uppercase tracking-widest text-white/40 mb-3 text-center">Next fixtures</p>
-          <div className="space-y-2">
-            {upcomingFixtures.map(m => (
-              <div key={m.id} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  {m.home_logo
-                    ? <Image src={m.home_logo} alt={m.home_team_name} width={24} height={24} className="object-contain shrink-0" unoptimized />
-                    : <span className="text-lg shrink-0">{m.home_flag ?? '🏳️'}</span>}
-                  <span className="text-sm text-white truncate">{m.home_team_name}</span>
-                </div>
-                <div className="text-center shrink-0 px-2">
-                  <p className="text-xs text-white/50 whitespace-nowrap">{m.kickoff ? fmtKickoff(m.kickoff) : 'TBC'}</p>
-                  {m.venue_city && <p className="text-[10px] text-white/30 mt-0.5">{m.venue_city}</p>}
-                </div>
-                <div className="flex items-center gap-2 flex-1 min-w-0 flex-row-reverse">
-                  {m.away_logo
-                    ? <Image src={m.away_logo} alt={m.away_team_name} width={24} height={24} className="object-contain shrink-0" unoptimized />
-                    : <span className="text-lg shrink-0">{m.away_flag ?? '🏳️'}</span>}
-                  <span className="text-sm text-white truncate text-right">{m.away_team_name}</span>
-                </div>
+      {/* ── SEE IT IN ACTION ─────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
+        <ScrollReveal>
+          <div className="bg-grass/10 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-6 h-px bg-lime" />
+                <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">Try it first</span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── STATS BAR ─────────────────────────────────────────── */}
-      <div className="border-y border-white/10 py-10 px-6 mt-16">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map(s => (
-            <div key={s.value} className="text-center">
-              <span className="block font-heading text-4xl text-lime leading-none mb-1">{s.value}</span>
-              <span className="block text-xs text-white/40 leading-snug">{s.label}</span>
+              <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight tracking-tight mb-4">
+                See the real thing.<br />
+                <span className="text-lime">No sign-up needed.</span>
+              </h2>
+              <p className="text-white/50 font-light leading-relaxed mb-6">
+                Two live demo sweepstakes — pick a tournament and see exactly what your group gets.
+              </p>
+              <p className="text-xs font-medium tracking-widest uppercase text-white/30 mb-3">Choose a demo</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="/s/demo2026"
+                  className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
+                >
+                  ⚽ World Cup 2026
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </a>
+                <a
+                  href="/s/demoeurovision"
+                  className="inline-flex items-center justify-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
+                  style={{ background: '#F10F59', color: '#fff' }}
+                >
+                  🎤 Eurovision 2026
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </a>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="w-full md:w-80 shrink-0">
+              <HeroDrawAnimation />
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
 
-      {/* ── EUROVISION BANNER ─────────────────────────────────── */}
-      <EurovisionBanner />
-
-      {/* ── HOW IT WORKS ──────────────────────────────────────── */}
-      <section id="how" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
+      <section id="how" className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
         <div className="flex items-center gap-3 mb-4">
           <span className="w-6 h-px bg-lime" />
           <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">How it works</span>
         </div>
         <h2 className="font-heading text-[clamp(36px,5vw,64px)] leading-none tracking-tight mb-4">
-          Set up in minutes.<br /><span className="text-lime">Runs itself all summer.</span>
+          Set up in minutes.<br /><span className="text-lime">Runs itself.</span>
         </h2>
         <p className="text-white/50 text-lg font-light max-w-md mb-12">
-          No spreadsheets. No group chat chaos. No chasing people for cash. Just a link.
+          No spreadsheets. No group chat chaos. No chasing people for cash.
         </p>
         <ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
@@ -285,84 +227,7 @@ export default async function LandingPage() {
         </ScrollReveal>
       </section>
 
-      {/* ── SEE IT IN ACTION ──────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
-        <ScrollReveal>
-          <div className="bg-grass/10 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
-            {/* Copy */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-6 h-px bg-lime" />
-                <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">See it in action</span>
-              </div>
-              <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight tracking-tight mb-4">
-                Try the real thing.<br />
-                <span className="text-lime">No sign-up needed.</span>
-              </h2>
-              <p className="text-white/50 font-light leading-relaxed mb-6">
-                We&apos;ve set up two live demo sweepstakes — pick your tournament and see exactly what your group will get. No sign-up, no strings.
-              </p>
-              <p className="text-xs font-medium tracking-widest uppercase text-white/30 mb-3">Choose a demo</p>
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <a
-                  href="/s/demo2026"
-                  className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
-                >
-                  ⚽ World Cup 2026
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </a>
-                <a
-                  href="/s/demoeurovision"
-                  className="inline-flex items-center justify-center gap-2 bg-[#F10F59] text-white font-semibold text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
-                >
-                  🎤 Eurovision 2026
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </a>
-              </div>
-              <a
-                href="#reserve"
-                className="inline-flex items-center justify-center gap-2 bg-white/8 border border-white/15 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-white/12 transition-colors"
-              >
-                Set up yours free
-              </a>
-            </div>
-
-            {/* Mini animation */}
-            <div className="w-full md:w-80 shrink-0">
-              <HeroDrawAnimation />
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ── FEATURES ──────────────────────────────────────────── */}
-      <section id="features" className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="w-6 h-px bg-lime" />
-          <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">Features</span>
-        </div>
-        <h2 className="font-heading text-[clamp(36px,5vw,64px)] leading-none tracking-tight mb-4">
-          Everything you<br /><span className="text-lime">need.</span>
-        </h2>
-        <p className="text-white/50 text-lg font-light max-w-md mb-12">
-          Built for pub landlords, office managers, and anyone who runs the sweepstake every tournament.
-        </p>
-        <ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
-            {features.map(f => (
-              <div key={f.title} className="bg-grass/10 hover:bg-grass/20 transition-colors p-8">
-                <div className="w-10 h-10 rounded-lg bg-lime/10 border border-lime/20 flex items-center justify-center text-lg mb-4">
-                  {f.icon}
-                </div>
-                <p className="font-medium text-white mb-2">{f.title}</p>
-                <p className="text-sm text-white/50 font-light leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ── TESTIMONIALS ──────────────────────────────────────── */}
+      {/* ── TESTIMONIALS ─────────────────────────────────────── */}
       <div className="border-y border-white/10 bg-grass/10 py-16 px-6">
         <p className="text-center text-xs tracking-[0.2em] uppercase text-white/30 mb-10">
           Trusted by sweepstake organisers across the UK
@@ -380,23 +245,20 @@ export default async function LandingPage() {
         </ScrollReveal>
       </div>
 
-      {/* ── BOTTOM CTA BAND ───────────────────────────────────── */}
+      {/* ── BOTTOM CTA ───────────────────────────────────────── */}
       <div className="relative text-center px-6 py-24 md:py-32 overflow-hidden border-t border-lime/10">
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(200,240,70,0.07)_0%,transparent_60%)]" />
-
         <div className="relative max-w-lg mx-auto">
           <h2 className="font-heading text-[clamp(32px,5vw,64px)] leading-tight tracking-tight mb-3">
             Office, pub, five-a-side<br />
             <span className="text-lime">or family — it&apos;s yours.</span>
           </h2>
           <p className="text-lg text-white/50 font-light mb-10">
-            Three minutes now saves hours of WhatsApp chaos in June.
+            Three minutes now saves hours of WhatsApp chaos.
           </p>
-
           <HeroEmailForm variant="band" />
-
           <p className="mt-5 text-xs text-white/30">
-            Free · No credit card · 48 teams ready to draw
+            Free · No credit card · World Cup & Eurovision ready
           </p>
         </div>
       </div>
