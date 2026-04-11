@@ -1,0 +1,83 @@
+<svg width="760" height="520" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="760" height="520" fill="#F4F7F2" rx="16"/>
+
+  <!-- Title -->
+  <text x="40" y="52" font-size="22" font-weight="800" fill="#0B3D2E" letter-spacing="-0.5">playdrawr — Colour Palette</text>
+
+  <!-- ── PRIMARY COLOURS ── -->
+  <text x="40" y="90" font-size="11" font-weight="700" fill="#4A7C62" letter-spacing="1.5">PRIMARY</text>
+
+  <!-- Pitch #0B3D2E -->
+  <rect x="40"  y="104" width="100" height="100" rx="12" fill="#0B3D2E"/>
+  <text x="40"  y="220" font-size="12" font-weight="700" fill="#0B3D2E">Pitch</text>
+  <text x="40"  y="235" font-size="11" fill="#4A7C62">#0B3D2E</text>
+
+  <!-- Dark #1A2E22 -->
+  <rect x="156" y="104" width="100" height="100" rx="12" fill="#1A2E22"/>
+  <text x="156" y="220" font-size="12" font-weight="700" fill="#0B3D2E">Dark</text>
+  <text x="156" y="235" font-size="11" fill="#4A7C62">#1A2E22</text>
+
+  <!-- Grass #1A6B47 -->
+  <rect x="272" y="104" width="100" height="100" rx="12" fill="#1A6B47"/>
+  <text x="272" y="220" font-size="12" font-weight="700" fill="#0B3D2E">Grass</text>
+  <text x="272" y="235" font-size="11" fill="#4A7C62">#1A6B47</text>
+
+  <!-- Lime #C8F046 -->
+  <rect x="388" y="104" width="100" height="100" rx="12" fill="#C8F046"/>
+  <text x="388" y="220" font-size="12" font-weight="700" fill="#0B3D2E">Lime</text>
+  <text x="388" y="235" font-size="11" fill="#4A7C62">#C8F046</text>
+
+  <!-- Mid #4A7C62 -->
+  <rect x="504" y="104" width="100" height="100" rx="12" fill="#4A7C62"/>
+  <text x="504" y="220" font-size="12" font-weight="700" fill="#0B3D2E">Mid</text>
+  <text x="504" y="235" font-size="11" fill="#4A7C62">#4A7C62</text>
+
+  <!-- Light #F4F7F2 -->
+  <rect x="620" y="104" width="100" height="100" rx="12" fill="#F4F7F2" stroke="#D1D9D5" stroke-width="1"/>
+  <text x="620" y="220" font-size="12" font-weight="700" fill="#0B3D2E">Light</text>
+  <text x="620" y="235" font-size="11" fill="#4A7C62">#F4F7F2</text>
+
+  <!-- ── ACCENT ── -->
+  <text x="40" y="270" font-size="11" font-weight="700" fill="#4A7C62" letter-spacing="1.5">ACCENT</text>
+
+  <!-- Gold #F0B429 -->
+  <rect x="40"  y="284" width="100" height="80" rx="12" fill="#F0B429"/>
+  <text x="40"  y="380" font-size="12" font-weight="700" fill="#0B3D2E">Gold</text>
+  <text x="40"  y="395" font-size="11" fill="#4A7C62">#F0B429</text>
+
+  <!-- White #FFFFFF -->
+  <rect x="156" y="284" width="100" height="80" rx="12" fill="#FFFFFF" stroke="#D1D9D5" stroke-width="1"/>
+  <text x="156" y="380" font-size="12" font-weight="700" fill="#0B3D2E">White</text>
+  <text x="156" y="395" font-size="11" fill="#4A7C62">#FFFFFF</text>
+
+  <!-- ── EUROVISION ── -->
+  <text x="388" y="270" font-size="11" font-weight="700" fill="#7C62A0" letter-spacing="1.5">EUROVISION</text>
+
+  <!-- Eurovision Pink #F10F59 -->
+  <rect x="388" y="284" width="100" height="80" rx="12" fill="#F10F59"/>
+  <text x="388" y="380" font-size="12" font-weight="700" fill="#0B3D2E">Eurovision Pink</text>
+  <text x="388" y="395" font-size="11" fill="#4A7C62">#F10F59</text>
+
+  <!-- Eurovision Purple #1B0744 -->
+  <rect x="504" y="284" width="100" height="80" rx="12" fill="#1B0744"/>
+  <text x="504" y="380" font-size="12" font-weight="700" fill="#0B3D2E">Eurovision Purple</text>
+  <text x="504" y="395" font-size="11" fill="#4A7C62">#1B0744</text>
+
+  <!-- Eurovision Lavender #EEE8FF -->
+  <rect x="620" y="284" width="100" height="80" rx="12" fill="#EEE8FF" stroke="#CFC3F0" stroke-width="1"/>
+  <text x="620" y="380" font-size="12" font-weight="700" fill="#0B3D2E">Eurovision Lavender</text>
+  <text x="620" y="395" font-size="11" fill="#4A7C62">#EEE8FF</text>
+
+  <!-- Usage guide -->
+  <rect x="40" y="430" width="680" height="60" rx="10" fill="#ffffff" stroke="#D1D9D5" stroke-width="1"/>
+  <text x="60" y="452" font-size="11" font-weight="700" fill="#0B3D2E">Usage rules:</text>
+  <text x="60" y="468" font-size="11" fill="#4A7C62">Lime is the primary CTA colour on dark backgrounds. Never use Lime text on a white background — use Grass instead.</text>
+  <text x="60" y="482" font-size="11" fill="#4A7C62">Eurovision Pink replaces Lime for all Eurovision-specific emails, buttons, and UI elements.</text>
+</svg>

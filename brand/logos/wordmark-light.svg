@@ -1,0 +1,20 @@
+<!-- playdrawr wordmark — light variant (for dark backgrounds) -->
+<svg width="220" height="44" viewBox="0 0 220 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logomark -->
+  <circle cx="22" cy="22" r="22" fill="#0B3D2E"/>
+  <circle cx="22" cy="22" r="14.3" stroke="#C8F046" stroke-width="1.65" fill="none"/>
+  <line x1="22" y1="7.7"  x2="22" y2="36.3" stroke="#C8F046" stroke-width="1.65"/>
+  <line x1="7.7" y1="22"  x2="36.3" y2="22"  stroke="#C8F046" stroke-width="1.65"/>
+  <line x1="11.55" y1="11.55" x2="32.45" y2="32.45" stroke="#C8F046" stroke-width="1.1" stroke-opacity="0.6"/>
+  <line x1="32.45" y1="11.55" x2="11.55" y2="32.45" stroke="#C8F046" stroke-width="1.1" stroke-opacity="0.6"/>
+  <rect x="20.35" y="20.35" width="3.3" height="3.3" fill="#C8F046" transform="rotate(45 22 22)"/>
+  <!-- Wordmark text -->
+  <text x="54" y="31"
+        font-family="'Syne', -apple-system, sans-serif"
+        font-size="28" font-weight="800" letter-spacing="-0.8"
+        fill="#ffffff">play</text>
+  <text x="119" y="31"
+        font-family="'Syne', -apple-system, sans-serif"
+        font-size="28" font-weight="800" letter-spacing="-0.8"
+        fill="#C8F046">drawr</text>
+</svg>

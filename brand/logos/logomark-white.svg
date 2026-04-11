@@ -1,0 +1,10 @@
+<!-- playdrawr logomark — white/transparent variant (for coloured backgrounds) -->
+<svg width="80" height="80" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="none"/>
+  <circle cx="20" cy="20" r="13" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+  <line x1="20" y1="7"    x2="20" y2="33"   stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="7"  y1="20"   x2="33" y2="20"   stroke="#ffffff" stroke-width="1.5"/>
+  <line x1="10.5" y1="10.5" x2="29.5" y2="29.5" stroke="#ffffff" stroke-width="1" stroke-opacity="0.6"/>
+  <line x1="29.5" y1="10.5" x2="10.5" y2="29.5" stroke="#ffffff" stroke-width="1" stroke-opacity="0.6"/>
+  <rect x="18.5" y="18.5" width="3" height="3" fill="#ffffff" transform="rotate(45 20 20)"/>
+</svg>

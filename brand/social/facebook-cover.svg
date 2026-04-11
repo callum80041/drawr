@@ -1,0 +1,82 @@
+<svg width="820" height="312" viewBox="0 0 820 312" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow1" cx="78%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="#C8F04D" stop-opacity="0.09"/>
+      <stop offset="100%" stop-color="#C8F04D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="10%" cy="90%" r="40%">
+      <stop offset="0%" stop-color="#C8F04D" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#C8F04D" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="clip">
+      <rect width="820" height="312"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="820" height="312" fill="#1A2E22"/>
+  <rect width="820" height="312" fill="url(#glow1)"/>
+  <rect width="820" height="312" fill="url(#glow2)"/>
+
+  <!-- Decorative globe (right side) -->
+  <g clip-path="url(#clip)">
+    <circle cx="672" cy="156" r="148" fill="none" stroke="#C8F04D" stroke-width="1"   stroke-opacity="0.10"/>
+    <circle cx="672" cy="156" r="108" fill="none" stroke="#C8F04D" stroke-width="1"   stroke-opacity="0.14"/>
+    <circle cx="672" cy="156" r="68"  fill="none" stroke="#C8F04D" stroke-width="1.5" stroke-opacity="0.20"/>
+    <circle cx="672" cy="156" r="32"  fill="none" stroke="#C8F04D" stroke-width="1.5" stroke-opacity="0.30"/>
+    <line x1="484" y1="156" x2="860" y2="156" stroke="#C8F04D" stroke-width="1"   stroke-opacity="0.12"/>
+    <line x1="672" y1="8"   x2="672" y2="304" stroke="#C8F04D" stroke-width="1"   stroke-opacity="0.12"/>
+    <line x1="567" y1="51"  x2="777" y2="261" stroke="#C8F04D" stroke-width="0.8" stroke-opacity="0.08"/>
+    <line x1="777" y1="51"  x2="567" y2="261" stroke="#C8F04D" stroke-width="0.8" stroke-opacity="0.08"/>
+    <!-- Centre diamond -->
+    <rect x="665.5" y="149.5" width="13" height="13" fill="#C8F04D" transform="rotate(45 672 156)" opacity="0.9"/>
+    <!-- Stars -->
+    <text x="592" y="74"  font-size="16" fill="#C8F04D" opacity="0.35" font-family="serif">★</text>
+    <text x="762" y="96"  font-size="11" fill="#C8F04D" opacity="0.28" font-family="serif">★</text>
+    <text x="716" y="262" font-size="13" fill="#C8F04D" opacity="0.28" font-family="serif">★</text>
+    <text x="544" y="232" font-size="9"  fill="#C8F04D" opacity="0.22" font-family="serif">★</text>
+    <text x="798" y="218" font-size="11" fill="#C8F04D" opacity="0.25" font-family="serif">★</text>
+    <text x="640" y="42"  font-size="9"  fill="#C8F04D" opacity="0.20" font-family="serif">★</text>
+  </g>
+
+  <!-- Subtle vertical divider -->
+  <line x1="490" y1="40" x2="490" y2="272" stroke="#C8F04D" stroke-width="1" stroke-opacity="0.07"/>
+
+  <!-- Eyebrow pill -->
+  <rect x="56" y="62" width="182" height="26" rx="13" fill="#C8F04D" fill-opacity="0.10"/>
+  <rect x="56" y="62" width="182" height="26" rx="13" fill="none" stroke="#C8F04D" stroke-opacity="0.20" stroke-width="1"/>
+  <text x="147" y="80"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="10" font-weight="700" fill="#C8F04D" letter-spacing="1.8" text-anchor="middle">
+    2026 SWEEPSTAKE TOOL
+  </text>
+
+  <!-- Headline -->
+  <text x="56" y="152"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="58" font-weight="900" fill="#ffffff" letter-spacing="-2">
+    Sweepstakes
+  </text>
+  <text x="56" y="214"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="58" font-weight="900" fill="#C8F04D" letter-spacing="-2">
+    made simple.
+  </text>
+
+  <!-- Tournament line -->
+  <text x="56" y="248"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="14.5" fill="rgba(255,255,255,0.45)" letter-spacing="0.2">
+    ⚽ World Cup 2026  ·  🎤 Eurovision 2026
+  </text>
+
+  <!-- URL -->
+  <text x="58" y="282"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="12" font-weight="600" fill="#C8F04D" opacity="0.65" letter-spacing="0.4">
+    playdrawr.co.uk
+  </text>
+
+  <!-- Bottom accent bar -->
+  <rect x="56" y="296" width="72" height="2.5" rx="1.25" fill="#C8F04D" opacity="0.35"/>
+</svg>
