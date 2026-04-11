@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { PaymentSummary } from '@/components/dashboard/PaymentSummary'
 import { ParticipantRow } from '@/components/dashboard/ParticipantRow'
 import { WaitlistRow, type WaitlistEntry } from '@/components/dashboard/WaitlistRow'
+import { ShareButtons } from '@/components/dashboard/ShareButtons'
 
 const FREE_PLAN_CAP = 48
 
@@ -17,6 +18,9 @@ interface Participant {
 
 interface Props {
   sweepstakeId: string
+  sweepstakeName: string
+  joinUrl: string
+  isEurovision?: boolean
   plan: string
   entryFee: number
   initialParticipants: Participant[]
@@ -25,7 +29,7 @@ interface Props {
   organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
+export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(initialWaitlist)
@@ -264,8 +268,23 @@ export function ParticipantsClient({ sweepstakeId, plan, entryFee, initialPartic
       )}
 
       {participants.length === 0 && (
-        <div className="text-center py-12 text-mid text-sm">
-          No participants yet. Add the first one above.
+        <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
+          <p className="text-xs font-bold uppercase tracking-widest text-mid mb-1">Or invite them</p>
+          <h3 className="font-heading font-bold text-pitch tracking-tight mb-1">Share the self-signup link</h3>
+          <p className="text-sm text-mid mb-4">
+            Send this to your group — they sign themselves up. No manual adding needed.
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
+            <code className="flex-1 bg-light rounded-lg px-3 py-2.5 text-xs text-pitch font-mono truncate border border-[#E5EDEA]">
+              {joinUrl}
+            </code>
+          </div>
+          <ShareButtons
+            url={joinUrl}
+            sweepstakeName={sweepstakeName}
+            isEurovision={isEurovision}
+            size="lg"
+          />
         </div>
       )}
 

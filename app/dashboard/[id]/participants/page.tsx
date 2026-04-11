@@ -23,7 +23,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, plan, entry_fee, organiser_id')
+    .select('id, name, plan, entry_fee, organiser_id, share_token, sweepstake_type')
     .eq('id', id)
     .single()
 
@@ -44,9 +44,14 @@ export default async function ParticipantsPage({ params }: Props) {
   // waitlist table may not exist yet if migration hasn't been run
   const waitlist = waitlistResult.error ? [] : (waitlistResult.data ?? [])
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
+
   return (
     <ParticipantsClient
       sweepstakeId={id}
+      sweepstakeName={sweepstake.name}
+      joinUrl={`${appUrl}/join/${sweepstake.share_token}`}
+      isEurovision={sweepstake.sweepstake_type === 'eurovision'}
       plan={sweepstake.plan}
       entryFee={Number(sweepstake.entry_fee)}
       initialParticipants={participants ?? []}

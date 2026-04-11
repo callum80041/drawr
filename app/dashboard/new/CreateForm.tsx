@@ -86,7 +86,7 @@ export function CreateForm({ organiserId }: Props) {
       body: JSON.stringify({ sweepstakeId: data.id }),
     }).catch(() => { /* best-effort */ })
 
-    router.push(`/dashboard/${data.id}`)
+    router.push(`/dashboard/${data.id}?created=1`)
   }
 
   return (
