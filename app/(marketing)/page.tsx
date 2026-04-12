@@ -178,40 +178,52 @@ export default async function LandingPage() {
       {/* ── SEE IT IN ACTION ─────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-6 pb-20 md:pb-28">
         <ScrollReveal>
-          <div className="bg-grass/10 border border-white/10 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-6 h-px bg-lime" />
-                <span className="text-xs font-medium tracking-[0.2em] uppercase text-lime">Try it first</span>
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ border: '1px solid rgba(200,240,70,0.2)', background: 'linear-gradient(135deg, rgba(200,240,70,0.05) 0%, rgba(255,255,255,0.02) 60%)' }}
+          >
+            {/* Top bar */}
+            <div
+              className="flex items-center justify-between px-6 py-3"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-lime/60" />
+                <span className="text-xs font-medium text-lime tracking-widest uppercase">Live demo</span>
               </div>
-              <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight tracking-tight mb-4">
-                See the real thing.<br />
-                <span className="text-lime">No sign-up needed.</span>
-              </h2>
-              <p className="text-white/50 font-light leading-relaxed mb-6">
-                Two live demo sweepstakes — pick a tournament and see exactly what your group gets.
-              </p>
-              <p className="text-xs font-medium tracking-widest uppercase text-white/30 mb-3">Choose a demo</p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="/s/demo2026"
-                  className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-semibold text-sm px-6 py-3 rounded-xl hover:bg-lime/90 transition-colors"
-                >
-                  ⚽ World Cup 2026
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </a>
-                <a
-                  href="/s/demoeurovision"
-                  className="inline-flex items-center justify-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity"
-                  style={{ background: '#F10F59', color: '#fff' }}
-                >
-                  🎤 Eurovision 2026
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </a>
-              </div>
+              <span className="text-[10px] text-white/30 font-mono">playdrawr.co.uk</span>
             </div>
-            <div className="w-full md:w-80 shrink-0">
-              <HeroDrawAnimation />
+
+            <div className="p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
+              <div className="flex-1 min-w-0">
+                <h2 className="font-heading text-[clamp(28px,4vw,46px)] leading-tight tracking-tight mb-4">
+                  See the real thing.<br />
+                  <span className="text-lime">No sign-up needed.</span>
+                </h2>
+                <p className="text-white/50 font-light leading-relaxed mb-8">
+                  Two live demo sweepstakes — pick a tournament and see exactly what your group gets. Scores, leaderboard, everything.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="/s/demo2026"
+                    className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-bold text-sm px-6 py-3.5 rounded-xl hover:bg-lime/90 transition-colors"
+                  >
+                    ⚽ World Cup demo
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                  <a
+                    href="/s/demoeurovision"
+                    className="inline-flex items-center justify-center gap-2 font-bold text-sm px-6 py-3.5 rounded-xl hover:opacity-90 transition-opacity"
+                    style={{ background: '#F10F59', color: '#fff' }}
+                  >
+                    🎤 Eurovision demo
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                </div>
+              </div>
+              <div className="w-full md:w-72 shrink-0">
+                <HeroDrawAnimation />
+              </div>
             </div>
           </div>
         </ScrollReveal>

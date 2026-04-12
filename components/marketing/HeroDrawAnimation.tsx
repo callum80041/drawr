@@ -1,70 +1,52 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
-// All 48 participants from the demo sweepstake — synced to real WC2026 teams
-const DEMO_DRAW = [
-  { name: 'Jake Murray',       flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', team: 'England'              },
-  { name: 'Kim Shaw',          flag: '🇦🇷', team: 'Argentina'          },
-  { name: 'Callum M.',         flag: '🇧🇷', team: 'Brazil'             },
-  { name: 'Matthew Griffiths', flag: '🇫🇷', team: 'France'             },
-  { name: 'Elaine Burton',     flag: '🇪🇸', team: 'Spain'              },
-  { name: 'Daniel K.',         flag: '🇩🇪', team: 'Germany'            },
-  { name: 'Mike D.',           flag: '🇵🇹', team: 'Portugal'           },
-  { name: 'Steve J.',          flag: '🇳🇱', team: 'Netherlands'        },
-  { name: 'Tom S.',            flag: '🇧🇪', team: 'Belgium'            },
-  { name: 'Nicky Evans',       flag: '🇺🇾', team: 'Uruguay'            },
-  { name: 'Willow B.',         flag: '🇺🇸', team: 'USA'                },
-  { name: 'Megan Clarke',      flag: '🇲🇽', team: 'Mexico'             },
-  { name: 'Amanda P.',         flag: '🇨🇦', team: 'Canada'             },
-  { name: 'Lee C.',            flag: '🇲🇦', team: 'Morocco'            },
-  { name: 'Darcy Thompson',    flag: '🇯🇵', team: 'Japan'              },
-  { name: 'Harry F.',          flag: '🇰🇷', team: 'South Korea'        },
-  { name: 'Paul Y.',           flag: '🇦🇺', team: 'Australia'          },
-  { name: 'Oliver Richards',   flag: '🇸🇳', team: 'Senegal'            },
-  { name: 'Leanne Fox',        flag: '🇨🇭', team: 'Switzerland'        },
-  { name: 'Leo Simmons',       flag: '🇭🇷', team: 'Croatia'            },
-  { name: 'Amanda Fletcher',   flag: '🇸🇪', team: 'Sweden'             },
-  { name: 'Charlotte Webb',    flag: '🇨🇻', team: 'Cape Verde'         },
-  { name: 'Jamie Brooks',      flag: '🇧🇦', team: 'Bosnia & Herzegovina'},
-  { name: 'Nick Cooper',       flag: '🇨🇴', team: 'Colombia'           },
-  { name: 'Richard Palmer',    flag: '🇪🇨', team: 'Ecuador'            },
-  { name: 'Debbie Price',      flag: '🇵🇾', team: 'Paraguay'           },
-  { name: 'Lucy R.',           flag: '🇨🇩', team: 'DR Congo'           },
-  { name: 'John R.',           flag: '🇮🇷', team: 'Iran'               },
-  { name: 'Luke B.',           flag: '🇸🇦', team: 'Saudi Arabia'       },
-  { name: 'Sarah Allen',       flag: '🇶🇦', team: 'Qatar'              },
-  { name: 'Jordan H.',         flag: '🇨🇮', team: 'Ivory Coast'        },
-  { name: 'Kieran H.',         flag: '🇮🇶', team: 'Iraq'               },
-  { name: 'Chris Scott',       flag: '🇬🇭', team: 'Ghana'              },
-  { name: 'Dan M.',            flag: '🇪🇬', team: 'Egypt'              },
-  { name: 'Eddie O\'Brien',    flag: '🇹🇳', team: 'Tunisia'            },
-  { name: 'Mick N.',           flag: '🇩🇿', team: 'Algeria'            },
-  { name: 'Louie Ward',        flag: '🇹🇷', team: 'Turkey'             },
-  { name: 'Katie Davies',      flag: '🇯🇴', team: 'Jordan'             },
-  { name: 'Emma Lawson',       flag: '🇭🇹', team: 'Haiti'              },
-  { name: 'Simon G.',          flag: '🇦🇹', team: 'Austria'            },
-  { name: 'Robert B.',         flag: '🇿🇦', team: 'South Africa'       },
-  { name: 'Joe W.',            flag: '🇨🇿', team: 'Czech Republic'     },
-  { name: 'Kevin L.',          flag: '🇨🇼', team: 'Curacao'            },
-  { name: 'Ellen Walsh',       flag: '🇳🇴', team: 'Norway'             },
-  { name: 'Ashley Cole',       flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', team: 'Scotland'           },
-  { name: 'Victoria Stone',    flag: '🇳🇿', team: 'New Zealand'        },
-  { name: 'Rachel G.',         flag: '🇺🇿', team: 'Uzbekistan'         },
-  { name: 'Ralph J.',          flag: '🇵🇦', team: 'Panama'             },
+const WORLD_CUP = [
+  { name: 'Jake Murray',    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', team: 'England'     },
+  { name: 'Kim Shaw',       flag: '🇦🇷', team: 'Argentina'   },
+  { name: 'Callum M.',      flag: '🇧🇷', team: 'Brazil'      },
+  { name: 'Elaine Burton',  flag: '🇪🇸', team: 'Spain'       },
+  { name: 'Daniel K.',      flag: '🇩🇪', team: 'Germany'     },
+  { name: 'Mike D.',        flag: '🇵🇹', team: 'Portugal'    },
+  { name: 'Nicky Evans',    flag: '🇺🇾', team: 'Uruguay'     },
+  { name: 'Willow B.',      flag: '🇺🇸', team: 'USA'         },
+  { name: 'Megan Clarke',   flag: '🇲🇽', team: 'Mexico'      },
+  { name: 'Darcy Thompson', flag: '🇯🇵', team: 'Japan'       },
+  { name: 'Leanne Fox',     flag: '🇨🇭', team: 'Switzerland' },
+  { name: 'Charlotte Webb', flag: '🇸🇪', team: 'Sweden'      },
 ]
 
-type Phase = 'idle' | 'drawing' | 'grid'
+const EUROVISION = [
+  { name: 'Sophie T.',     flag: '🇸🇪', team: 'Sweden'         },
+  { name: 'Jake Murray',   flag: '🇬🇧', team: 'United Kingdom'  },
+  { name: 'Elaine B.',     flag: '🇫🇷', team: 'France'          },
+  { name: 'Kim Shaw',      flag: '🇳🇴', team: 'Norway'          },
+  { name: 'Daniel K.',     flag: '🇮🇹', team: 'Italy'           },
+  { name: 'Callum M.',     flag: '🇪🇸', team: 'Spain'           },
+  { name: 'Willow B.',     flag: '🇺🇦', team: 'Ukraine'         },
+  { name: 'Nicky Evans',   flag: '🇩🇪', team: 'Germany'         },
+  { name: 'Leanne Fox',    flag: '🇨🇭', team: 'Switzerland'     },
+  { name: 'Megan Clarke',  flag: '🇦🇹', team: 'Austria'         },
+  { name: 'Mike D.',       flag: '🇸🇪', team: 'Iceland'         },
+  { name: 'Charlotte W.',  flag: '🇮🇸', team: 'Moldova'         },
+]
 
-const DRAW_INTERVAL = 480  // ms per reveal
-const GRID_HOLD    = 5000  // ms to hold the full results grid
-const IDLE_HOLD    = 1400  // ms on "ready to draw" screen
+type Mode = 'worldcup' | 'eurovision'
+type Phase = 'idle' | 'drawing' | 'done'
+
+const DRAW_INTERVAL = 180   // ms per card reveal
+const DONE_HOLD    = 3500   // ms holding the complete grid
+const IDLE_HOLD    = 1200   // ms on "ready" screen between cycles
 
 export function HeroDrawAnimation() {
+  const [mode, setMode]             = useState<Mode>('worldcup')
   const [phase, setPhase]           = useState<Phase>('idle')
   const [currentIdx, setCurrentIdx] = useState(0)
-  const [shown, setShown]           = useState<typeof DEMO_DRAW>([])
-  const gridRef = useRef<HTMLDivElement>(null)
+  const [shown, setShown]           = useState<typeof WORLD_CUP>([])
+
+  const entries = mode === 'worldcup' ? WORLD_CUP : EUROVISION
+  const isEV    = mode === 'eurovision'
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>
@@ -78,39 +60,68 @@ export function HeroDrawAnimation() {
     }
 
     if (phase === 'drawing') {
-      if (currentIdx < DEMO_DRAW.length) {
+      if (currentIdx < entries.length) {
         timer = setTimeout(() => {
-          setShown(prev => [...prev, DEMO_DRAW[currentIdx]])
+          setShown(prev => [...prev, entries[currentIdx]])
           setCurrentIdx(i => i + 1)
         }, DRAW_INTERVAL)
       } else {
-        timer = setTimeout(() => setPhase('grid'), 400)
+        timer = setTimeout(() => setPhase('done'), 300)
       }
     }
 
-    if (phase === 'grid') {
-      timer = setTimeout(() => setPhase('idle'), GRID_HOLD)
+    if (phase === 'done') {
+      timer = setTimeout(() => {
+        // Alternate tournament each cycle
+        setMode(m => m === 'worldcup' ? 'eurovision' : 'worldcup')
+        setPhase('idle')
+      }, DONE_HOLD)
     }
 
     return () => clearTimeout(timer)
-  }, [phase, currentIdx])
+  }, [phase, currentIdx, entries])
 
-  const current = phase === 'drawing' && currentIdx < DEMO_DRAW.length
-    ? DEMO_DRAW[currentIdx]
+  const current = phase === 'drawing' && currentIdx < entries.length
+    ? entries[currentIdx]
     : null
+
+  const accentColor  = isEV ? '#F10F59' : '#C8F046'
+  const accentBg     = isEV ? 'rgba(241,15,89,0.15)'  : 'rgba(200,240,70,0.15)'
+  const accentText   = isEV ? '#F10F59'                : '#C8F046'
+  const accentBorder = isEV ? 'rgba(241,15,89,0.3)'   : 'rgba(200,240,70,0.3)'
+  const label        = isEV ? '🎤 Eurovision 2026'    : '⚽ World Cup 2026'
+
+  // ── Tournament badge ──────────────────────────────────────────────────────
+  function Badge() {
+    return (
+      <div
+        className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full mb-3"
+        style={{ background: accentBg, color: accentText, border: `1px solid ${accentBorder}` }}
+      >
+        {label}
+      </div>
+    )
+  }
 
   // ── Idle ──────────────────────────────────────────────────────────────────
   if (phase === 'idle') {
     return (
       <div className="w-full">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center space-y-4">
-          <div className="text-5xl" style={{ animation: 'draw-spin 0.5s ease both' }}>🎲</div>
-          <p className="font-heading font-bold text-white text-lg tracking-tight">Ready to draw</p>
-          <p className="text-white/40 text-xs">{DEMO_DRAW.length} participants · 48 teams</p>
-          <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden">
+        <div
+          className="rounded-2xl p-6 text-center space-y-3"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <Badge />
+          <div className="text-4xl">{isEV ? '🎤' : '🎲'}</div>
+          <p className="font-heading font-bold text-white text-base tracking-tight">Ready to draw</p>
+          <p className="text-white/40 text-xs">{entries.length} participants · {entries.length} {isEV ? 'countries' : 'teams'}</p>
+          <div className="w-full bg-white/10 rounded-full h-0.5 overflow-hidden">
             <div
-              className="bg-lime h-full rounded-full"
-              style={{ animation: `progress-fill ${IDLE_HOLD}ms linear both` }}
+              className="h-full rounded-full"
+              style={{
+                background: accentColor,
+                animation: `progress-fill ${IDLE_HOLD}ms linear both`,
+              }}
             />
           </div>
         </div>
@@ -121,37 +132,39 @@ export function HeroDrawAnimation() {
   // ── Drawing ────────────────────────────────────────────────────────────────
   if (phase === 'drawing') {
     return (
-      <div className="w-full space-y-3">
-        {/* Big reveal card */}
+      <div className="w-full space-y-2">
+        <Badge />
         {current && (
           <div
             key={currentIdx}
-            className="bg-white rounded-2xl border-2 border-lime shadow-xl shadow-black/20 p-5 text-center md:max-w-xs md:mx-auto"
-            style={{ animation: 'hero-reveal 0.3s ease both' }}
+            className="bg-white rounded-2xl p-4 text-center"
+            style={{
+              border: `2px solid ${accentColor}`,
+              boxShadow: `0 0 24px ${accentColor}30`,
+              animation: 'hero-reveal 0.25s ease both',
+            }}
           >
-            <p className="text-xs text-mid mb-2 tabular-nums">
-              {currentIdx + 1} <span className="text-[#D1D9D5]">/</span> {DEMO_DRAW.length}
+            <p className="text-[10px] text-mid mb-1.5 tabular-nums">
+              {currentIdx + 1} <span className="text-[#D1D9D5]">/</span> {entries.length}
             </p>
-            <div className="text-5xl mb-1.5 leading-none select-none">{current.flag}</div>
-            <p className="font-heading text-lg font-bold text-pitch leading-tight">{current.team}</p>
-            <div className="my-2.5 flex items-center gap-2">
+            <div className="text-4xl mb-1 leading-none select-none">{current.flag}</div>
+            <p className="font-heading text-base font-bold text-pitch leading-tight">{current.team}</p>
+            <div className="my-2 flex items-center gap-2">
               <span className="flex-1 h-px bg-[#E5EDEA]" />
-              <span className="text-[10px] uppercase tracking-widest text-mid">drawn by</span>
+              <span className="text-[9px] uppercase tracking-widest text-mid">drawn by</span>
               <span className="flex-1 h-px bg-[#E5EDEA]" />
             </div>
-            <p className="font-heading text-sm font-bold text-grass">{current.name}</p>
+            <p className="font-heading text-xs font-bold text-grass">{current.name}</p>
           </div>
         )}
-
-        {/* Scrollable mini grid of already-drawn */}
         {shown.length > 0 && (
-          <div className="max-h-52 overflow-y-auto rounded-xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
-              {shown.map((entry, i) => (
+          <div className="max-h-40 overflow-hidden rounded-xl">
+            <div className="grid grid-cols-2 gap-1">
+              {[...shown].reverse().slice(0, 6).map((entry, i) => (
                 <div
                   key={i}
-                  className="bg-white/8 border border-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2"
-                  style={{ animation: 'card-in 0.2s ease both' }}
+                  className="rounded-lg px-2.5 py-1.5 flex items-center gap-2"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', animation: 'card-in 0.15s ease both' }}
                 >
                   <span className="text-sm leading-none shrink-0">{entry.flag}</span>
                   <div className="min-w-0">
@@ -167,21 +180,28 @@ export function HeroDrawAnimation() {
     )
   }
 
-  // ── Grid: all drawn ────────────────────────────────────────────────────────
+  // ── Done: all drawn ────────────────────────────────────────────────────────
   return (
-    <div className="w-full space-y-3" ref={gridRef}>
+    <div className="w-full space-y-2">
       <div className="flex items-center justify-between">
-        <p className="font-heading font-bold text-white text-sm tracking-tight">Draw complete 🎉</p>
-        <span className="text-xs bg-lime/20 text-lime px-2.5 py-1 rounded-full font-medium">
-          {DEMO_DRAW.length} teams drawn
+        <Badge />
+        <span
+          className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+          style={{ background: accentBg, color: accentText }}
+        >
+          Draw complete 🎉
         </span>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 max-h-[420px] overflow-y-auto rounded-xl">
-        {DEMO_DRAW.map((entry, i) => (
+      <div className="grid grid-cols-2 gap-1 max-h-[260px] overflow-y-auto rounded-xl">
+        {entries.map((entry, i) => (
           <div
             key={i}
-            className="bg-white/8 border border-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2"
-            style={{ animation: `card-in 0.2s ${Math.min(i * 25, 400)}ms ease both` }}
+            className="rounded-lg px-2.5 py-1.5 flex items-center gap-2"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              animation: `card-in 0.15s ${Math.min(i * 30, 300)}ms ease both`,
+            }}
           >
             <span className="text-sm leading-none shrink-0">{entry.flag}</span>
             <div className="min-w-0">
