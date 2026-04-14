@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CampaignSection, type CampaignData } from './CampaignSection'
 
 interface Stats {
   totalOrganisers: number
@@ -39,6 +40,7 @@ interface SweepstakeDetail {
   share_token: string
   created_at: string
   draw_completed_at: string | null
+  sweepstake_type?: string
   participants: ParticipantDetail[]
 }
 
@@ -72,6 +74,7 @@ interface Props {
   organiserDetails: OrganiserDetail[]
   emailLog: EmailLogEntry[]
   analytics: AnalyticsData | null
+  campaignData: CampaignData
 }
 
 const APP_URL = 'https://playdrawr.co.uk'
@@ -92,7 +95,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emailLog, analytics }: Props) {
+export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData }: Props) {
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
@@ -405,6 +408,9 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
             </div>
           )}
         </section>
+
+        {/* World Cup campaign emails */}
+        <CampaignSection data={campaignData} />
 
         {/* Email template previews */}
         <section>

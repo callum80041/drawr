@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/server'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminLogin } from './AdminLogin'
+import type { CampaignQualifier } from './CampaignSection'
 
 export const dynamic = 'force-dynamic'
 
@@ -76,6 +77,7 @@ export default async function HeadCoachAdminPage() {
       id, name, email, created_at, last_login_at,
       sweepstakes (
         id, name, status, entry_fee, share_token, created_at, draw_completed_at,
+        sweepstake_type,
         participants ( id, name, email, paid, created_at )
       )
     `).order('created_at', { ascending: false }),
@@ -93,8 +95,56 @@ export default async function HeadCoachAdminPage() {
     return acc
   }, {})
 
+  // ── Campaign audience segmentation ─────────────────────────────────────────
+  // Computed from organiserDetails which already has sweepstake + participant data.
+  // Segments are mutually exclusive based on the organiser's best-performing WC sweepstake.
+  const email1: CampaignQualifier[] = []  // no WC sweepstake at all
+  const email2: CampaignQualifier[] = []  // WC sweepstake, < 3 participants
+  const email3: CampaignQualifier[] = []  // WC sweepstake, 3–9 participants
+
+  for (const org of (organiserDetails ?? [])) {
+    const wcSweepstakes = org.sweepstakes.filter(
+      (s: { sweepstake_type?: string }) => s.sweepstake_type === 'worldcup'
+    )
+
+    if (wcSweepstakes.length === 0) {
+      email1.push({ id: org.id, name: org.name, email: org.email })
+    } else {
+      // Use the sweepstake with the most participants as the qualifying one
+      const best = wcSweepstakes.reduce(
+        (a: typeof wcSweepstakes[0], b: typeof wcSweepstakes[0]) =>
+          (a.participants?.length ?? 0) >= (b.participants?.length ?? 0) ? a : b
+      )
+      const count = best.participants?.length ?? 0
+
+      if (count < 3) {
+        email2.push({
+          id: org.id, name: org.name, email: org.email,
+          sweepstakeName: best.name,
+          shareToken:     best.share_token,
+          participantCount: count,
+        })
+      } else if (count <= 9) {
+        email3.push({
+          id: org.id, name: org.name, email: org.email,
+          sweepstakeName: best.name,
+          shareToken:     best.share_token,
+          participantCount: count,
+        })
+      }
+      // count >= 10: already at target, not in any campaign segment
+    }
+  }
+
+  const campaignData = {
+    email1: { count: email1.length, qualifiers: email1.slice(0, 30) },
+    email2: { count: email2.length, qualifiers: email2.slice(0, 30) },
+    email3: { count: email3.length, qualifiers: email3.slice(0, 30) },
+  }
+
   return (
     <AdminDashboard
+      campaignData={campaignData}
       stats={{
         totalOrganisers:       totalOrganisers      ?? 0,
         organisersLast7:       organisersLast7      ?? 0,

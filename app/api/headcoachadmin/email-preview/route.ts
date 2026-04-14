@@ -8,6 +8,11 @@ import { participantJoinedEmailHtml }        from '@/lib/email/templates/partici
 import { welcomeEmailHtml }                  from '@/lib/email/templates/welcome'
 import { waitlistPromotedEmailHtml }         from '@/lib/email/templates/waitlist-promoted'
 import { organiserUpdateEmailHtml }          from '@/lib/email/templates/organiser-update'
+import {
+  campaignNoSweepstakeHtml,
+  campaignLowParticipantsHtml,
+  campaignPushToTenHtml,
+} from '@/lib/email/templates/campaign-wc'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
@@ -117,6 +122,31 @@ function buildHtml(template: string, version: string, isEurovision: boolean): st
   }
 }
 
+/**
+ * Campaign template renderer — reads dynamic data from query params so the
+ * CampaignSection can render either sample data or a real organiser record
+ * without any server-side state. Preview only, no sending.
+ */
+function buildCampaignHtml(template: string, p: URLSearchParams): string | null {
+  const firstName    = p.get('firstName')    ?? 'Sarah'
+  const sweepName    = p.get('sweepName')    ?? 'The Crown World Cup 2026'
+  const sweepLink    = p.get('sweepLink')    ?? `${APP_URL}/join/demo2026`
+  const createLink   = p.get('createLink')   ?? `${APP_URL}/dashboard/new`
+  const countRaw     = p.get('count')
+  const count        = countRaw ? parseInt(countRaw, 10) : 5
+
+  switch (template) {
+    case 'campaign-1':
+      return campaignNoSweepstakeHtml({ firstName, createSweepstakeLink: createLink })
+    case 'campaign-2':
+      return campaignLowParticipantsHtml({ firstName, sweepstakeName: sweepName, sweepstakeLink: sweepLink })
+    case 'campaign-3':
+      return campaignPushToTenHtml({ firstName, sweepstakeName: sweepName, sweepstakeLink: sweepLink, participantCount: count })
+    default:
+      return null
+  }
+}
+
 export async function GET(req: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD
   const cookie = req.cookies.get('hc_admin')
@@ -124,9 +154,17 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Unauthorised', { status: 401 })
   }
 
-  const template    = req.nextUrl.searchParams.get('template') ?? 'organiser-update'
-  const version     = req.nextUrl.searchParams.get('version')  ?? 'A'
-  const isEurovision = req.nextUrl.searchParams.get('variant') === 'eurovision'
+  const p        = req.nextUrl.searchParams
+  const template = p.get('template') ?? 'organiser-update'
+  const version  = p.get('version')  ?? 'A'
+  const isEurovision = p.get('variant') === 'eurovision'
+
+  // Campaign templates have their own renderer (accept dynamic query params)
+  if (template.startsWith('campaign-')) {
+    const html = buildCampaignHtml(template, p)
+    if (!html) return new NextResponse('Unknown campaign template', { status: 400 })
+    return new NextResponse(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
+  }
 
   const html = buildHtml(template, version, isEurovision)
   if (!html) {
