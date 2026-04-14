@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 const APP_URL = 'https://playdrawr.co.uk'
 
@@ -52,8 +52,8 @@ const CAMPAIGNS = [
   {
     id: 3 as const,
     template: 'campaign-3',
-    label: 'Push to 10 by 30 April',
-    subject: 'Get your sweepstake to 10 players by 30 April',
+    label: 'Get more people in',
+    subject: 'Get more people into your sweepstake',
     previewText: "You've already got your sweepstake started — now get it in front of more people.",
     audienceLabel: 'WC sweepstake, 3–9 participants',
     audienceNote: 'Organisers with a World Cup sweepstake where the participant count is 3–9 (within reach of the prize draw threshold).',
@@ -97,9 +97,16 @@ function buildPreviewSrc(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
+type SendState = 'idle' | 'confirming' | 'sending' | 'done'
+type SendResult = { sent: number; skipped: number; failed: number }
+
 export function CampaignSection({ data }: { data: CampaignData }) {
   const [activeId, setActiveId]     = useState<1 | 2 | 3 | null>(null)
   const [record, setRecord]         = useState<'sample' | CampaignQualifier>('sample')
+
+  const [sendState, setSendState]   = useState<SendState>('idle')
+  const [sendResult, setSendResult] = useState<SendResult | null>(null)
+  const [sendError, setSendError]   = useState('')
 
   const audiences: Record<1 | 2 | 3, CampaignAudience> = {
     1: data.email1,
@@ -119,7 +126,33 @@ export function CampaignSection({ data }: { data: CampaignData }) {
       setActiveId(id)
       setRecord('sample')
     }
+    setSendState('idle')
+    setSendResult(null)
+    setSendError('')
   }
+
+  const handleSend = useCallback(async (id: 1 | 2 | 3) => {
+    setSendState('sending')
+    setSendError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/campaign-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignId: id }),
+      })
+      const body = await res.json() as { sent?: number; skipped?: number; failed?: number; error?: string }
+      if (!res.ok) {
+        setSendError(body.error ?? 'Something went wrong.')
+        setSendState('confirming')
+        return
+      }
+      setSendResult({ sent: body.sent ?? 0, skipped: body.skipped ?? 0, failed: body.failed ?? 0 })
+      setSendState('done')
+    } catch {
+      setSendError('Request failed — check your connection and try again.')
+      setSendState('confirming')
+    }
+  }, [])
 
   const previewSrc = active
     ? buildPreviewSrc(active.template, record, active.id)
@@ -134,27 +167,12 @@ export function CampaignSection({ data }: { data: CampaignData }) {
             World Cup campaign emails
           </h2>
           <p className="text-xs text-mid mt-0.5">
-            Preview only — no sending. Each email targets a different organiser lifecycle stage.
+            Each email targets a different organiser lifecycle stage. Deduplicates against email_log; respects unsubscribes.
           </p>
         </div>
         <div className="shrink-0 text-right">
           <p className="text-2xl font-heading font-bold text-pitch leading-none">{totalReach}</p>
           <p className="text-xs text-mid mt-0.5">total in audience</p>
-        </div>
-      </div>
-
-      {/* Prize draw callout */}
-      <div className="mb-5 bg-[#FAFFF0] border border-[#C8F046] rounded-xl px-5 py-3 flex items-start gap-3">
-        <span className="text-xl mt-0.5">🏆</span>
-        <div>
-          <p className="text-sm font-semibold text-pitch">
-            £50 organiser prize draw · £25 participant prize draw
-          </p>
-          <p className="text-xs text-mid mt-0.5 leading-relaxed">
-            Organisers qualify if they have a WC sweepstake with 10+ participants by 11:59pm on 30&nbsp;April&nbsp;2026.
-            Participants qualify by joining with their email address.
-            Vouchers sent 17&nbsp;June&nbsp;2026, ahead of England&nbsp;v&nbsp;Croatia.
-          </p>
         </div>
       </div>
 
@@ -224,12 +242,55 @@ export function CampaignSection({ data }: { data: CampaignData }) {
                 {activeAudience.count} recipient{activeAudience.count !== 1 ? 's' : ''} · {active.audienceNote}
               </p>
             </div>
-            <button
-              onClick={() => { setActiveId(null); setRecord('sample') }}
-              className="text-xs text-mid hover:text-pitch transition-colors shrink-0"
-            >
-              Close ✕
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Send controls */}
+              {sendState === 'idle' && activeAudience.count > 0 && (
+                <button
+                  onClick={() => setSendState('confirming')}
+                  className="text-xs font-semibold bg-lime text-pitch px-3 py-1.5 rounded-lg hover:bg-[#b8e03d] transition-colors"
+                >
+                  Send to {activeAudience.count} →
+                </button>
+              )}
+
+              {sendState === 'confirming' && (
+                <div className="flex items-center gap-2">
+                  {sendError && <p className="text-xs text-red-600">{sendError}</p>}
+                  <span className="text-xs text-mid">Send now?</span>
+                  <button
+                    onClick={() => { setSendState('idle'); setSendError('') }}
+                    className="text-xs text-mid hover:text-pitch transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleSend(active.id)}
+                    className="text-xs font-semibold bg-pitch text-white px-3 py-1.5 rounded-lg hover:bg-pitch/90 transition-colors"
+                  >
+                    Confirm send
+                  </button>
+                </div>
+              )}
+
+              {sendState === 'sending' && (
+                <span className="text-xs text-mid animate-pulse">Sending…</span>
+              )}
+
+              {sendState === 'done' && sendResult && (
+                <span className="text-xs text-pitch font-medium">
+                  ✓ Sent {sendResult.sent}
+                  {sendResult.skipped > 0 ? ` · Skipped ${sendResult.skipped}` : ''}
+                  {sendResult.failed > 0 ? ` · Failed ${sendResult.failed}` : ''}
+                </span>
+              )}
+
+              <button
+                onClick={() => { setActiveId(null); setRecord('sample') }}
+                className="text-xs text-mid hover:text-pitch transition-colors"
+              >
+                Close ✕
+              </button>
+            </div>
           </div>
 
           {/* Record picker */}
