@@ -221,6 +221,13 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
 
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-8">
 
+        {/* Quick links */}
+        <div className="flex gap-3">
+          <a href="/headcoachadmin/lottery" className="text-sm font-medium bg-white border border-[#E5EDEA] rounded-lg px-4 py-2 text-pitch hover:bg-[#F2F7F5] transition">
+            🎱 Lottery syndicates →
+          </a>
+        </div>
+
         {/* Traffic */}
         <section>
           <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">Traffic</h2>
