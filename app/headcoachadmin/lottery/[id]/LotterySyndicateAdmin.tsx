@@ -128,10 +128,17 @@ export function LotterySyndicateAdmin({ syndicate, members: initialMembers, paym
 
   const activeMembers = initialMembers.filter(m => !m.left_at)
 
-  // Pot value: paid payments for current cycle draws' date range
-  // Simplified: total paid entries × entry fee (all time)
-  const totalPaid = initialPayments.filter(p => p.paid).length
-  const potPence  = totalPaid * syndicate.entry_fee_pence
+  // Pot = paid weeks from first draw of current cycle up to (and including) the latest draw.
+  // Advance payments beyond the latest draw are reserved but not yet in the pot.
+  const cycleDraws  = initialDraws.filter(d => d.pot_cycle === syndicate.current_pot_cycle).sort((a, b) => a.draw_date.localeCompare(b.draw_date))
+  const cycleStart  = cycleDraws[0]?.draw_date ?? null
+  const latestDraw  = cycleDraws[cycleDraws.length - 1]?.draw_date ?? null
+  const potPence    = (cycleStart && latestDraw)
+    ? initialPayments.filter(p => p.paid && p.week_date >= cycleStart && p.week_date <= latestDraw).length * syndicate.entry_fee_pence
+    : 0
+  const reservedPence = (latestDraw)
+    ? initialPayments.filter(p => p.paid && p.week_date > latestDraw).length * syndicate.entry_fee_pence
+    : 0
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-8">
@@ -148,8 +155,11 @@ export function LotterySyndicateAdmin({ syndicate, members: initialMembers, paym
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Total paid in</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Current jackpot</p>
             <p className="font-heading text-2xl font-bold text-yellow-400">£{(potPence / 100).toFixed(2)}</p>
+            {reservedPence > 0 && (
+              <p className="text-xs text-gray-500 mt-0.5">+£{(reservedPence / 100).toFixed(2)} reserved</p>
+            )}
           </div>
         </div>
 
@@ -183,7 +193,7 @@ export function LotterySyndicateAdmin({ syndicate, members: initialMembers, paym
           <DrawsTab syndicateId={syndicate.id} draws={initialDraws} members={activeMembers} cycle={syndicate.current_pot_cycle} onSave={refresh} />
         )}
         {tab === 'winners' && (
-          <WinnersTab syndicateId={syndicate.id} winners={initialWinners} members={activeMembers} entryFeePence={syndicate.entry_fee_pence} totalPaid={totalPaid} onSave={refresh} />
+          <WinnersTab syndicateId={syndicate.id} winners={initialWinners} members={activeMembers} entryFeePence={syndicate.entry_fee_pence} potPence={potPence} onSave={refresh} />
         )}
       </div>
     </div>
@@ -656,10 +666,10 @@ function DrawsTab({ syndicateId, draws, members, cycle, onSave }: {
 
 // ── Winners tab ────────────────────────────────────────────────────────────────
 
-function WinnersTab({ syndicateId, winners, members, entryFeePence, totalPaid, onSave }: {
-  syndicateId: string; winners: Winner[]; members: Member[]; entryFeePence: number; totalPaid: number; onSave: () => void
+function WinnersTab({ syndicateId, winners, members, entryFeePence, potPence, onSave }: {
+  syndicateId: string; winners: Winner[]; members: Member[]; entryFeePence: number; potPence: number; onSave: () => void
 }) {
-  const [form, setForm] = useState({ member_id: '', draw_date: new Date().toISOString().slice(0, 10), amount_pence: String(totalPaid * entryFeePence), notes: '' })
+  const [form, setForm] = useState({ member_id: '', draw_date: new Date().toISOString().slice(0, 10), amount_pence: String(potPence), notes: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 

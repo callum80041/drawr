@@ -38,11 +38,13 @@ export default async function ParticipantPage({ params }: Props) {
     { data: draws },
     { data: payments },
     { data: winners },
+    { data: allPayments },
   ] = await Promise.all([
     supabase.from('syndicate_members').select('id, name, number1, number2, number3, number4, number5, number6, left_at').eq('syndicate_id', syndicate.id).is('left_at', null).order('name'),
     supabase.from('lottery_draws').select('*').eq('syndicate_id', syndicate.id).order('draw_date', { ascending: false }),
     supabase.from('syndicate_payments').select('week_date, paid').eq('member_id', member.id).order('week_date', { ascending: false }),
     supabase.from('syndicate_winners').select('*, syndicate_members(name)').eq('syndicate_id', syndicate.id).order('created_at', { ascending: false }),
+    supabase.from('syndicate_payments').select('week_date, paid').eq('syndicate_id', syndicate.id),
   ])
 
   const cycle = syndicate.current_pot_cycle
@@ -54,6 +56,14 @@ export default async function ParticipantPage({ params }: Props) {
     drawnBalls.add(d.ball1); drawnBalls.add(d.ball2); drawnBalls.add(d.ball3)
     drawnBalls.add(d.ball4); drawnBalls.add(d.ball5); drawnBalls.add(d.ball6)
   }
+
+  // Pot = paid weeks from first draw of current cycle up to latest draw (advance payments reserved)
+  const cycleDraws = (draws ?? []).filter(d => d.pot_cycle === cycle).sort((a, b) => a.draw_date.localeCompare(b.draw_date))
+  const cycleStart = cycleDraws[0]?.draw_date ?? null
+  const latestDraw = cycleDraws[cycleDraws.length - 1]?.draw_date ?? null
+  const potPence = (cycleStart && latestDraw && allPayments)
+    ? allPayments.filter(p => p.paid && p.week_date >= cycleStart && p.week_date <= latestDraw).length * syndicate.entry_fee_pence
+    : 0
 
   const myNumbers = [member.number1, member.number2, member.number3, member.number4, member.number5, member.number6]
   const myNeeds = myNumbers.filter(n => !drawnBalls.has(n)).length
@@ -68,8 +78,8 @@ export default async function ParticipantPage({ params }: Props) {
     })
     .sort((a, b) => a.needs - b.needs)
 
-  const totalPaid = (payments ?? []).filter(p => p.paid).length
-  const totalWeeks = (payments ?? []).length
+  const myPaidWeeks  = (payments ?? []).filter(p => p.paid).length
+  const myTotalWeeks = (payments ?? []).length
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -79,6 +89,11 @@ export default async function ParticipantPage({ params }: Props) {
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-1">{syndicate.name}</p>
           <h1 className="font-heading text-3xl font-bold">{member.name}</h1>
+          {potPence > 0 && (
+            <div className="mt-3 inline-flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/30 rounded-full px-4 py-1.5">
+              <span className="text-yellow-300 text-sm font-semibold">🏆 Jackpot: £{(potPence / 100).toFixed(2)}</span>
+            </div>
+          )}
         </div>
 
         {/* My numbers */}
@@ -179,12 +194,12 @@ export default async function ParticipantPage({ params }: Props) {
         {/* Payment status */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-4">Your payments</p>
-          {totalWeeks === 0 ? (
+          {myTotalWeeks === 0 ? (
             <p className="text-sm text-gray-400">No payment records yet.</p>
           ) : (
             <>
               <p className="text-sm text-gray-300 mb-3">
-                <span className="font-semibold text-white">{totalPaid}</span> of {totalWeeks} weeks paid
+                <span className="font-semibold text-white">{myPaidWeeks}</span> of {myTotalWeeks} weeks paid
               </p>
               <div className="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto">
                 {(payments ?? []).slice(0, 24).map(p => (
