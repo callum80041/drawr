@@ -88,7 +88,7 @@ We do, automatically. Scores come from a live football data provider and update 
 Yes. Set an entry fee when creating the sweepstake. playdrawr tracks who has paid and shows the total prize pot.
 
 **Does playdrawr handle the money?**
-No. The money stays between you and your participants — collect it however you normally would (cash, bank transfer, whatever works for your group). We just track who's paid.
+No. playdrawr takes 0% commission. All entry fees go 100% to you. Collect payments directly from your participants however you want (cash, bank transfer, Venmo, whatever). We just track who's paid for your records.
 
 **Is this gambling?**
 No. A sweepstake is a social competition. playdrawr is not a bookmaker and is not regulated as one.

@@ -23,7 +23,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, plan, entry_fee, organiser_id, share_token, sweepstake_type')
+    .select('id, name, plan, entry_fee, currency, organiser_id, share_token, sweepstake_type')
     .eq('id', id)
     .single()
 
@@ -54,6 +54,7 @@ export default async function ParticipantsPage({ params }: Props) {
       isEurovision={sweepstake.sweepstake_type === 'eurovision'}
       plan={sweepstake.plan}
       entryFee={Number(sweepstake.entry_fee)}
+      currency={sweepstake.currency ?? 'GBP'}
       initialParticipants={participants ?? []}
       initialWaitlist={waitlist ?? []}
       organiserName={organiser?.name ?? ''}

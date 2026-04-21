@@ -6,6 +6,7 @@ import { PaymentSummary } from '@/components/dashboard/PaymentSummary'
 import { ParticipantRow } from '@/components/dashboard/ParticipantRow'
 import { WaitlistRow, type WaitlistEntry } from '@/components/dashboard/WaitlistRow'
 import { ShareButtons } from '@/components/dashboard/ShareButtons'
+import { type CurrencyCode } from '@/lib/constants/currencies'
 
 const FREE_PLAN_CAP = 48
 
@@ -23,13 +24,14 @@ interface Props {
   isEurovision?: boolean
   plan: string
   entryFee: number
+  currency?: CurrencyCode
   initialParticipants: Participant[]
   initialWaitlist: WaitlistEntry[]
   organiserName: string
   organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
+export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, currency = 'GBP', initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(initialWaitlist)
@@ -155,7 +157,7 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
     <div className="max-w-2xl space-y-6">
 
       {/* Payment summary */}
-      <PaymentSummary total={participants.length} paid={paidCount} entryFee={entryFee} />
+      <PaymentSummary total={participants.length} paid={paidCount} entryFee={entryFee} currency={currency} />
 
       {/* Add participant form */}
       <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
@@ -259,6 +261,7 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
                 participant={p}
                 sweepstakeId={sweepstakeId}
                 entryFee={entryFee}
+                currency={currency}
                 onTogglePaid={handleTogglePaid}
                 onRemove={handleRemove}
               />

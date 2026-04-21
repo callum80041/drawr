@@ -272,6 +272,19 @@ export default async function LandingPage() {
         </ScrollReveal>
       </div>
 
+      {/* ── TRUST BADGE ──────────────────────────────────────── */}
+      <div className="bg-grass/5 border-y border-grass/20 py-12 px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-xs font-bold tracking-widest uppercase text-grass/60 mb-3">Complete transparency</p>
+          <h2 className="font-heading text-2xl leading-tight tracking-tight text-pitch mb-3">
+            playdrawr doesn't take a cut.
+          </h2>
+          <p className="text-mid text-sm leading-relaxed">
+            Entry fees go 100% to you. We don't process payments or take a percentage. You collect the money directly from your group, however you want.
+          </p>
+        </div>
+      </div>
+
       {/* ── BOTTOM CTA ───────────────────────────────────────── */}
       <div className="relative text-center px-6 py-24 md:py-32 overflow-hidden border-t border-lime/10">
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(200,240,70,0.07)_0%,transparent_60%)]" />

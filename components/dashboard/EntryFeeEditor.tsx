@@ -2,18 +2,22 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { CURRENCIES, type CurrencyCode } from '@/lib/constants/currencies'
+import { formatCurrency } from '@/lib/utils/formatCurrency'
 
 interface Props {
   sweepstakeId: string
   initialFee: number
+  currency?: CurrencyCode
 }
 
-export function EntryFeeEditor({ sweepstakeId, initialFee }: Props) {
+export function EntryFeeEditor({ sweepstakeId, initialFee, currency = 'GBP' }: Props) {
   const [fee, setFee] = useState(initialFee)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(initialFee > 0 ? String(initialFee) : '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const currencySymbol = CURRENCIES[currency].symbol
 
   async function handleSave() {
     const parsed = draft.trim() === '' ? 0 : parseFloat(draft)
@@ -43,7 +47,7 @@ export function EntryFeeEditor({ sweepstakeId, initialFee }: Props) {
         <p className="text-xs text-mid mb-2 font-medium uppercase tracking-wide">Entry fee</p>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mid text-sm">£</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mid text-sm">{currencySymbol}</span>
             <input
               type="number"
               min="0"
@@ -81,7 +85,7 @@ export function EntryFeeEditor({ sweepstakeId, initialFee }: Props) {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-2xl font-heading font-bold text-pitch">
-            {fee > 0 ? `£${Number(fee).toFixed(2)}` : '—'}
+            {fee > 0 ? formatCurrency(fee, currency) : '—'}
           </p>
           <p className="text-xs text-mid mt-0.5">Entry fee</p>
           <p className="text-xs text-mid/60 mt-0.5">

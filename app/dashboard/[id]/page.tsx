@@ -158,7 +158,7 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
             <p className="text-xs text-mid mt-0.5">{s.label}</p>
           </div>
         ))}
-        <EntryFeeEditor sweepstakeId={id} initialFee={Number(sweepstake.entry_fee ?? 0)} />
+        <EntryFeeEditor sweepstakeId={id} initialFee={Number(sweepstake.entry_fee ?? 0)} currency={sweepstake.currency ?? 'GBP'} />
       </div>
 
       {/* Setup checklist */}

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { type CurrencyCode } from '@/lib/constants/currencies'
+import { formatCurrency } from '@/lib/utils/formatCurrency'
 
 interface Participant {
   id: string
@@ -13,13 +15,14 @@ interface Props {
   participant: Participant
   sweepstakeId: string
   entryFee: number
+  currency?: CurrencyCode
   onTogglePaid: (id: string, paid: boolean) => void
   onRemove: (id: string) => void
 }
 
 type ActionStatus = 'idle' | 'sending' | 'sent' | 'error'
 
-export function ParticipantRow({ participant, sweepstakeId, entryFee, onTogglePaid, onRemove }: Props) {
+export function ParticipantRow({ participant, sweepstakeId, entryFee, currency = 'GBP', onTogglePaid, onRemove }: Props) {
   const [inviteStatus, setInviteStatus] = useState<ActionStatus>('idle')
   const [chaseStatus, setChaseStatus] = useState<ActionStatus>('idle')
 
@@ -118,10 +121,10 @@ export function ParticipantRow({ participant, sweepstakeId, entryFee, onTogglePa
             <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="text-grass">
               <path d="M1 4l2.5 2.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Paid{entryFee > 0 ? ` £${entryFee.toFixed(2)}` : ''}
+            Paid{entryFee > 0 ? ` ${formatCurrency(entryFee, currency)}` : ''}
           </>
         ) : (
-          <>Unpaid{entryFee > 0 ? ` £${entryFee.toFixed(2)}` : ''}</>
+          <>Unpaid{entryFee > 0 ? ` ${formatCurrency(entryFee, currency)}` : ''}</>
         )}
       </button>
 

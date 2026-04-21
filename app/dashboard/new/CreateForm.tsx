@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSelector'
+import { CURRENCIES, CURRENCY_OPTIONS, type CurrencyCode } from '@/lib/constants/currencies'
 
 type Mode = 'random' | 'auto' | 'manual'
 type PrizeType = 'money' | 'prizes'
@@ -41,6 +42,7 @@ export function CreateForm({ organiserId }: Props) {
 
   const [name, setName] = useState('')
   const [entryFee, setEntryFee] = useState('')
+  const [currency, setCurrency] = useState<CurrencyCode>('GBP')
   const [mode, setMode] = useState<Mode>('random')
   const [prizeType, setPrizeType] = useState<PrizeType>('money')
   const [payoutStructure, setPayoutStructure] = useState<PayoutStructure>('winner')
@@ -64,6 +66,7 @@ export function CreateForm({ organiserId }: Props) {
         tournament_name: t.tournamentName,
         sweepstake_type: tournament,
         entry_fee: entryFee ? parseFloat(entryFee) : 0,
+        currency: currency,
         assignment_mode: mode,
         prize_type: prizeType,
         payout_structure: payoutStructure,
@@ -132,25 +135,45 @@ export function CreateForm({ organiserId }: Props) {
         </div>
       </div>
 
-      {/* Entry fee */}
-      <div>
-        <label htmlFor="entry-fee" className="block text-sm font-medium text-pitch mb-1.5">
-          Entry fee per participant <span className="text-mid font-normal">(optional)</span>
-        </label>
-        <div className="relative max-w-xs">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mid text-sm">£</span>
-          <input
-            id="entry-fee"
-            type="number"
-            min="0"
-            step="0.50"
-            value={entryFee}
-            onChange={e => setEntryFee(e.target.value)}
-            placeholder="0.00"
-            className="w-full pl-7 pr-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
-          />
+      {/* Currency & Entry fee */}
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="currency" className="block text-sm font-medium text-pitch mb-1.5">
+            Currency <span className="text-mid font-normal">(optional)</span>
+          </label>
+          <select
+            id="currency"
+            value={currency}
+            onChange={e => setCurrency(e.target.value as CurrencyCode)}
+            className="w-full max-w-xs px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
+          >
+            {CURRENCY_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
-        <p className="text-xs text-mid mt-1.5">How much each person pays to enter. You collect payments yourself — we just track who&apos;s paid.</p>
+
+        <div>
+          <label htmlFor="entry-fee" className="block text-sm font-medium text-pitch mb-1.5">
+            Entry fee per participant <span className="text-mid font-normal">(optional)</span>
+          </label>
+          <div className="relative max-w-xs">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mid text-sm">{CURRENCIES[currency].symbol}</span>
+            <input
+              id="entry-fee"
+              type="number"
+              min="0"
+              step="0.50"
+              value={entryFee}
+              onChange={e => setEntryFee(e.target.value)}
+              placeholder="0.00"
+              className="w-full pl-7 pr-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
+            />
+          </div>
+          <p className="text-xs text-mid mt-1.5">You collect payments directly from participants. playdrawr doesn&apos;t take a percentage — you keep 100% of entry fees.</p>
+        </div>
       </div>
 
       {/* Prize type */}

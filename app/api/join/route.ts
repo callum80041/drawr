@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   // Honeypot — bots fill this in, humans don't
   if (website) {
     // Silently pretend it worked
-    return NextResponse.json({ ok: true, participant: { id: 'x', name, email }, sweepstake: { name: '', entryFee: 0 } })
+    return NextResponse.json({ ok: true, participant: { id: 'x', name, email }, sweepstake: { name: '', entryFee: 0, currency: 'GBP' } })
   }
 
   if (!token || !name?.trim()) {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   // Look up sweepstake by share token (public_read RLS allows this)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, plan, organiser_id, sweepstake_type')
+    .select('id, name, status, entry_fee, currency, plan, organiser_id, sweepstake_type')
     .eq('share_token', token)
     .single()
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         ok: true,
         waitlisted: true,
         participant: { name: waitlistEntry.name },
-        sweepstake: { name: sweepstake.name, entryFee: Number(sweepstake.entry_fee ?? 0) },
+        sweepstake: { name: sweepstake.name, entryFee: Number(sweepstake.entry_fee ?? 0), currency: sweepstake.currency ?? 'GBP' },
       })
     }
   }
@@ -157,6 +157,7 @@ export async function POST(req: NextRequest) {
     sweepstake: {
       name: sweepstake.name,
       entryFee: Number(sweepstake.entry_fee ?? 0),
+      currency: sweepstake.currency ?? 'GBP',
     },
   })
 }

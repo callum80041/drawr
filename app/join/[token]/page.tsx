@@ -3,6 +3,8 @@
 import { useState, use } from 'react'
 import Link from 'next/link'
 import { ShareButtons } from '@/components/dashboard/ShareButtons'
+import { type CurrencyCode } from '@/lib/constants/currencies'
+import { formatCurrency } from '@/lib/utils/formatCurrency'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
@@ -18,7 +20,7 @@ export default function JoinPage({ params }: Props) {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number; waitlisted: boolean } | null>(null)
+  const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number; currency: CurrencyCode; waitlisted: boolean } | null>(null)
 
   const joinUrl = `${APP_URL}/join/${token}`
 
@@ -46,6 +48,7 @@ export default function JoinPage({ params }: Props) {
         name: data.participant.name,
         sweepstakeName: data.sweepstake.name,
         entryFee: data.sweepstake.entryFee,
+        currency: data.sweepstake.currency ?? 'GBP',
         waitlisted: !!data.waitlisted,
       })
       setStatus('success')
@@ -106,7 +109,7 @@ export default function JoinPage({ params }: Props) {
               {successData.entryFee > 0 && (
                 <div className="mt-5 bg-light rounded-xl px-5 py-4 text-left">
                   <p className="text-xs text-mid uppercase tracking-wide font-semibold mb-1">Entry fee</p>
-                  <p className="text-2xl font-heading font-black text-pitch">£{successData.entryFee.toFixed(2)}</p>
+                  <p className="text-2xl font-heading font-black text-pitch">{formatCurrency(successData.entryFee, successData.currency)}</p>
                   <p className="text-xs text-mid mt-1">Pay your organiser directly — they&apos;ll mark you as paid.</p>
                 </div>
               )}
