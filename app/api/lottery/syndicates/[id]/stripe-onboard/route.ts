@@ -11,6 +11,7 @@ type Params = { params: Promise<{ id: string }> }
 
 export async function POST(req: NextRequest, { params }: Params) {
   if (!isAuthed(req)) return new NextResponse('Unauthorised', { status: 401 })
+  if (!stripe) return new NextResponse('Stripe not configured', { status: 500 })
   const { id } = await params
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 

@@ -4,6 +4,8 @@ import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
+  if (!stripe) return new NextResponse('Stripe not configured', { status: 500 })
+
   const body = await req.text()
   const sig  = req.headers.get('stripe-signature')
 
