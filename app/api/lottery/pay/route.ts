@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Already paid for this week' }, { status: 400 })
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await stripe!.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [{

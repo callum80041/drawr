@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   let accountId = syndicate?.stripe_account_id as string | null
 
   if (!accountId) {
-    const account = await stripe.accounts.create({
+    const account = await stripe!.accounts.create({
       type: 'express',
       country: 'GB',
       capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     await supabase.from('syndicates').update({ stripe_account_id: accountId }).eq('id', id)
   }
 
-  const accountLink = await stripe.accountLinks.create({
+  const accountLink = await stripe!.accountLinks.create({
     account: accountId,
     refresh_url: `${appUrl}/headcoachadmin/lottery/${id}?stripe=refresh`,
     return_url:  `${appUrl}/headcoachadmin/lottery/${id}?stripe=success`,
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 // Check onboarding status by querying Stripe directly
 export async function GET(req: NextRequest, { params }: Params) {
   if (!isAuthed(req)) return new NextResponse('Unauthorised', { status: 401 })
+  if (!stripe) return new NextResponse('Stripe not configured', { status: 500 })
   const { id } = await params
 
   const supabase = await createServiceClient()
