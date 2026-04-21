@@ -36,7 +36,7 @@ export default async function LotterySyndicateAdminPage({ params }: Props) {
   // Check Stripe Connect status live
   let stripeConnected = false
   let stripeChargesEnabled = false
-  if (syndicate.stripe_account_id && process.env.STRIPE_SECRET_KEY) {
+  if (syndicate.stripe_account_id && stripe) {
     try {
       const account = await stripe.accounts.retrieve(syndicate.stripe_account_id)
       stripeChargesEnabled = !!(account.charges_enabled && account.details_submitted)
