@@ -53,7 +53,7 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
           </svg>
         </div>
         <div>
-          <p className="text-sm font-semibold text-white">You&apos;re reserved!</p>
+          <p className="text-sm font-semibold text-white">Check your inbox</p>
           <p className="text-sm text-white/70 mt-0.5">
             We&apos;ve sent a magic link to <span className="text-white font-medium">{email}</span> — click it to open your dashboard.
           </p>
@@ -99,7 +99,7 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
           disabled={status === 'submitting' || !email.trim() || !name.trim()}
           className="shrink-0 bg-lime text-pitch font-bold text-sm px-5 py-3 rounded-xl hover:bg-[#d4f54d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
-          {status === 'submitting' ? '…' : 'Reserve free →'}
+          {status === 'submitting' ? '…' : 'Get started free →'}
         </button>
       </div>
       {status === 'error' && errorMsg && (

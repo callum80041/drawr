@@ -46,10 +46,10 @@ async function getOrganiserCount(): Promise<number> {
 }
 
 const steps = [
-  { num: '01', title: 'Create your sweepstake', desc: 'Name it, pick your tournament, set an optional entry fee, and invite participants via a link.' },
-  { num: '02', title: 'Run the draw', desc: 'One button. Teams or countries assigned at random — fair, instant, no arguments.' },
-  { num: '03', title: 'Share with your group', desc: 'Send one link to the office, pub group chat, or family WhatsApp. No accounts needed.' },
-  { num: '04', title: 'Watch it run itself', desc: 'Scores, standings and the leaderboard update automatically. You just watch.' },
+  { num: '01', title: 'Create your sweepstake', desc: 'Create a free account and set up in under a minute. Add participants yourself, or share a signup link and let people join themselves.' },
+  { num: '02', title: 'Share with your group', desc: 'One link. No account, no password required from anyone joining. They click. They\'re in.' },
+  { num: '03', title: 'Run the live draw', desc: 'Hit the button. Watch teams assigned live — pull it up on screen in the office, share to the group chat, or run it at the pub. Rerun if you need to.' },
+  { num: '04', title: 'Watch it run itself', desc: 'Scores update automatically a few minutes after each match. Your leaderboard runs itself for the entire tournament.' },
 ]
 
 const testimonials = [
@@ -79,12 +79,12 @@ export default async function LandingPage() {
         </div>
 
         <h1 className="font-heading font-bold leading-tight tracking-tight text-[clamp(36px,6vw,80px)] mb-5 max-w-3xl">
-          Your sweepstake.<br />
-          <span className="text-lime">Pick your tournament.</span>
+          Live draw. Automatic leaderboard.<br />
+          <span className="text-lime">Ready in 60 seconds.</span>
         </h1>
 
         <p className="max-w-xl text-lg text-white/60 leading-relaxed mb-10">
-          World Cup 2026 or Eurovision 2026 — run a fair draw, share one link with your group, and let the leaderboard do the rest. Free forever.
+          Free account for organisers. Anyone joining just needs a link — no sign-up, no passwords.
         </p>
 
         {/* Tournament cards */}
@@ -197,11 +197,11 @@ export default async function LandingPage() {
             <div className="p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
               <div className="flex-1 min-w-0">
                 <h2 className="font-heading text-[clamp(28px,4vw,46px)] leading-tight tracking-tight mb-4">
-                  See the real thing.<br />
-                  <span className="text-lime">No sign-up needed.</span>
+                  See it before you commit.<br />
+                  <span className="text-lime">No account needed.</span>
                 </h2>
                 <p className="text-white/50 font-light leading-relaxed mb-8">
-                  Two live demo sweepstakes — pick a tournament and see exactly what your group gets. Scores, leaderboard, everything.
+                  Two live demo sweepstakes — pick a tournament and see exactly what your group gets. Live draw, leaderboard, automatic scores.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
@@ -275,12 +275,12 @@ export default async function LandingPage() {
       {/* ── TRUST BADGE ──────────────────────────────────────── */}
       <div className="bg-grass/5 border-y border-grass/20 py-12 px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <p className="text-xs font-bold tracking-widest uppercase text-grass/60 mb-3">Complete transparency</p>
+          <p className="text-xs font-bold tracking-widest uppercase text-grass/60 mb-3">No money handling</p>
           <h2 className="font-heading text-2xl leading-tight tracking-tight text-pitch mb-3">
-            playdrawr doesn't take a cut.
+            We don&apos;t handle your money.
           </h2>
           <p className="text-mid text-sm leading-relaxed">
-            Entry fees go 100% to you. We don't process payments or take a percentage. You collect the money directly from your group, however you want.
+            playdrawr doesn&apos;t process payments, hold funds, or take fees. How your group pays — cash, bank transfer, the kitty at the pub — is entirely up to you. We run the draw. We track the scores.
           </p>
         </div>
       </div>
@@ -290,11 +290,11 @@ export default async function LandingPage() {
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(200,240,70,0.07)_0%,transparent_60%)]" />
         <div className="relative max-w-lg mx-auto">
           <h2 className="font-heading text-[clamp(32px,5vw,64px)] leading-tight tracking-tight mb-3">
-            Office, pub, five-a-side<br />
-            <span className="text-lime">or family — it&apos;s yours.</span>
+            Your sweepstake is<br />
+            <span className="text-lime">60 seconds away.</span>
           </h2>
           <p className="text-lg text-white/50 font-light mb-10">
-            Three minutes now saves hours of WhatsApp chaos.
+            Free account. One link to share. Zero admin after you hit go.
           </p>
           <HeroEmailForm variant="band" />
           <p className="mt-5 text-xs text-white/30">
