@@ -16,7 +16,7 @@ export default async function DrawPage({ params }: Props) {
   // Fetch sweepstake (layout already validated ownership)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, assignment_mode, draw_completed_at, tournament_id, status, share_token')
+    .select('id, name, assignment_mode, draw_completed_at, tournament_id, status, share_token, teams_per_participant')
     .eq('id', id)
     .single()
 
@@ -49,6 +49,7 @@ export default async function DrawPage({ params }: Props) {
       shareToken={sweepstake.share_token ?? ''}
       assignmentMode={sweepstake.assignment_mode}
       drawCompletedAt={sweepstake.draw_completed_at}
+      teamsPerParticipant={sweepstake.teams_per_participant ?? 'all'}
       participants={participantsRes.data ?? []}
       teams={teamsRes.data ?? []}
       initialAssignments={assignmentsRes.data ?? []}

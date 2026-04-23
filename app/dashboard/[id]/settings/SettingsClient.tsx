@@ -8,6 +8,7 @@ import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSel
 type Mode = 'random' | 'auto' | 'manual'
 type PrizeType = 'money' | 'prizes'
 type PayoutStructure = 'winner' | 'top_3'
+type TeamsPerParticipant = 'one' | 'all'
 
 interface Props {
   sweepstakeId: string
@@ -17,6 +18,7 @@ interface Props {
   initialPrizeType: PrizeType
   initialPayoutStructure: PayoutStructure
   initialImageUrl: string | null
+  initialTeamsPerParticipant: TeamsPerParticipant
   drawDone: boolean
   status: string
 }
@@ -29,6 +31,7 @@ export function SettingsClient({
   initialPrizeType,
   initialPayoutStructure,
   initialImageUrl,
+  initialTeamsPerParticipant,
   drawDone,
   status,
 }: Props) {
@@ -95,6 +98,7 @@ export function SettingsClient({
   const [mode, setMode] = useState<Mode>(initialMode)
   const [prizeType, setPrizeType] = useState<PrizeType>(initialPrizeType)
   const [payoutStructure, setPayoutStructure] = useState<PayoutStructure>(initialPayoutStructure)
+  const [teamsPerParticipant, setTeamsPerParticipant] = useState<TeamsPerParticipant>(initialTeamsPerParticipant)
 
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -120,6 +124,7 @@ export function SettingsClient({
         assignment_mode: mode,
         prize_type: prizeType,
         payout_structure: payoutStructure,
+        teams_per_participant: teamsPerParticipant,
       })
       .eq('id', sweepstakeId)
 
@@ -273,6 +278,43 @@ export function SettingsClient({
                 <p className="text-xs text-mid">{opt.desc}</p>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Teams per participant — locked once draw is done */}
+        <div className="p-6">
+          <label className="block text-sm font-medium text-pitch mb-1">
+            Teams per participant
+            {drawDone && (
+              <span className="ml-2 text-xs font-normal text-mid bg-light px-2 py-0.5 rounded-full">
+                Locked — draw completed
+              </span>
+            )}
+          </label>
+          {!drawDone && (
+            <p className="text-xs text-mid mb-3">Can only be changed before the draw is run.</p>
+          )}
+          <div className={drawDone ? 'opacity-50 pointer-events-none mt-3' : 'mt-3'}>
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                { value: 'one', icon: '1️⃣', label: 'One team each', desc: 'Each participant gets 1 team.' },
+                { value: 'all', icon: '📊', label: 'Distribute all', desc: 'Spread all teams across participants.' },
+              ] as { value: TeamsPerParticipant; icon: string; label: string; desc: string }[]).map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setTeamsPerParticipant(opt.value)}
+                  disabled={drawDone}
+                  className={`text-left p-4 rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    teamsPerParticipant === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
+                  }`}
+                >
+                  <span className="text-2xl mb-2 block">{opt.icon}</span>
+                  <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
+                  <p className="text-xs text-mid">{opt.desc}</p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

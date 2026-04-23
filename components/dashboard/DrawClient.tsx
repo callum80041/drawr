@@ -34,6 +34,7 @@ interface Props {
   shareToken: string
   assignmentMode: string
   drawCompletedAt: string | null
+  teamsPerParticipant: 'one' | 'all'
   participants: Participant[]
   teams: Team[]
   initialAssignments: Assignment[]
@@ -56,14 +57,25 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-function computeDraw(participants: Participant[], teams: Team[]): Map<string, Team[]> {
-  const shuffledTeams = shuffle(teams)
+function computeDraw(participants: Participant[], teams: Team[], teamsPerParticipant: 'one' | 'all'): Map<string, Team[]> {
   const result = new Map<string, Team[]>()
   participants.forEach(p => result.set(p.id, []))
-  shuffledTeams.forEach((team, i) => {
-    const p = participants[i % participants.length]
-    result.get(p.id)!.push(team)
-  })
+
+  if (teamsPerParticipant === 'one') {
+    // One team per participant: shuffle teams and assign first N teams (N = participant count)
+    const shuffledTeams = shuffle(teams).slice(0, participants.length)
+    shuffledTeams.forEach((team, i) => {
+      result.get(participants[i].id)!.push(team)
+    })
+  } else {
+    // Distribute all teams evenly across participants
+    const shuffledTeams = shuffle(teams)
+    shuffledTeams.forEach((team, i) => {
+      const p = participants[i % participants.length]
+      result.get(p.id)!.push(team)
+    })
+  }
+
   return result
 }
 
@@ -179,6 +191,7 @@ export function DrawClient({
   shareToken,
   assignmentMode,
   drawCompletedAt,
+  teamsPerParticipant,
   participants,
   teams,
   initialAssignments,
@@ -252,7 +265,7 @@ export function DrawClient({
     setError('')
     setPhase('saving')
 
-    const map = computeDraw(participants, teams)
+    const map = computeDraw(participants, teams, teamsPerParticipant)
 
     startTransition(async () => {
       try {
