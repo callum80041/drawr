@@ -29,7 +29,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   if (!sweepstake || sweepstake.organiser_id !== organiser.id) notFound()
 
-  const [{ data: participants }, waitlistResult] = await Promise.all([
+  const [{ data: participants }, waitlistResult, { count: assignmentCount }] = await Promise.all([
     supabase
       .from('participants')
       .select('id, name, email, paid')
@@ -40,6 +40,10 @@ export default async function ParticipantsPage({ params }: Props) {
       .select('id, name, email, created_at')
       .eq('sweepstake_id', id)
       .order('created_at', { ascending: true }),
+    supabase
+      .from('assignments')
+      .select('*', { count: 'exact', head: true })
+      .eq('sweepstake_id', id),
   ])
   // waitlist table may not exist yet if migration hasn't been run
   const waitlist = waitlistResult.error ? [] : (waitlistResult.data ?? [])
@@ -55,6 +59,7 @@ export default async function ParticipantsPage({ params }: Props) {
       plan={sweepstake.plan}
       entryFee={Number(sweepstake.entry_fee)}
       currency={sweepstake.currency ?? 'GBP'}
+      drawDone={(assignmentCount ?? 0) > 0}
       initialParticipants={participants ?? []}
       initialWaitlist={waitlist ?? []}
       organiserName={organiser?.name ?? ''}

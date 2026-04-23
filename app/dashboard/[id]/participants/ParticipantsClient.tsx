@@ -25,13 +25,14 @@ interface Props {
   plan: string
   entryFee: number
   currency?: CurrencyCode
+  drawDone: boolean
   initialParticipants: Participant[]
   initialWaitlist: WaitlistEntry[]
   organiserName: string
   organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, currency = 'GBP', initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
+export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, currency = 'GBP', drawDone, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(initialWaitlist)
@@ -39,6 +40,9 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [removeConfirm, setRemoveConfirm] = useState<{ id: string; name: string } | null>(null)
+  const [removeOption, setRemoveOption] = useState<'return-teams' | null>('return-teams')
+  const [removing, setRemoving] = useState(false)
 
   const cap = plan === 'free' ? FREE_PLAN_CAP : Infinity
   const atCap = participants.length >= cap
@@ -115,13 +119,49 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
     })
   }
 
-  function handleRemove(id: string) {
+  function handleRemoveClick(id: string) {
+    const participant = participants.find(p => p.id === id)
+    if (!participant) return
+
+    if (drawDone) {
+      setRemoveConfirm({ id, name: participant.name })
+      setRemoveOption('return-teams')
+    } else {
+      handleConfirmRemove(id, 'return-teams')
+    }
+  }
+
+  function handleConfirmRemove(id: string, option: 'return-teams') {
     const previous = participants
     setParticipants(prev => prev.filter(p => p.id !== id))
+    setRemoving(true)
 
     startTransition(async () => {
-      const { error } = await supabase.from('participants').delete().eq('id', id)
-      if (error) setParticipants(previous)
+      try {
+        // If draw is done and user chose "return teams to pool", delete assignments first
+        if (drawDone && option === 'return-teams') {
+          const { error: delError } = await supabase
+            .from('assignments')
+            .delete()
+            .eq('sweepstake_id', sweepstakeId)
+            .eq('participant_id', id)
+          if (delError) throw delError
+        }
+
+        // Delete the participant
+        const { error } = await supabase.from('participants').delete().eq('id', id)
+        if (error) {
+          setParticipants(previous)
+          throw error
+        }
+
+        setRemoveConfirm(null)
+      } catch (err) {
+        setParticipants(previous)
+        setError(err instanceof Error ? err.message : 'Failed to remove participant')
+      } finally {
+        setRemoving(false)
+      }
     })
   }
 
@@ -263,7 +303,7 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
                 entryFee={entryFee}
                 currency={currency}
                 onTogglePaid={handleTogglePaid}
-                onRemove={handleRemove}
+                onRemove={handleRemoveClick}
               />
             ))}
           </ul>
@@ -317,6 +357,51 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
               />
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Remove confirmation modal */}
+      {removeConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-sm w-full space-y-4">
+            <div className="px-6 py-4 border-b border-[#E5EDEA]">
+              <h2 className="font-heading font-bold text-pitch text-lg">Remove participant?</h2>
+              <p className="text-mid text-sm mt-1">
+                {drawDone
+                  ? `Remove ${removeConfirm.name} and return their assigned teams to the available pool?`
+                  : `Remove ${removeConfirm.name} from this sweepstake?`}
+              </p>
+            </div>
+
+            {drawDone && (
+              <div className="px-6 pt-2">
+                <p className="text-xs text-mid mb-2">Their teams will be unassigned and available for rebalancing.</p>
+              </div>
+            )}
+
+            <div className="px-6 pb-4 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setRemoveConfirm(null)}
+                disabled={removing}
+                className="flex-1 px-4 py-2 bg-light text-pitch text-sm font-medium rounded-lg hover:bg-[#D1D9D5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (removeConfirm && removeOption) {
+                    handleConfirmRemove(removeConfirm.id, removeOption)
+                  }
+                }}
+                disabled={removing}
+                className="flex-1 px-4 py-2 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {removing ? 'Removing…' : 'Remove'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
