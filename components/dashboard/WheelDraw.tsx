@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { TeamWheel } from '@/components/dashboard/wheel/TeamWheel'
 import { ParticipantStrip } from '@/components/dashboard/wheel/ParticipantStrip'
 import { WinnerPanel } from '@/components/dashboard/wheel/WinnerPanel'
+import { AvailableTeamsList } from '@/components/dashboard/wheel/AvailableTeamsList'
 import { FullscreenToggle } from '@/components/dashboard/wheel/FullscreenToggle'
 import { Confetti } from '@/components/dashboard/wheel/Confetti'
 import { createSoundManager } from '@/components/dashboard/wheel/SoundEffects'
@@ -54,6 +55,7 @@ export function WheelDraw({
   const [winners, setWinners] = useState<Assignment[]>([])
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [confettiTrigger, setConfettiTrigger] = useState(0)
+  const [autoSpin, setAutoSpin] = useState(false)
 
   const currentParticipant = participants[currentIdx]
   const assignedTeam = assignmentMap.get(currentParticipant?.id ?? '')?.at(0)
@@ -115,6 +117,31 @@ export function WheelDraw({
     }
   }
 
+  // Auto-spin when in auto mode and phase is revealed
+  useEffect(() => {
+    if (!autoSpin || phase !== 'revealed') return
+
+    const timer = setTimeout(() => {
+      handleNext()
+      // After advancing, auto-spin will trigger again via the revealed->spinning phase change
+    }, 800)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSpin, phase, currentIdx, participants.length])
+
+  // Auto-trigger spin when phase becomes spinning and auto is enabled
+  useEffect(() => {
+    if (!autoSpin || phase !== 'spinning' || isSpinning) return
+
+    const timer = setTimeout(() => {
+      handleSpin()
+    }, 500)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSpin, phase, isSpinning])
+
   // Completed state
   if (phase === 'completed') {
     return (
@@ -154,6 +181,21 @@ export function WheelDraw({
         </div>
         <div className="flex items-center gap-3">
           <button
+            onClick={() => setAutoSpin(!autoSpin)}
+            title={autoSpin ? 'Stop auto-spin' : 'Start auto-spin'}
+            className={`transition-colors p-2 rounded ${autoSpin ? 'bg-lime text-pitch' : 'text-pitch hover:text-grass'}`}
+          >
+            {autoSpin ? (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+              </svg>
+            )}
+          </button>
+          <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             title={soundEnabled ? 'Mute' : 'Unmute'}
             className="text-pitch hover:text-grass transition-colors p-2"
@@ -186,8 +228,13 @@ export function WheelDraw({
         />
       </div>
 
-      {/* Main layout: Wheel + Winners */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 px-6 pb-6 min-h-0 overflow-hidden">
+      {/* Main layout: Available teams | Wheel | Winners + Controls */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-6 px-6 pb-6 min-h-0 overflow-hidden">
+        {/* Available teams list */}
+        <div className="min-h-0">
+          <AvailableTeamsList teams={availableTeams} />
+        </div>
+
         {/* Wheel */}
         <div className="flex flex-col items-center justify-center bg-white rounded-lg border border-[#E5EDEA] p-4 overflow-hidden">
           <TeamWheel
@@ -211,7 +258,7 @@ export function WheelDraw({
             {phase === 'spinning' && (
               <button
                 onClick={handleSpin}
-                disabled={isSpinning || !assignedTeam}
+                disabled={isSpinning || !assignedTeam || autoSpin}
                 className="w-full bg-lime text-pitch font-heading font-bold py-3 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               >
                 {isSpinning ? 'Spinning…' : 'Spin →'}
@@ -221,7 +268,8 @@ export function WheelDraw({
             {phase === 'revealed' && currentIdx < participants.length - 1 && (
               <button
                 onClick={handleNext}
-                className="w-full bg-lime text-pitch font-heading font-bold py-3 rounded-lg hover:bg-[#b8e03d] transition-colors text-lg"
+                disabled={autoSpin}
+                className="w-full bg-lime text-pitch font-heading font-bold py-3 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               >
                 Next →
               </button>
@@ -230,7 +278,8 @@ export function WheelDraw({
             {phase === 'revealed' && currentIdx === participants.length - 1 && (
               <button
                 onClick={handleNext}
-                className="w-full bg-lime text-pitch font-heading font-bold py-3 rounded-lg hover:bg-[#b8e03d] transition-colors text-lg"
+                disabled={autoSpin}
+                className="w-full bg-lime text-pitch font-heading font-bold py-3 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
               >
                 Finish →
               </button>

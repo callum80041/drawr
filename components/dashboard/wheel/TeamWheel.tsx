@@ -71,14 +71,6 @@ export function TeamWheel({ teams, isSpinning, spinRotation }: Props) {
     return `M 0 0 L ${x1} ${y1} A ${wheelRadius} ${wheelRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`
   }
 
-  const getTeamShortName = (name: string) => {
-    if (name.length <= 8) return name
-    const words = name.split(' ')
-    if (words.length > 1) {
-      return words.map(w => w[0]).join('')
-    }
-    return name.substring(0, 8) + '…'
-  }
 
   return (
     <div className="flex items-center justify-center">
@@ -125,35 +117,18 @@ export function TeamWheel({ teams, isSpinning, spinRotation }: Props) {
                     opacity={isAvailable ? 1 : 0.2}
                   />
 
-                  {/* Label */}
+                  {/* Flag label */}
                   {isAvailable && (
                     <g transform={`translate(${labelX}, ${labelY})`}>
-                      {/* Flag emoji */}
                       <text
                         x="0"
-                        y="-10"
+                        y="0"
                         textAnchor="middle"
-                        fontSize="24"
+                        fontSize="28"
                         dominantBaseline="middle"
                       >
                         {team.flag ?? '🏳️'}
                       </text>
-
-                      {/* Abbreviated team name */}
-                      <text
-                        x="0"
-                        y="14"
-                        textAnchor="middle"
-                        fontSize="11"
-                        fontWeight="bold"
-                        fill="#F4F7F2"
-                        dominantBaseline="middle"
-                        style={{ fontFamily: 'DM Sans, sans-serif' }}
-                      >
-                        {getTeamShortName(team.name)}
-                      </text>
-
-                      {/* Tooltip title for full name */}
                       <title>{team.name}</title>
                     </g>
                   )}
