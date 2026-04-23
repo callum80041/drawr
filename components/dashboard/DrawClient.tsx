@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ManualDraw } from '@/components/dashboard/ManualDraw'
+import { WheelDraw } from '@/components/dashboard/WheelDraw'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
@@ -29,6 +30,7 @@ interface Assignment {
 
 interface Props {
   sweepstakeId: string
+  sweepstakeName: string
   shareToken: string
   assignmentMode: string
   drawCompletedAt: string | null
@@ -37,8 +39,8 @@ interface Props {
   initialAssignments: Assignment[]
 }
 
-type Phase = 'idle' | 'saving' | 'animating' | 'revealed' | 'confirm-redo'
-type DrawMode = 'auto' | 'manual'
+type Phase = 'idle' | 'saving' | 'animating' | 'revealed' | 'confirm-redo' | 'wheel'
+type DrawMode = 'auto' | 'manual' | 'wheel'
 
 interface DrawItem {
   participant: Participant
@@ -173,6 +175,7 @@ function ShareNativeButton({ shareToken }: { shareToken: string }) {
 
 export function DrawClient({
   sweepstakeId,
+  sweepstakeName,
   shareToken,
   assignmentMode,
   drawCompletedAt,
@@ -251,19 +254,25 @@ export function DrawClient({
 
     const map = computeDraw(participants, teams)
 
-    // Build draw order: shuffle participants, pair with their teams
-    const order: DrawItem[] = shuffle(participants).map(p => ({
-      participant: p,
-      teams: map.get(p.id) ?? [],
-    }))
-
     startTransition(async () => {
       try {
         await saveDrawToDb(map)
         setAssignmentMap(map)
-        setDrawOrder(order)
-        setCurrentIdx(0)
-        setPhase('animating')
+
+        if (mode === 'wheel') {
+          // For wheel draw, go directly to wheel phase
+          setPhase('wheel')
+        } else {
+          // For auto and manual, build draw order and go to animating phase
+          const order: DrawItem[] = shuffle(participants).map(p => ({
+            participant: p,
+            teams: map.get(p.id) ?? [],
+          }))
+          setDrawOrder(order)
+          setCurrentIdx(0)
+          setPhase('animating')
+        }
+
         // Fire-and-forget — don't block the animation on email delivery
         fetch('/api/email/draw-complete', {
           method: 'POST',
@@ -331,6 +340,20 @@ export function DrawClient({
     handleConfirmRedo() // Goes back to idle, organiser clicks "Run the Draw" again with animation
   }
 
+  // ── Wheel draw ───────────────────────────────────────────────────────────────
+  if (phase === 'wheel') {
+    return (
+      <WheelDraw
+        sweepstakeName={sweepstakeName}
+        participants={participants}
+        teams={teams}
+        assignmentMap={assignmentMap}
+        onComplete={() => setPhase('revealed')}
+        onSkip={handleSkip}
+      />
+    )
+  }
+
   // ── Manual mode / late-join manual rearrange ─────────────────────────────────
   if (assignmentMode === 'manual' || lateJoinManual) {
     // Rebuild initialAssignments from current map so ManualDraw has latest state
@@ -387,6 +410,12 @@ export function DrawClient({
               className="w-full bg-lime text-pitch font-heading font-bold text-lg py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors tracking-tight"
             >
               Auto draw →
+            </button>
+            <button
+              onClick={() => handleRunDraw('wheel')}
+              className="w-full bg-grass text-white font-heading font-bold text-lg py-3.5 rounded-xl hover:bg-[#0f5a38] transition-colors tracking-tight"
+            >
+              Wheel draw →
             </button>
             <button
               onClick={() => handleRunDraw('manual')}
