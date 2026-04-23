@@ -1,7 +1,11 @@
 'use client'
 
 export function createSoundManager() {
-  const AudioContextClass = typeof window !== 'undefined' ? (window.AudioContext || (window as { webkitAudioContext: typeof AudioContext }).webkitAudioContext) : null
+  if (typeof window === 'undefined') {
+    return { playSpin: () => {}, playLand: () => {} }
+  }
+
+  const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
   const audioContext = AudioContextClass ? new AudioContextClass() : null
 
   return {
