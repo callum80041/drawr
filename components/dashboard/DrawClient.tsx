@@ -38,7 +38,7 @@ interface Props {
 }
 
 type Phase = 'idle' | 'saving' | 'animating' | 'revealed' | 'confirm-redo'
-type Speed = 'normal' | 'fast'
+type DrawMode = 'auto' | 'manual'
 
 interface DrawItem {
   participant: Participant
@@ -202,11 +202,12 @@ export function DrawClient({
   )
   const [drawOrder,      setDrawOrder]      = useState<DrawItem[]>([])
   const [currentIdx,     setCurrentIdx]     = useState(0)
-  const [speed,          setSpeed]          = useState<Speed>('normal')
+  const [drawMode,       setDrawMode]       = useState<DrawMode>('auto')
   const [error,          setError]          = useState('')
   const [lateJoinManual, setLateJoinManual] = useState(false)
 
-  const INTERVAL_MS = speed === 'fast' ? 220 : 520
+  // Spread auto draw evenly over 24 seconds regardless of participant count
+  const intervalMs = drawOrder.length > 0 ? Math.round(24000 / drawOrder.length) : 500
 
   // ── Advance animation ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -215,9 +216,10 @@ export function DrawClient({
       setPhase('revealed')
       return
     }
-    const timer = setTimeout(() => setCurrentIdx(i => i + 1), INTERVAL_MS)
+    if (drawMode === 'manual') return
+    const timer = setTimeout(() => setCurrentIdx(i => i + 1), intervalMs)
     return () => clearTimeout(timer)
-  }, [phase, currentIdx, drawOrder.length, INTERVAL_MS])
+  }, [phase, currentIdx, drawOrder.length, intervalMs, drawMode])
 
   async function saveDrawToDb(map: Map<string, Team[]>) {
     const { error: delErr } = await supabase
@@ -241,8 +243,9 @@ export function DrawClient({
     if (updateErr) throw updateErr
   }
 
-  function handleRunDraw() {
+  function handleRunDraw(mode: DrawMode = 'auto') {
     if (participants.length === 0) return
+    setDrawMode(mode)
     setError('')
     setPhase('saving')
 
@@ -378,12 +381,20 @@ export function DrawClient({
             Teams will be randomly shuffled and each participant drawn one by one.
           </p>
           {error && <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
-          <button
-            onClick={handleRunDraw}
-            className="w-full bg-lime text-pitch font-heading font-bold text-lg py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors tracking-tight"
-          >
-            Run the Draw →
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => handleRunDraw('auto')}
+              className="w-full bg-lime text-pitch font-heading font-bold text-lg py-3.5 rounded-xl hover:bg-[#b8e03d] transition-colors tracking-tight"
+            >
+              Auto draw →
+            </button>
+            <button
+              onClick={() => handleRunDraw('manual')}
+              className="w-full bg-light text-pitch font-heading font-bold text-sm py-3 rounded-xl hover:bg-[#D1D9D5] transition-colors tracking-tight"
+            >
+              Draw manually (one at a time)
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -417,12 +428,14 @@ export function DrawClient({
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSpeed(s => s === 'normal' ? 'fast' : 'normal')}
-              className="text-xs text-mid hover:text-pitch transition-colors px-3 py-1.5 rounded-lg border border-[#E5EDEA] bg-white"
-            >
-              {speed === 'normal' ? '⏩ Speed up' : '⏸ Normal'}
-            </button>
+            {drawMode === 'manual' ? (
+              <button
+                onClick={() => setCurrentIdx(i => i + 1)}
+                className="text-sm font-heading font-bold text-pitch px-5 py-2 rounded-xl bg-lime hover:bg-[#b8e03d] transition-colors tracking-tight"
+              >
+                Draw next →
+              </button>
+            ) : null}
             <button
               onClick={handleSkip}
               className="text-xs text-mid hover:text-pitch transition-colors underline underline-offset-2"

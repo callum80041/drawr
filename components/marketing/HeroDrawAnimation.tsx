@@ -35,9 +35,9 @@ const EUROVISION = [
 type Mode = 'worldcup' | 'eurovision'
 type Phase = 'idle' | 'drawing' | 'done'
 
-const DRAW_INTERVAL = 180   // ms per card reveal
-const DONE_HOLD    = 3500   // ms holding the complete grid
-const IDLE_HOLD    = 1200   // ms on "ready" screen between cycles
+const DRAW_INTERVAL = 833   // ms per card reveal — 12 cards ≈ 10s total
+const DONE_HOLD    = 4500   // ms holding the complete grid
+const IDLE_HOLD    = 2500   // ms on "ready" screen between cycles
 
 export function HeroDrawAnimation() {
   const [mode, setMode]             = useState<Mode>('worldcup')
