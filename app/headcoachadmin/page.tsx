@@ -95,6 +95,38 @@ export default async function HeadCoachAdminPage() {
     return acc
   }, {})
 
+  // ── Tournament breakdown stats ─────────────────────────────────────────
+  let worldcupSweepstakes = 0, eurovisionSweepstakes = 0
+  let worldcupParticipants = 0, eurovisionParticipants = 0
+  const organisersWithWc = new Set<string>()
+  const organisersWithEurovision = new Set<string>()
+
+  for (const org of (organiserDetails ?? [])) {
+    let hasWc = false, hasEv = false
+    for (const s of org.sweepstakes) {
+      if (s.sweepstake_type === 'worldcup') {
+        hasWc = true
+        worldcupSweepstakes++
+        worldcupParticipants += s.participants?.length ?? 0
+      } else if (s.sweepstake_type === 'eurovision') {
+        hasEv = true
+        eurovisionSweepstakes++
+        eurovisionParticipants += s.participants?.length ?? 0
+      }
+    }
+    if (hasWc) organisersWithWc.add(org.id)
+    if (hasEv) organisersWithEurovision.add(org.id)
+  }
+
+  const breakdownStats = {
+    organisersWithWc: organisersWithWc.size,
+    organisersWithEurovision: organisersWithEurovision.size,
+    worldcupSweepstakes,
+    eurovisionSweepstakes,
+    worldcupParticipants,
+    eurovisionParticipants,
+  }
+
   // ── Campaign audience segmentation ─────────────────────────────────────────
   // Computed from organiserDetails which already has sweepstake + participant data.
   // Segments are mutually exclusive based on the organiser's best-performing WC sweepstake.
@@ -156,6 +188,7 @@ export default async function HeadCoachAdminPage() {
         totalParticipants:     totalParticipants    ?? 0,
         participantsWithEmail: participantsWithEmail ?? 0,
       }}
+      breakdownStats={breakdownStats}
       recentOrganisers={recentOrganisers ?? []}
       organiserDetails={organiserDetails ?? []}
       emailLog={emailLog ?? []}

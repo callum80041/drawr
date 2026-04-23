@@ -16,6 +16,15 @@ interface Stats {
   participantsWithEmail: number
 }
 
+interface BreakdownStats {
+  organisersWithWc: number
+  organisersWithEurovision: number
+  worldcupSweepstakes: number
+  eurovisionSweepstakes: number
+  worldcupParticipants: number
+  eurovisionParticipants: number
+}
+
 interface Organiser {
   id: string
   name: string
@@ -70,6 +79,7 @@ interface EmailLogEntry {
 
 interface Props {
   stats: Stats
+  breakdownStats: BreakdownStats
   recentOrganisers: Organiser[]
   organiserDetails: OrganiserDetail[]
   emailLog: EmailLogEntry[]
@@ -95,7 +105,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData }: Props) {
+export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData }: Props) {
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
@@ -294,6 +304,25 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
             <StatCard label="Last 7 days"    value={stats.organisersLast7} />
             <StatCard label="Last 30 days"   value={stats.organisersLast30} />
           </div>
+          <div className="mt-4 bg-white rounded-xl border border-[#E5EDEA] p-5">
+            <p className="text-xs font-medium text-mid uppercase tracking-wide mb-3">Tournament breakdown</p>
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <div className="flex items-end gap-2 mb-2">
+                  <div style={{ height: `${(breakdownStats.organisersWithWc / stats.totalOrganisers) * 80}px` }} className="flex-1 bg-yellow-500 rounded-t"></div>
+                  <div style={{ height: `${(breakdownStats.organisersWithEurovision / stats.totalOrganisers) * 80}px` }} className="flex-1 bg-pink-500 rounded-t"></div>
+                </div>
+                <div className="flex text-xs text-mid gap-2">
+                  <div className="flex-1 text-center">{breakdownStats.organisersWithWc}</div>
+                  <div className="flex-1 text-center">{breakdownStats.organisersWithEurovision}</div>
+                </div>
+              </div>
+              <div className="text-xs space-y-1 text-mid w-28">
+                <p>🏆 <strong className="text-pitch">{breakdownStats.organisersWithWc}</strong> World Cup</p>
+                <p>🎤 <strong className="text-pitch">{breakdownStats.organisersWithEurovision}</strong> Eurovision</p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Sweepstakes */}
@@ -305,6 +334,25 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
             <StatCard label="With entry fee" value={stats.paidEntries} sub="money pot sweepstakes" />
             <StatCard label="Active"         value={stats.byStatus['active'] ?? 0} sub={Object.entries(stats.byStatus).map(([s, n]) => `${n} ${s}`).join(' · ') || '—'} />
           </div>
+          <div className="mt-4 bg-white rounded-xl border border-[#E5EDEA] p-5">
+            <p className="text-xs font-medium text-mid uppercase tracking-wide mb-3">Tournament breakdown</p>
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <div className="flex items-end gap-2 mb-2">
+                  <div style={{ height: `${(breakdownStats.worldcupSweepstakes / stats.totalSweepstakes) * 80}px` }} className="flex-1 bg-yellow-500 rounded-t"></div>
+                  <div style={{ height: `${(breakdownStats.eurovisionSweepstakes / stats.totalSweepstakes) * 80}px` }} className="flex-1 bg-pink-500 rounded-t"></div>
+                </div>
+                <div className="flex text-xs text-mid gap-2">
+                  <div className="flex-1 text-center">{breakdownStats.worldcupSweepstakes}</div>
+                  <div className="flex-1 text-center">{breakdownStats.eurovisionSweepstakes}</div>
+                </div>
+              </div>
+              <div className="text-xs space-y-1 text-mid w-28">
+                <p>🏆 <strong className="text-pitch">{breakdownStats.worldcupSweepstakes}</strong> World Cup</p>
+                <p>🎤 <strong className="text-pitch">{breakdownStats.eurovisionSweepstakes}</strong> Eurovision</p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Participants */}
@@ -314,6 +362,25 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
             <StatCard label="Total participants"  value={stats.totalParticipants} />
             <StatCard label="With email address"  value={stats.participantsWithEmail} sub={`${emailPct}% — eligible for notifications`} />
             <StatCard label="Avg per sweepstake"  value={stats.totalSweepstakes > 0 ? Math.round(stats.totalParticipants / stats.totalSweepstakes) : '—'} />
+          </div>
+          <div className="mt-4 bg-white rounded-xl border border-[#E5EDEA] p-5">
+            <p className="text-xs font-medium text-mid uppercase tracking-wide mb-3">Tournament breakdown</p>
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <div className="flex items-end gap-2 mb-2">
+                  <div style={{ height: `${(breakdownStats.worldcupParticipants / stats.totalParticipants) * 80}px` }} className="flex-1 bg-yellow-500 rounded-t"></div>
+                  <div style={{ height: `${(breakdownStats.eurovisionParticipants / stats.totalParticipants) * 80}px` }} className="flex-1 bg-pink-500 rounded-t"></div>
+                </div>
+                <div className="flex text-xs text-mid gap-2">
+                  <div className="flex-1 text-center">{breakdownStats.worldcupParticipants}</div>
+                  <div className="flex-1 text-center">{breakdownStats.eurovisionParticipants}</div>
+                </div>
+              </div>
+              <div className="text-xs space-y-1 text-mid w-28">
+                <p>🏆 <strong className="text-pitch">{breakdownStats.worldcupParticipants}</strong> World Cup</p>
+                <p>🎤 <strong className="text-pitch">{breakdownStats.eurovisionParticipants}</strong> Eurovision</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -575,7 +642,20 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
             {organiserDetails.length === 0 && (
               <p className="text-sm text-mid">No organisers yet.</p>
             )}
-            {organiserDetails.map(o => {
+            {organiserDetails
+              .filter(o => {
+                if (sweepstakeTypeFilter === 'all') return true
+                return o.sweepstakes.some(s => s.sweepstake_type === sweepstakeTypeFilter)
+              })
+              .length === 0 && organiserDetails.length > 0 && (
+              <p className="text-sm text-mid">No organisers with {sweepstakeTypeFilter === 'worldcup' ? 'World Cup' : 'Eurovision'} sweepstakes.</p>
+            )}
+            {organiserDetails
+              .filter(o => {
+                if (sweepstakeTypeFilter === 'all') return true
+                return o.sweepstakes.some(s => s.sweepstake_type === sweepstakeTypeFilter)
+              })
+              .map(o => {
               const isOpen = expandedOrganiser === o.id
               const totalParticipants = o.sweepstakes.reduce((n, s) => n + s.participants.length, 0)
               return (
