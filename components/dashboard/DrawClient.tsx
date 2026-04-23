@@ -412,12 +412,6 @@ export function DrawClient({
               Auto draw →
             </button>
             <button
-              onClick={() => handleRunDraw('wheel')}
-              className="w-full bg-grass text-white font-heading font-bold text-lg py-3.5 rounded-xl hover:bg-[#0f5a38] transition-colors tracking-tight"
-            >
-              Wheel draw →
-            </button>
-            <button
               onClick={() => handleRunDraw('manual')}
               className="w-full bg-light text-pitch font-heading font-bold text-sm py-3 rounded-xl hover:bg-[#D1D9D5] transition-colors tracking-tight"
             >
