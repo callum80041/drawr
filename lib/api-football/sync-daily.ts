@@ -35,6 +35,20 @@ interface ApiFixture {
   goals: { home: number | null; away: number | null }
 }
 
+interface ApiStanding {
+  league: {
+    standings: Array<{
+      group: string
+      rank: number
+      team: { id: number; name: string }
+      all: { played: number; win: number; draw: number; lose: number; goals: { for: number; against: number } }
+      goalsDiff: number
+      points: number
+      update: string
+    }>
+  }
+}
+
 export async function runDailySync(): Promise<{
   status: 'ok' | 'skipped' | 'error'
   message: string
@@ -130,16 +144,74 @@ export async function runDailySync(): Promise<{
       matchesUpdated = matchUpserts.length
     }
 
-    // ── 3. Log ───────────────────────────────────────────────────────────────
+    // ── 3. Sync standings ────────────────────────────────────────────────────
+    let standingsUpdated = 0
+    try {
+      const standingsData = await apiFetch<ApiStanding[]>(
+        `/standings?league=${WC2026_LEAGUE_ID}&season=${WC2026_SEASON}`
+      )
+      apiCallsUsed++
+
+      if (standingsData.response.length > 0) {
+        // Flatten the standings array (API returns one object with nested standings)
+        const allStandings = standingsData.response.flatMap(item =>
+          item.league.standings.map(standing => ({
+            tournament_id: WC2026_TOURNAMENT_ID,
+            group_name: standing.group,
+            team_id: standing.team.id, // This is API-Football ID, need to map to our ID
+            position: standing.rank,
+            played: standing.all.played,
+            wins: standing.all.win,
+            draws: standing.all.draw,
+            losses: standing.all.lose,
+            goals_for: standing.all.goals.for,
+            goals_against: standing.all.goals.against,
+            goals_diff: standing.goalsDiff,
+            points: standing.points,
+            form: null,
+            updated_at: new Date().toISOString(),
+          }))
+        )
+
+        // Map API-Football team IDs to our internal team IDs
+        const { data: teamsWithApiId } = await supabase
+          .from('teams')
+          .select('id, api_football_id')
+          .eq('tournament_id', WC2026_TOURNAMENT_ID)
+          .not('api_football_id', 'is', null)
+
+        const apiIdToInternal = Object.fromEntries(
+          (teamsWithApiId ?? []).map(t => [t.api_football_id, t.id])
+        )
+
+        const standingsWithInternalIds = allStandings
+          .map(s => ({ ...s, team_id: apiIdToInternal[s.team_id] }))
+          .filter(s => s.team_id !== undefined)
+
+        const { error: standingsError } = await supabase
+          .from('standings')
+          .upsert(standingsWithInternalIds, { onConflict: 'tournament_id,group_name,team_id' })
+
+        if (standingsError) throw standingsError
+        standingsUpdated = standingsWithInternalIds.length
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      console.warn(`Standings sync failed (non-blocking): ${message}`)
+      // Don't throw; standings are nice-to-have
+    }
+
+    // ── 4. Log ───────────────────────────────────────────────────────────────
     await supabase.from('sync_log').insert({
       sync_type: 'daily',
       tournament_id: WC2026_TOURNAMENT_ID,
       api_calls_used: apiCallsUsed,
       matches_updated: matchesUpdated,
+      standings_updated: standingsUpdated,
       status: 'success',
     })
 
-    return { status: 'ok', message: `Synced ${matchesUpdated} matches`, apiCallsUsed, matchesUpdated }
+    return { status: 'ok', message: `Synced ${matchesUpdated} matches, ${standingsUpdated} standings`, apiCallsUsed, matchesUpdated }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     await supabase.from('sync_log').insert({

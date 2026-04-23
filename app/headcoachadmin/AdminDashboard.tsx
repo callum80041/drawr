@@ -127,6 +127,30 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
     }
   }
 
+  // Clear draw
+  const [confirmClearDraw, setConfirmClearDraw] = useState<string | null>(null)
+  const [clearingDraw, setClearingDraw] = useState<string | null>(null)
+  const [clearDrawError, setClearDrawError] = useState('')
+
+  async function handleClearDraw(sweepstakeId: string) {
+    setClearingDraw(sweepstakeId)
+    setClearDrawError('')
+    try {
+      const res = await fetch('/api/headcoachadmin/clear-draw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sweepstakeId }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setClearDrawError(data.error ?? 'Failed'); setClearingDraw(null); return }
+      setConfirmClearDraw(null)
+      router.refresh()
+    } catch {
+      setClearDrawError('Something went wrong.')
+      setClearingDraw(null)
+    }
+  }
+
   // Template preview
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null)
 
@@ -601,6 +625,9 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <p className="font-medium text-pitch text-sm">{s.name}</p>
+                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${s.sweepstake_type === 'worldcup' ? 'bg-yellow-100 text-yellow-700' : 'bg-pink-100 text-pink-700'}`}>
+                                    {s.sweepstake_type === 'worldcup' ? '🏆 World Cup' : '🎤 Eurovision'}
+                                  </span>
                                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOURS[s.status] ?? 'bg-slate-100 text-slate-600'}`}>
                                     {s.status}
                                   </span>
@@ -634,38 +661,72 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
                                   </div>
                                 </div>
 
-                                {/* Reset draw */}
+                                {/* Clear/Reset draw */}
                                 {s.draw_completed_at && (
-                                  confirmResetDraw === s.id ? (
-                                    <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
-                                      <p className="text-xs text-orange-800 flex-1">
-                                        This will delete all {s.participants.length} team assignments and reset the sweepstake to setup. Cannot be undone.
-                                      </p>
-                                      <button
-                                        onClick={() => handleResetDraw(s.id)}
-                                        disabled={resettingDraw === s.id}
-                                        className="text-xs font-semibold bg-orange-600 text-white px-3 py-1.5 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors shrink-0"
-                                      >
-                                        {resettingDraw === s.id ? 'Resetting…' : 'Yes, reset draw'}
-                                      </button>
-                                      <button
-                                        onClick={() => { setConfirmResetDraw(null); setResetDrawError('') }}
-                                        className="text-xs text-mid hover:text-pitch transition-colors shrink-0"
-                                      >
-                                        Cancel
-                                      </button>
-                                      {resetDrawError && <p className="text-xs text-red-600 w-full">{resetDrawError}</p>}
-                                    </div>
-                                  ) : (
-                                    <div className="flex justify-end">
-                                      <button
-                                        onClick={() => setConfirmResetDraw(s.id)}
-                                        className="text-xs text-orange-500 hover:text-orange-700 transition-colors"
-                                      >
-                                        Reset draw
-                                      </button>
-                                    </div>
-                                  )
+                                  <div className="space-y-2">
+                                    {confirmClearDraw === s.id ? (
+                                      <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
+                                        <p className="text-xs text-amber-800 flex-1">
+                                          Clear all {s.participants.length} team assignments. Cannot be undone.
+                                        </p>
+                                        <button
+                                          onClick={() => handleClearDraw(s.id)}
+                                          disabled={clearingDraw === s.id}
+                                          className="text-xs font-semibold bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors shrink-0"
+                                        >
+                                          {clearingDraw === s.id ? 'Clearing…' : 'Yes, clear draw'}
+                                        </button>
+                                        <button
+                                          onClick={() => { setConfirmClearDraw(null); setClearDrawError('') }}
+                                          className="text-xs text-mid hover:text-pitch transition-colors shrink-0"
+                                        >
+                                          Cancel
+                                        </button>
+                                        {clearDrawError && <p className="text-xs text-red-600 w-full">{clearDrawError}</p>}
+                                      </div>
+                                    ) : (
+                                      <div />
+                                    )}
+                                    {confirmResetDraw === s.id ? (
+                                      <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
+                                        <p className="text-xs text-orange-800 flex-1">
+                                          Reset draw: delete all {s.participants.length} assignments and reset sweepstake to setup. Cannot be undone.
+                                        </p>
+                                        <button
+                                          onClick={() => handleResetDraw(s.id)}
+                                          disabled={resettingDraw === s.id}
+                                          className="text-xs font-semibold bg-orange-600 text-white px-3 py-1.5 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors shrink-0"
+                                        >
+                                          {resettingDraw === s.id ? 'Resetting…' : 'Yes, reset draw'}
+                                        </button>
+                                        <button
+                                          onClick={() => { setConfirmResetDraw(null); setResetDrawError('') }}
+                                          className="text-xs text-mid hover:text-pitch transition-colors shrink-0"
+                                        >
+                                          Cancel
+                                        </button>
+                                        {resetDrawError && <p className="text-xs text-red-600 w-full">{resetDrawError}</p>}
+                                      </div>
+                                    ) : (
+                                      <div />
+                                    )}
+                                    {confirmClearDraw !== s.id && confirmResetDraw !== s.id && (
+                                      <div className="flex justify-end gap-2">
+                                        <button
+                                          onClick={() => setConfirmClearDraw(s.id)}
+                                          className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
+                                        >
+                                          Clear draw
+                                        </button>
+                                        <button
+                                          onClick={() => setConfirmResetDraw(s.id)}
+                                          className="text-xs text-orange-500 hover:text-orange-700 transition-colors"
+                                        >
+                                          Reset draw
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 )}
 
                               {/* Participants table */}
