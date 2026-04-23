@@ -102,6 +102,7 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState('')
+  const [sweepstakeTypeFilter, setSweepstakeTypeFilter] = useState<'all' | 'worldcup' | 'eurovision'>('all')
 
   // Reset draw
   const [confirmResetDraw, setConfirmResetDraw] = useState<string | null>(null) // sweepstakeId
@@ -535,7 +536,41 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
 
         {/* All organisers — drill-down */}
         <section>
-          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">All organisers</h2>
+          <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+            <h2 className="font-heading font-bold text-pitch text-lg tracking-tight">All organisers</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSweepstakeTypeFilter('all')}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                  sweepstakeTypeFilter === 'all'
+                    ? 'bg-pitch text-white'
+                    : 'bg-light text-pitch hover:bg-pitch/10'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setSweepstakeTypeFilter('worldcup')}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                  sweepstakeTypeFilter === 'worldcup'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                }`}
+              >
+                🏆 World Cup
+              </button>
+              <button
+                onClick={() => setSweepstakeTypeFilter('eurovision')}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                  sweepstakeTypeFilter === 'eurovision'
+                    ? 'bg-pink-600 text-white'
+                    : 'bg-pink-50 text-pink-700 hover:bg-pink-100'
+                }`}
+              >
+                🎤 Eurovision
+              </button>
+            </div>
+          </div>
           <div className="space-y-2">
             {organiserDetails.length === 0 && (
               <p className="text-sm text-mid">No organisers yet.</p>
@@ -609,13 +644,20 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
                       {o.sweepstakes.length === 0 && (
                         <p className="text-sm text-mid italic">No sweepstakes created yet.</p>
                       )}
-                      {o.sweepstakes.map(s => {
-                        const swOpen = expandedSweepstake === s.id
-                        const joinUrl = `${APP_URL}/join/${s.share_token}`
-                        const lbUrl   = `${APP_URL}/s/${s.share_token}`
-                        const paidCount = s.participants.filter(p => p.paid).length
-                        return (
-                          <div key={s.id} className="bg-white rounded-lg border border-[#E5EDEA] overflow-hidden">
+                      {o.sweepstakes
+                        .filter(s => sweepstakeTypeFilter === 'all' || s.sweepstake_type === sweepstakeTypeFilter)
+                        .length === 0 && o.sweepstakes.length > 0 && (
+                        <p className="text-sm text-mid italic">No {sweepstakeTypeFilter === 'worldcup' ? 'World Cup' : 'Eurovision'} sweepstakes.</p>
+                      )}
+                      {o.sweepstakes
+                        .filter(s => sweepstakeTypeFilter === 'all' || s.sweepstake_type === sweepstakeTypeFilter)
+                        .map(s => {
+                          const swOpen = expandedSweepstake === s.id
+                          const joinUrl = `${APP_URL}/join/${s.share_token}`
+                          const lbUrl   = `${APP_URL}/s/${s.share_token}`
+                          const paidCount = s.participants.filter(p => p.paid).length
+                          return (
+                            <div key={s.id} className="bg-white rounded-lg border border-[#E5EDEA] overflow-hidden">
                             {/* Sweepstake row */}
                             <button
                               type="button"
@@ -767,9 +809,9 @@ export function AdminDashboard({ stats, recentOrganisers, organiserDetails, emai
                                 )}
                               </div>
                             )}
-                          </div>
-                        )
-                      })}
+                            </div>
+                          )
+                        })}
                     </div>
                   )}
                 </div>
