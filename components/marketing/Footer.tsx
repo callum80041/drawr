@@ -11,6 +11,7 @@ export function MarketingFooter() {
           <Wordmark size="sm" variant="light" />
 
           <ul className="flex flex-wrap gap-x-6 gap-y-2 list-none">
+            <li><Link href="/blog" className="text-sm text-white/50 hover:text-white transition-colors">Blog</Link></li>
             <li><Link href="/privacy" className="text-sm text-white/50 hover:text-white transition-colors">Privacy</Link></li>
             <li><Link href="/terms" className="text-sm text-white/50 hover:text-white transition-colors">Terms</Link></li>
             <li><Link href="/contact" className="text-sm text-white/50 hover:text-white transition-colors">Contact</Link></li>
