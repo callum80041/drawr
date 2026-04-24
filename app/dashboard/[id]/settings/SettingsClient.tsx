@@ -7,8 +7,6 @@ import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSel
 import { PrizesSection, type PrizeRow } from './PrizesSection'
 
 type Mode = 'random' | 'auto' | 'manual'
-type PrizeType = 'money' | 'prizes'
-type PayoutStructure = 'winner' | 'top_3'
 type TeamsPerParticipant = 'one' | 'all'
 
 interface Props {
@@ -16,8 +14,6 @@ interface Props {
   initialName: string
   initialEntryFee: number
   initialMode: Mode
-  initialPrizeType: PrizeType
-  initialPayoutStructure: PayoutStructure
   initialImageUrl: string | null
   initialTeamsPerParticipant: TeamsPerParticipant
   initialPrizes: PrizeRow[]
@@ -30,8 +26,6 @@ export function SettingsClient({
   initialName,
   initialEntryFee,
   initialMode,
-  initialPrizeType,
-  initialPayoutStructure,
   initialImageUrl,
   initialTeamsPerParticipant,
   initialPrizes,
@@ -41,7 +35,7 @@ export function SettingsClient({
   const router = useRouter()
   const supabase = createClient()
 
-  const [name, setName] = useState(initialName)
+  // ── Photo ────────────────────────────────────────────────────────────────
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
@@ -52,37 +46,22 @@ export function SettingsClient({
     setUploadError('')
 
     const allowed = ['image/jpeg', 'image/png', 'image/webp']
-    if (!allowed.includes(file.type)) {
-      setUploadError('Please upload a JPEG, PNG, or WebP image.')
-      return
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Image must be under 5 MB.')
-      return
-    }
+    if (!allowed.includes(file.type)) { setUploadError('Please upload a JPEG, PNG, or WebP image.'); return }
+    if (file.size > 5 * 1024 * 1024) { setUploadError('Image must be under 5 MB.'); return }
 
     setUploading(true)
     const ext = file.name.split('.').pop()
     const path = `${sweepstakeId}/${Date.now()}.${ext}`
 
-    // Delete old image if exists
     if (imageUrl) {
       const oldPath = imageUrl.split('/sweepstake-images/')[1]
       if (oldPath) await supabase.storage.from('sweepstake-images').remove([oldPath])
     }
 
-    const { error: uploadErr } = await supabase.storage
-      .from('sweepstake-images')
-      .upload(path, file, { upsert: false })
-
-    if (uploadErr) {
-      setUploadError(uploadErr.message)
-      setUploading(false)
-      return
-    }
+    const { error: uploadErr } = await supabase.storage.from('sweepstake-images').upload(path, file, { upsert: false })
+    if (uploadErr) { setUploadError(uploadErr.message); setUploading(false); return }
 
     const { data: { publicUrl } } = supabase.storage.from('sweepstake-images').getPublicUrl(path)
-
     await supabase.from('sweepstakes').update({ image_url: publicUrl }).eq('id', sweepstakeId)
     setImageUrl(publicUrl)
     setUploading(false)
@@ -97,81 +76,75 @@ export function SettingsClient({
     setImageUrl(null)
     router.refresh()
   }
+
+  // ── Basic settings ───────────────────────────────────────────────────────
+  const [name, setName] = useState(initialName)
   const [entryFee, setEntryFee] = useState(initialEntryFee > 0 ? String(initialEntryFee) : '')
+  const [savingBasic, setSavingBasic] = useState(false)
+  const [savedBasic, setSavedBasic] = useState(false)
+  const [saveErrorBasic, setSaveErrorBasic] = useState('')
+
+  async function handleSaveBasic(e: React.FormEvent) {
+    e.preventDefault()
+    setSavingBasic(true)
+    setSavedBasic(false)
+    setSaveErrorBasic('')
+    const fee = entryFee.trim() === '' ? 0 : parseFloat(entryFee)
+    const { error } = await supabase
+      .from('sweepstakes')
+      .update({ name: name.trim(), entry_fee: isNaN(fee) || fee < 0 ? 0 : fee })
+      .eq('id', sweepstakeId)
+    setSavingBasic(false)
+    if (error) { setSaveErrorBasic(error.message) } else {
+      setSavedBasic(true); router.refresh(); setTimeout(() => setSavedBasic(false), 3000)
+    }
+  }
+
+  // ── Draw settings ────────────────────────────────────────────────────────
   const [mode, setMode] = useState<Mode>(initialMode)
-  const [prizeType, setPrizeType] = useState<PrizeType>(initialPrizeType)
-  const [payoutStructure, setPayoutStructure] = useState<PayoutStructure>(initialPayoutStructure)
   const [teamsPerParticipant, setTeamsPerParticipant] = useState<TeamsPerParticipant>(initialTeamsPerParticipant)
+  const [savingDraw, setSavingDraw] = useState(false)
+  const [savedDraw, setSavedDraw] = useState(false)
+  const [saveErrorDraw, setSaveErrorDraw] = useState('')
 
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [saveError, setSaveError] = useState('')
+  async function handleSaveDraw(e: React.FormEvent) {
+    e.preventDefault()
+    setSavingDraw(true)
+    setSavedDraw(false)
+    setSaveErrorDraw('')
+    const { error } = await supabase
+      .from('sweepstakes')
+      .update({ assignment_mode: mode, teams_per_participant: teamsPerParticipant })
+      .eq('id', sweepstakeId)
+    setSavingDraw(false)
+    if (error) { setSaveErrorDraw(error.message) } else {
+      setSavedDraw(true); router.refresh(); setTimeout(() => setSavedDraw(false), 3000)
+    }
+  }
 
+  // ── Delete ───────────────────────────────────────────────────────────────
   const [deleting, setDeleting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleteError, setDeleteError] = useState('')
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault()
-    setSaving(true)
-    setSaved(false)
-    setSaveError('')
-
-    const fee = entryFee.trim() === '' ? 0 : parseFloat(entryFee)
-
-    const { error } = await supabase
-      .from('sweepstakes')
-      .update({
-        name: name.trim(),
-        entry_fee: isNaN(fee) || fee < 0 ? 0 : fee,
-        assignment_mode: mode,
-        prize_type: prizeType,
-        payout_structure: payoutStructure,
-        teams_per_participant: teamsPerParticipant,
-      })
-      .eq('id', sweepstakeId)
-
-    setSaving(false)
-
-    if (error) {
-      setSaveError(error.message)
-    } else {
-      setSaved(true)
-      router.refresh()
-      setTimeout(() => setSaved(false), 3000)
-    }
-  }
-
   async function handleDelete() {
-    if (deleteConfirm !== name.trim()) {
-      setDeleteError('Name doesn\'t match — type it exactly to confirm.')
-      return
-    }
+    if (deleteConfirm !== name.trim()) { setDeleteError('Name doesn\'t match — type it exactly to confirm.'); return }
     setDeleting(true)
     setDeleteError('')
-    const { error } = await supabase
-      .from('sweepstakes')
-      .delete()
-      .eq('id', sweepstakeId)
-    if (error) {
-      setDeleteError(error.message)
-      setDeleting(false)
-    } else {
-      router.push('/dashboard')
-    }
+    const { error } = await supabase.from('sweepstakes').delete().eq('id', sweepstakeId)
+    if (error) { setDeleteError(error.message); setDeleting(false) } else { router.push('/dashboard') }
   }
 
   return (
     <div className="max-w-2xl space-y-8">
 
-      {/* Main settings form */}
-      <form onSubmit={handleSave} className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
+      {/* ── Basic settings ── */}
+      <form onSubmit={handleSaveBasic} className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
 
-          {/* Cover photo */}
+        {/* Cover photo */}
         <div className="p-6">
           <p className="text-sm font-medium text-pitch mb-1">Cover photo <span className="text-mid font-normal">(optional)</span></p>
           <p className="text-xs text-mid mb-4">Shown as a banner on your public leaderboard. JPEG, PNG or WebP, max 5 MB.</p>
-
           {imageUrl ? (
             <div className="space-y-3">
               <img src={imageUrl} alt="Cover" className="w-full h-40 object-cover rounded-xl border border-[#E5EDEA]" />
@@ -180,9 +153,7 @@ export function SettingsClient({
                   Change photo
                   <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
                 </label>
-                <button type="button" onClick={handleRemovePhoto} className="text-xs text-mid hover:text-red-500 transition-colors">
-                  Remove
-                </button>
+                <button type="button" onClick={handleRemovePhoto} className="text-xs text-mid hover:text-red-500 transition-colors">Remove</button>
               </div>
             </div>
           ) : (
@@ -201,9 +172,7 @@ export function SettingsClient({
 
         {/* Name */}
         <div className="p-6">
-          <label htmlFor="s-name" className="block text-sm font-medium text-pitch mb-1.5">
-            Sweepstake name
-          </label>
+          <label htmlFor="s-name" className="block text-sm font-medium text-pitch mb-1.5">Sweepstake name</label>
           <input
             id="s-name"
             type="text"
@@ -236,67 +205,33 @@ export function SettingsClient({
           </div>
         </div>
 
-        {/* Prize type */}
-        <div className="p-6">
-          <label className="block text-sm font-medium text-pitch mb-3">What are you playing for?</label>
-          <div className="grid grid-cols-2 gap-3">
-            {([
-              { value: 'money', icon: '💷', label: 'Money pot', desc: 'Entry fees go into a prize pot.' },
-              { value: 'prizes', icon: '🏆', label: 'Prizes', desc: 'Physical or non-cash prizes.' },
-            ] as { value: PrizeType; icon: string; label: string; desc: string }[]).map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setPrizeType(opt.value)}
-                className={`text-left p-4 rounded-xl border-2 transition-all ${
-                  prizeType === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
-                }`}
-              >
-                <span className="text-2xl mb-2 block">{opt.icon}</span>
-                <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
-                <p className="text-xs text-mid">{opt.desc}</p>
-              </button>
-            ))}
-          </div>
+        {/* Save basic */}
+        <div className="p-6 flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={savingBasic || !name.trim()}
+            className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {savingBasic ? 'Saving…' : 'Save changes'}
+          </button>
+          {savedBasic && <span className="text-sm text-grass font-medium">✓ Saved</span>}
+          {saveErrorBasic && <span className="text-sm text-red-500">{saveErrorBasic}</span>}
         </div>
+      </form>
 
-        {/* Payout structure */}
-        <div className="p-6">
-          <label className="block text-sm font-medium text-pitch mb-3">Who wins?</label>
-          <div className="grid grid-cols-2 gap-3">
-            {([
-              { value: 'winner', icon: '🥇', label: 'Winner only', desc: 'First place takes everything.' },
-              { value: 'top_3', icon: '🎖️', label: '1st, 2nd & 3rd', desc: 'Prize split across the top three.' },
-            ] as { value: PayoutStructure; icon: string; label: string; desc: string }[]).map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setPayoutStructure(opt.value)}
-                className={`text-left p-4 rounded-xl border-2 transition-all ${
-                  payoutStructure === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
-                }`}
-              >
-                <span className="text-2xl mb-2 block">{opt.icon}</span>
-                <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
-                <p className="text-xs text-mid">{opt.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* ── Prizes ── */}
+      <PrizesSection sweepstakeId={sweepstakeId} initialPrizes={initialPrizes} />
 
-        {/* Teams per participant — locked once draw is done */}
+      {/* ── Draw settings ── */}
+      <form onSubmit={handleSaveDraw} className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
+
+        {/* Teams per participant */}
         <div className="p-6">
           <label className="block text-sm font-medium text-pitch mb-1">
             Teams per participant
-            {drawDone && (
-              <span className="ml-2 text-xs font-normal text-mid bg-light px-2 py-0.5 rounded-full">
-                Locked — draw completed
-              </span>
-            )}
+            {drawDone && <span className="ml-2 text-xs font-normal text-mid bg-light px-2 py-0.5 rounded-full">Locked — draw completed</span>}
           </label>
-          {!drawDone && (
-            <p className="text-xs text-mid mb-3">Can only be changed before the draw is run.</p>
-          )}
+          {!drawDone && <p className="text-xs text-mid mb-3">Can only be changed before the draw is run.</p>}
           <div className={drawDone ? 'opacity-50 pointer-events-none mt-3' : 'mt-3'}>
             <div className="grid grid-cols-2 gap-3">
               {([
@@ -308,9 +243,7 @@ export function SettingsClient({
                   type="button"
                   onClick={() => setTeamsPerParticipant(opt.value)}
                   disabled={drawDone}
-                  className={`text-left p-4 rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                    teamsPerParticipant === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
-                  }`}
+                  className={`text-left p-4 rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${teamsPerParticipant === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'}`}
                 >
                   <span className="text-2xl mb-2 block">{opt.icon}</span>
                   <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
@@ -321,41 +254,33 @@ export function SettingsClient({
           </div>
         </div>
 
-        {/* Assignment mode — locked once draw is done */}
+        {/* Assignment mode */}
         <div className="p-6">
           <label className="block text-sm font-medium text-pitch mb-1">
             Team assignment mode
-            {drawDone && (
-              <span className="ml-2 text-xs font-normal text-mid bg-light px-2 py-0.5 rounded-full">
-                Locked — draw completed
-              </span>
-            )}
+            {drawDone && <span className="ml-2 text-xs font-normal text-mid bg-light px-2 py-0.5 rounded-full">Locked — draw completed</span>}
           </label>
-          {!drawDone && (
-            <p className="text-xs text-mid mb-3">Can only be changed before the draw is run.</p>
-          )}
+          {!drawDone && <p className="text-xs text-mid mb-3">Can only be changed before the draw is run.</p>}
           <div className={drawDone ? 'opacity-50 pointer-events-none mt-3' : 'mt-3'}>
             <AssignmentModeSelector value={mode} onChange={setMode} />
           </div>
         </div>
 
-        {/* Save */}
+        {/* Save draw */}
         <div className="p-6 flex items-center gap-4">
           <button
             type="submit"
-            disabled={saving || !name.trim()}
+            disabled={savingDraw || drawDone}
             className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving…' : 'Save changes'}
+            {savingDraw ? 'Saving…' : 'Save draw settings'}
           </button>
-          {saved && <span className="text-sm text-grass font-medium">✓ Saved</span>}
-          {saveError && <span className="text-sm text-red-500">{saveError}</span>}
+          {savedDraw && <span className="text-sm text-grass font-medium">✓ Saved</span>}
+          {saveErrorDraw && <span className="text-sm text-red-500">{saveErrorDraw}</span>}
         </div>
       </form>
 
-      <PrizesSection sweepstakeId={sweepstakeId} initialPrizes={initialPrizes} />
-
-      {/* Danger zone */}
+      {/* ── Danger zone ── */}
       {status !== 'complete' && (
         <div className="bg-white rounded-xl border border-red-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-red-100 bg-red-50">
@@ -364,9 +289,7 @@ export function SettingsClient({
           <div className="p-6 space-y-4">
             <div>
               <p className="text-sm font-medium text-pitch mb-1">Delete this sweepstake</p>
-              <p className="text-xs text-mid mb-4">
-                Permanently deletes the sweepstake, all participants, and all assignments. This cannot be undone.
-              </p>
+              <p className="text-xs text-mid mb-4">Permanently deletes the sweepstake, all participants, and all assignments. This cannot be undone.</p>
               <label className="block text-xs font-medium text-pitch mb-1.5">
                 Type <span className="font-mono bg-light px-1.5 py-0.5 rounded">{name}</span> to confirm
               </label>
