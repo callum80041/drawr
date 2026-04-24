@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSelector'
+import { PrizesSection, type PrizeRow } from './PrizesSection'
 
 type Mode = 'random' | 'auto' | 'manual'
 type PrizeType = 'money' | 'prizes'
@@ -19,6 +20,7 @@ interface Props {
   initialPayoutStructure: PayoutStructure
   initialImageUrl: string | null
   initialTeamsPerParticipant: TeamsPerParticipant
+  initialPrizes: PrizeRow[]
   drawDone: boolean
   status: string
 }
@@ -32,6 +34,7 @@ export function SettingsClient({
   initialPayoutStructure,
   initialImageUrl,
   initialTeamsPerParticipant,
+  initialPrizes,
   drawDone,
   status,
 }: Props) {
@@ -349,6 +352,8 @@ export function SettingsClient({
           {saveError && <span className="text-sm text-red-500">{saveError}</span>}
         </div>
       </form>
+
+      <PrizesSection sweepstakeId={sweepstakeId} initialPrizes={initialPrizes} />
 
       {/* Danger zone */}
       {status !== 'complete' && (

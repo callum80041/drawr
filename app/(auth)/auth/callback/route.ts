@@ -42,6 +42,13 @@ export async function GET(request: NextRequest) {
         try {
           const { createServiceClient } = await import('@/lib/supabase/server')
           const service = await createServiceClient()
+
+          const { data: organiser } = await service
+            .from('organisers')
+            .select('last_login_at')
+            .eq('user_id', user.id)
+            .single()
+
           await service
             .from('organisers')
             .update({
@@ -49,6 +56,11 @@ export async function GET(request: NextRequest) {
               ...(metaName ? { name: metaName } : {}),
             })
             .eq('user_id', user.id)
+
+          // First-ever login — send to name capture
+          if (!organiser?.last_login_at) {
+            response.headers.set('location', `${origin}/welcome`)
+          }
         } catch {
           // Non-critical — don't block the redirect if this fails
         }

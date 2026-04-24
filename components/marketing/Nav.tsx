@@ -51,7 +51,7 @@ export function MarketingNav() {
             href="#reserve"
             className="text-sm font-medium bg-lime text-pitch px-4 py-2 rounded-lg hover:bg-[#d4f54d] transition-colors"
           >
-            Create sweepstake
+            Start free
           </a>
         </li>
       </ul>

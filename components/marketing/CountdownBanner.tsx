@@ -33,8 +33,6 @@ export function CountdownBanner() {
     { label: 's', value: time?.seconds ?? null },
   ]
 
-  if (time === null && typeof window !== 'undefined') return null
-
   return (
     <div
       className="w-full py-2.5 px-4"

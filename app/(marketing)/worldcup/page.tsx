@@ -8,7 +8,6 @@ import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
-const SIGNUP_OFFSET = 30
 
 export const metadata: Metadata = {
   title: 'World Cup 2026 Sweepstake — Free | playdrawr',
@@ -22,15 +21,15 @@ export const metadata: Metadata = {
   },
 }
 
-async function getOrganiserCount(): Promise<number> {
+async function getParticipantCount(): Promise<number> {
   try {
     const supabase = await createServiceClient()
     const { count } = await supabase
-      .from('organisers')
+      .from('participants')
       .select('*', { count: 'exact', head: true })
-    return (count ?? 0) + SIGNUP_OFFSET
+    return count ?? 0
   } catch {
-    return SIGNUP_OFFSET
+    return 0
   }
 }
 
@@ -64,7 +63,7 @@ const testimonials = [
 ]
 
 export default async function WorldCupPage() {
-  const organiserCount = await getOrganiserCount()
+  const participantCount = await getParticipantCount()
 
   return (
     <div className="bg-pitch text-white overflow-x-hidden">
@@ -133,8 +132,8 @@ export default async function WorldCupPage() {
         <div className="flex items-center justify-center gap-2 mb-16">
           <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
           <p className="text-sm text-white/50">
-            <span className="text-white font-semibold">{organiserCount.toLocaleString()}</span>
-            {' '}organisers have already reserved their draw
+            <span className="text-white font-semibold">{participantCount.toLocaleString()}</span>
+            {' '}participants signed up so far
           </p>
         </div>
 

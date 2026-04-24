@@ -5,11 +5,11 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 import { HeroEmailForm } from '@/components/marketing/HeroEmailForm'
 import { HeroDrawAnimation } from '@/components/marketing/HeroDrawAnimation'
+import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 
 export const revalidate = 300
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
-const SIGNUP_OFFSET = 30
 
 export const metadata: Metadata = {
   title: 'playdrawr — Free Sweepstake Tool for World Cup & Eurovision 2026',
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
   },
 }
 
-async function getOrganiserCount(): Promise<number> {
+async function getParticipantCount(): Promise<number> {
   try {
     const supabase = await createServiceClient()
     const { count } = await supabase
-      .from('organisers')
+      .from('participants')
       .select('*', { count: 'exact', head: true })
-    return (count ?? 0) + SIGNUP_OFFSET
+    return count ?? 0
   } catch {
-    return SIGNUP_OFFSET
+    return 0
   }
 }
 
@@ -59,15 +59,19 @@ const testimonials = [
 ]
 
 export default async function LandingPage() {
-  const organiserCount = await getOrganiserCount()
+  const participantCount = await getParticipantCount()
 
   return (
     <div className="bg-pitch text-white overflow-x-hidden">
 
+      <div className="pt-16">
+        <CountdownBanner />
+      </div>
+
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
         id="reserve"
-        className="relative flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden"
+        className="relative flex flex-col items-center justify-center text-center px-6 pt-16 pb-20 overflow-hidden"
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_60%,rgba(200,240,70,0.04)_0%,transparent_70%)]" />
@@ -78,12 +82,15 @@ export default async function LandingPage() {
           <span className="text-xs font-medium tracking-widest uppercase text-white/60">2026 Sweepstake Tool</span>
         </div>
 
-        <h1 className="font-heading font-bold leading-tight tracking-tight text-[clamp(36px,6vw,80px)] mb-5 max-w-3xl">
-          Live draw. Automatic leaderboard.<br />
+        <h1 className="font-heading font-bold leading-tight tracking-tight text-[clamp(36px,6vw,80px)] mb-4 max-w-3xl">
           <span className="text-lime">Ready in 60 seconds.</span>
         </h1>
 
-        <p className="max-w-xl text-lg text-white/60 leading-relaxed mb-10">
+        <p className="max-w-xl text-xl text-white/80 font-medium leading-snug mb-3">
+          Live draw. Automatic leaderboard.
+        </p>
+
+        <p className="max-w-xl text-lg text-white/50 leading-relaxed mb-10">
           Free account for organisers. Anyone joining just needs a link — no sign-up, no passwords.
         </p>
 
@@ -145,33 +152,22 @@ export default async function LandingPage() {
           </Link>
         </div>
 
-        {/* Email form CTA */}
-        <div className="w-full max-w-md mb-5">
-          <HeroEmailForm variant="hero" />
+        {/* Social proof — above form */}
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 mb-5 text-sm">
+          <span className="flex items-center gap-2 text-white/60">
+            <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
+            <span className="text-white font-semibold">{participantCount.toLocaleString()}</span>
+            {' '}participants signed up so far
+          </span>
+          <span className="hidden sm:block w-px h-3 bg-white/20" />
+          <span className="text-white/40">Free forever</span>
+          <span className="hidden sm:block w-px h-3 bg-white/20" />
+          <span className="text-white/40">60 seconds to set up</span>
         </div>
 
-        {/* Social proof */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center justify-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-lime shrink-0" />
-            <p className="text-sm text-white/50">
-              <span className="text-white font-semibold">{organiserCount.toLocaleString()}</span>
-              {' '}organisers already signed up
-            </p>
-          </div>
-          <a
-            href="https://www.producthunt.com/products/playdrawr-sweepstakes-made-simple?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-playdrawr-sweepstakes-made-simple"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              alt="Playdrawr: Sweepstakes Made Simple - Sweepstakes sorted in minutes, not spreadsheets | Product Hunt"
-              width={250}
-              height={54}
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1120910&theme=dark&t=1775864125705"
-            />
-          </a>
+        {/* Email form CTA */}
+        <div className="w-full max-w-md">
+          <HeroEmailForm variant="hero" />
         </div>
       </section>
 
@@ -275,11 +271,11 @@ export default async function LandingPage() {
       {/* ── TRUST BADGE ──────────────────────────────────────── */}
       <div className="bg-grass/5 border-y border-grass/20 py-12 px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <p className="text-xs font-bold tracking-widest uppercase text-grass/60 mb-3">No money handling</p>
-          <h2 className="font-heading text-2xl leading-tight tracking-tight text-pitch mb-3">
+          <p className="text-xs font-bold tracking-widest uppercase text-lime/60 mb-3">No money handling</p>
+          <h2 className="font-heading text-2xl leading-tight tracking-tight text-white mb-3">
             We don&apos;t handle your money.
           </h2>
-          <p className="text-mid text-sm leading-relaxed">
+          <p className="text-white/50 text-sm leading-relaxed">
             playdrawr doesn&apos;t process payments, hold funds, or take fees. How your group pays — cash, bank transfer, the kitty at the pub — is entirely up to you. We run the draw. We track the scores.
           </p>
         </div>

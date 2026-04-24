@@ -23,17 +23,23 @@ export default async function SettingsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, assignment_mode, prize_type, payout_structure, image_url')
+    .select('id, name, status, entry_fee, assignment_mode, prize_type, payout_structure, image_url, teams_per_participant')
     .eq('id', id)
     .eq('organiser_id', organiser.id)
     .single()
 
   if (!sweepstake) notFound()
 
-  const { count: assignmentCount } = await supabase
-    .from('assignments')
-    .select('*', { count: 'exact', head: true })
-    .eq('sweepstake_id', id)
+  const [{ count: assignmentCount }, { data: prizes }] = await Promise.all([
+    supabase
+      .from('assignments')
+      .select('*', { count: 'exact', head: true })
+      .eq('sweepstake_id', id),
+    supabase
+      .from('sweepstake_prizes')
+      .select('prize_type, amount')
+      .eq('sweepstake_id', id),
+  ])
 
   return (
     <SettingsClient
@@ -44,7 +50,8 @@ export default async function SettingsPage({ params }: Props) {
       initialPrizeType={sweepstake.prize_type ?? 'money'}
       initialPayoutStructure={sweepstake.payout_structure ?? 'winner'}
       initialImageUrl={sweepstake.image_url ?? null}
-      initialTeamsPerParticipant="all"
+      initialTeamsPerParticipant={sweepstake.teams_per_participant ?? 'one'}
+      initialPrizes={prizes ?? []}
       drawDone={(assignmentCount ?? 0) > 0}
       status={sweepstake.status}
     />

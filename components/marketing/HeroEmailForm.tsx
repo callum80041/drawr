@@ -9,7 +9,6 @@ interface Props {
 }
 
 export function HeroEmailForm({ variant = 'hero' }: Props) {
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -32,7 +31,6 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
       email: email.trim().toLowerCase(),
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: name.trim() ? { name: name.trim() } : undefined,
       },
     })
 
@@ -69,21 +67,10 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
     )
   }
 
-  const inputClass = variant === 'hero'
-    ? 'flex-1 min-w-0 bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:border-lime focus:ring-2 focus:ring-lime/30'
-    : 'flex-1 min-w-0 bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:border-lime focus:ring-2 focus:ring-lime/30'
+  const inputClass = 'flex-1 min-w-0 bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:border-lime focus:ring-2 focus:ring-lime/30'
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-2">
-      <input
-        type="text"
-        required
-        placeholder="Your name"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        disabled={status === 'submitting'}
-        className={`${inputClass} w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors disabled:opacity-60`}
-      />
+    <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto">
       <div className="flex gap-2">
         <input
           type="email"
@@ -92,18 +79,18 @@ export function HeroEmailForm({ variant = 'hero' }: Props) {
           value={email}
           onChange={e => setEmail(e.target.value)}
           disabled={status === 'submitting'}
-          className={`${inputClass} px-4 py-3 rounded-xl text-sm outline-none transition-colors disabled:opacity-60`}
+          className={`${inputClass} px-4 py-4 rounded-xl text-sm outline-none transition-colors disabled:opacity-60`}
         />
         <button
           type="submit"
-          disabled={status === 'submitting' || !email.trim() || !name.trim()}
-          className="shrink-0 bg-lime text-pitch font-bold text-sm px-5 py-3 rounded-xl hover:bg-[#d4f54d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          disabled={status === 'submitting' || !email.trim()}
+          className="shrink-0 bg-lime text-pitch font-bold text-base px-8 py-4 rounded-xl shadow-[0_4px_16px_rgba(200,240,70,0.4)] hover:scale-105 hover:shadow-[0_6px_24px_rgba(200,240,70,0.6)] transition-all duration-200 border-2 border-lime/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-[0_4px_16px_rgba(200,240,70,0.4)] whitespace-nowrap"
         >
-          {status === 'submitting' ? '…' : 'Get started free →'}
+          {status === 'submitting' ? '…' : 'Start free'}
         </button>
       </div>
       {status === 'error' && errorMsg && (
-        <p className="text-xs text-red-400 px-1">{errorMsg}</p>
+        <p className="text-xs text-red-400 px-1 mt-2">{errorMsg}</p>
       )}
     </form>
   )
