@@ -56,9 +56,17 @@ export function TVLeaderboardClient({
   const accent = isEurovision ? PINK_EV : LIME_WC
   const background = isEurovision ? BG_EV : BG_WC
 
-  // Rotate panels every 12 seconds through all 8 panels
+  // Rotate panels every 12 seconds
   useEffect(() => {
-    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'promo', 'fixtures', 'join']
+    // Promo panel only shows until June 11, 2026
+    const now = new Date()
+    const juneEleventhDeadline = new Date('2026-06-11T00:00:00Z')
+    const includePromo = now < juneEleventhDeadline
+
+    const panels: PanelType[] = includePromo
+      ? ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'promo', 'fixtures', 'join']
+      : ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'fixtures', 'join']
+
     const interval = setInterval(() => {
       setCurrentPanel(p => {
         const idx = panels.indexOf(p)
