@@ -4,6 +4,7 @@ import { AdminDashboard } from './AdminDashboard'
 import { AdminLogin } from './AdminLogin'
 import type { CampaignQualifier } from './CampaignSection'
 import type { SignupData } from './SignupMethodChart'
+import type { GrowthData } from './GrowthTrendChart'
 
 async function fetchSignupMethodBreakdown(supabase: Awaited<ReturnType<typeof createServiceClient>>, days: number = 7) {
   const now = new Date()
@@ -49,6 +50,79 @@ async function fetchSignupMethodBreakdown(supabase: Awaited<ReturnType<typeof cr
       email: counts.email,
       google: counts.google,
       twitter: counts.twitter,
+    })
+  }
+
+  return result
+}
+
+async function fetchGrowthTrend(supabase: Awaited<ReturnType<typeof createServiceClient>>, days: number = 30) {
+  const now = new Date()
+  const startDate = new Date(now); startDate.setDate(startDate.getDate() - days)
+
+  const [
+    { data: organisers },
+    { data: sweepstakes },
+    { data: participants },
+  ] = await Promise.all([
+    supabase.from('organisers').select('created_at').gte('created_at', startDate.toISOString()).order('created_at', { ascending: true }),
+    supabase.from('sweepstakes').select('created_at').gte('created_at', startDate.toISOString()).order('created_at', { ascending: true }),
+    supabase.from('participants').select('created_at').gte('created_at', startDate.toISOString()).order('created_at', { ascending: true }),
+  ])
+
+  // Count cumulative totals by date
+  const dateMap = new Map<string, { organisers: number; sweepstakes: number; participants: number }>()
+
+  let orgCount = 0, sweepCount = 0, partCount = 0
+
+  for (const org of organisers ?? []) {
+    const date = org.created_at?.split('T')[0] || ''
+    orgCount++
+    if (!dateMap.has(date)) {
+      dateMap.set(date, { organisers: 0, sweepstakes: 0, participants: 0 })
+    }
+    dateMap.get(date)!.organisers = orgCount
+  }
+
+  for (const sweep of sweepstakes ?? []) {
+    const date = sweep.created_at?.split('T')[0] || ''
+    sweepCount++
+    if (!dateMap.has(date)) {
+      dateMap.set(date, { organisers: 0, sweepstakes: 0, participants: 0 })
+    }
+    dateMap.get(date)!.sweepstakes = sweepCount
+  }
+
+  for (const part of participants ?? []) {
+    const date = part.created_at?.split('T')[0] || ''
+    partCount++
+    if (!dateMap.has(date)) {
+      dateMap.set(date, { organisers: 0, sweepstakes: 0, participants: 0 })
+    }
+    dateMap.get(date)!.participants = partCount
+  }
+
+  // Build daily array with all dates and forward-fill cumulative values
+  const result: Array<{ date: string; organisers: number; sweepstakes: number; participants: number }> = []
+  let lastOrgs = 0, lastSweeps = 0, lastParts = 0
+
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+
+    const entry = dateMap.get(dateStr)
+    if (entry) {
+      lastOrgs = entry.organisers
+      lastSweeps = entry.sweepstakes
+      lastParts = entry.participants
+    }
+
+    result.push({
+      date: dateStr,
+      organisers: lastOrgs,
+      sweepstakes: lastSweeps,
+      participants: lastParts,
     })
   }
 
@@ -117,6 +191,7 @@ export default async function HeadCoachAdminPage() {
     { data: emailLog },
     analytics,
     signupMethodBreakdown,
+    growthTrend,
   ] = await Promise.all([
     supabase.from('organisers').select('*', { count: 'exact', head: true }),
     supabase.from('organisers').select('*', { count: 'exact', head: true }).gte('created_at', d7.toISOString()),
@@ -140,6 +215,7 @@ export default async function HeadCoachAdminPage() {
       .limit(200),
     fetchVercelAnalytics(),
     fetchSignupMethodBreakdown(supabase, 7),
+    fetchGrowthTrend(supabase, 30),
   ])
 
   const sweepstakes = sweepstakeRows ?? []
@@ -247,6 +323,7 @@ export default async function HeadCoachAdminPage() {
       emailLog={emailLog ?? []}
       analytics={analytics}
       signupMethodBreakdown={signupMethodBreakdown}
+      growthTrend={growthTrend}
     />
   )
 }

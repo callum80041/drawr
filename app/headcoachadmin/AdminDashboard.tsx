@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CampaignSection, type CampaignData } from './CampaignSection'
 import { SignupMethodChart, type SignupData } from './SignupMethodChart'
+import { GrowthTrendChart, type GrowthData } from './GrowthTrendChart'
 
 interface Stats {
   totalOrganisers: number
@@ -87,6 +88,7 @@ interface Props {
   analytics: AnalyticsData | null
   campaignData: CampaignData
   signupMethodBreakdown: SignupData[]
+  growthTrend: GrowthData[]
 }
 
 const APP_URL = 'https://playdrawr.co.uk'
@@ -107,7 +109,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData, signupMethodBreakdown }: Props) {
+export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData, signupMethodBreakdown, growthTrend }: Props) {
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
@@ -391,6 +393,14 @@ export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organi
           <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">Participant signup methods (last 7 days)</h2>
           <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
             <SignupMethodChart data={signupMethodBreakdown} />
+          </div>
+        </section>
+
+        {/* Growth trends */}
+        <section>
+          <h2 className="font-heading font-bold text-pitch text-lg tracking-tight mb-4">Growth trends (last 30 days)</h2>
+          <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
+            <GrowthTrendChart data={growthTrend} />
           </div>
         </section>
 
