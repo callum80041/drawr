@@ -70,6 +70,32 @@ export default function ContactPage() {
         </p>
       </div>
 
+      {/* Alternative contact methods */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        <a
+          href="https://api.whatsapp.com/message/LGHFQRATV6PLE1?autoload=1&app_absent=0"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-4 border border-[#D1D9D5] rounded-xl hover:border-grass hover:bg-lime/5 transition-colors group"
+        >
+          <span className="text-2xl">💬</span>
+          <div>
+            <p className="font-medium text-pitch text-sm">Message on WhatsApp</p>
+            <p className="text-xs text-mid">Fastest way to reach us</p>
+          </div>
+        </a>
+        <a
+          href="mailto:headcoach@playdrawr.co.uk"
+          className="flex items-center gap-3 p-4 border border-[#D1D9D5] rounded-xl hover:border-grass hover:bg-lime/5 transition-colors group"
+        >
+          <span className="text-2xl">✉️</span>
+          <div>
+            <p className="font-medium text-pitch text-sm">Email</p>
+            <p className="text-xs text-mid">headcoach@playdrawr.co.uk</p>
+          </div>
+        </a>
+      </div>
+
       {/* Ground rules card */}
       <div className="bg-pitch rounded-xl p-5 mb-8 flex gap-4 items-start">
         <span className="text-2xl shrink-0">🎲</span>

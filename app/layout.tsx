@@ -3,6 +3,8 @@ import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import { WhatsAppChat } from "@/components/brand/WhatsAppChat";
+import { BuyMeACoffee } from "@/components/brand/BuyMeACoffee";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -49,6 +51,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased">
         {children}
+        <WhatsAppChat />
+        <BuyMeACoffee />
         <Analytics />
         <Script
           async

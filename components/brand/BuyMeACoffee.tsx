@@ -10,6 +10,7 @@ export function BuyMeACoffee() {
         src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
         alt="Buy Me a Coffee"
         style={{ height: '40px', width: 'auto' }}
+        title="Buy Me a Coffee"
       />
     </a>
   )
