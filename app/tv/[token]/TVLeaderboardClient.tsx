@@ -875,9 +875,9 @@ function PromoPanel({
           </p>
         </div>
 
-        {/* FIFA Logo */}
-        <div style={{ fontSize: 'clamp(48px, 3vw, 80px)', marginBottom: 'clamp(12px, 0.8vw, 20px)' }}>
-          ⚽
+        {/* FIFA World Cup 2026 Trophy */}
+        <div style={{ marginBottom: 'clamp(12px, 0.8vw, 20px)', fontSize: 'clamp(80px, 6vw, 140px)' }}>
+          🏆
         </div>
 
         {/* Countdown */}
