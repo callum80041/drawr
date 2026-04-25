@@ -9,8 +9,22 @@ import { CURRENCIES, CURRENCY_OPTIONS, type CurrencyCode } from '@/lib/constants
 
 type Mode = 'random' | 'auto' | 'manual'
 type PrizeType = 'money' | 'prizes'
-type PayoutStructure = 'winner' | 'top_3'
+type PrizeCategory = 'first_place' | 'second_place' | 'third_place' | 'fourth_place' | 'wooden_spoon' | 'first_knocked_out' | 'most_goals_conceded' | 'fewest_goals_scored' | 'most_cards' | 'golden_boot' | 'golden_glove'
 type TournamentType = 'worldcup' | 'eurovision'
+
+const PRIZE_CATEGORIES: { type: PrizeCategory; icon: string; label: string; desc: string }[] = [
+  { type: 'first_place', icon: '🥇', label: '1st Place', desc: 'Winner of the sweepstake.' },
+  { type: 'second_place', icon: '🥈', label: '2nd Place', desc: 'Runner-up.' },
+  { type: 'third_place', icon: '🥉', label: '3rd Place', desc: 'Third place.' },
+  { type: 'fourth_place', icon: '🎗️', label: '4th Place', desc: 'Semi-final exit.' },
+  { type: 'wooden_spoon', icon: '🥄', label: 'Wooden Spoon', desc: 'Last place on the leaderboard.' },
+  { type: 'first_knocked_out', icon: '👋', label: 'First Knocked Out', desc: 'First team eliminated.' },
+  { type: 'most_goals_conceded', icon: '😬', label: 'Most Goals Conceded', desc: 'Team that concedes the most.' },
+  { type: 'fewest_goals_scored', icon: '😴', label: 'Fewest Goals Scored', desc: 'Team that scores the least.' },
+  { type: 'most_cards', icon: '🟥', label: 'Most Cards', desc: 'Most yellow and red cards combined.' },
+  { type: 'golden_boot', icon: '👟', label: 'Golden Boot Team', desc: 'Team whose player wins the Golden Boot.' },
+  { type: 'golden_glove', icon: '🧤', label: 'Golden Glove Team', desc: 'Team whose player wins the Golden Glove.' },
+]
 
 const TOURNAMENTS: { value: TournamentType; emoji: string; label: string; sub: string; count: string; tournamentId: number; tournamentName: string }[] = [
   {
@@ -46,7 +60,7 @@ export function CreateForm({ organiserId }: Props) {
   const [currency, setCurrency] = useState<CurrencyCode>('GBP')
   const [mode, setMode] = useState<Mode>('random')
   const [prizeType, setPrizeType] = useState<PrizeType>('money')
-  const [payoutStructure, setPayoutStructure] = useState<PayoutStructure>('winner')
+  const [enabledPrizes, setEnabledPrizes] = useState<Set<PrizeCategory>>(new Set(['first_place']))
   const [tournament, setTournament] = useState<TournamentType>('worldcup')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -70,7 +84,6 @@ export function CreateForm({ organiserId }: Props) {
         currency: currency,
         assignment_mode: mode,
         prize_type: prizeType,
-        payout_structure: payoutStructure,
         status: 'setup',
         plan: 'free',
       })
@@ -81,6 +94,19 @@ export function CreateForm({ organiserId }: Props) {
       setError(insertError?.message ?? 'Something went wrong. Please try again.')
       setLoading(false)
       return
+    }
+
+    // Create prize entries
+    if (enabledPrizes.size > 0) {
+      const prizeRows = Array.from(enabledPrizes).map(prizeType => ({
+        sweepstake_id: data.id,
+        prize_type: prizeType,
+        amount: null,
+      }))
+      await supabase
+        .from('sweepstake_prizes')
+        .insert(prizeRows)
+        .catch(() => { /* best-effort */ })
     }
 
     // Fire confirmation email (non-blocking)
@@ -180,25 +206,42 @@ export function CreateForm({ organiserId }: Props) {
       {/* Prize type */}
       <PrizesSection value={prizeType} onChange={setPrizeType} />
 
-      {/* Payout structure */}
+      {/* Prize categories */}
       <div>
-        <label className="block text-sm font-medium text-pitch mb-3">Who wins?</label>
-        <div className="grid grid-cols-2 gap-3">
-          {([
-            { value: 'winner', icon: '🥇', label: 'Winner only', desc: 'First place takes everything.' },
-            { value: 'top_3', icon: '🎖️', label: '1st, 2nd & 3rd', desc: 'Prize split across the top three.' },
-          ] as { value: PayoutStructure; icon: string; label: string; desc: string }[]).map(opt => (
+        <label className="block text-sm font-medium text-pitch mb-3">What are the prizes?</label>
+        <div className="space-y-2">
+          {PRIZE_CATEGORIES.map(cat => (
             <button
-              key={opt.value}
+              key={cat.type}
               type="button"
-              onClick={() => setPayoutStructure(opt.value)}
-              className={`text-left p-4 rounded-xl border-2 transition-all ${
-                payoutStructure === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
+              onClick={() => {
+                const newSet = new Set(enabledPrizes)
+                if (newSet.has(cat.type)) {
+                  newSet.delete(cat.type)
+                } else {
+                  newSet.add(cat.type)
+                }
+                setEnabledPrizes(newSet)
+              }}
+              className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                enabledPrizes.has(cat.type) ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
               }`}
             >
-              <span className="text-2xl mb-2 block">{opt.icon}</span>
-              <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
-              <p className="text-xs text-mid">{opt.desc}</p>
+              <div className="flex items-start gap-3">
+                <div className="pt-0.5">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                    enabledPrizes.has(cat.type) ? 'border-grass bg-grass' : 'border-[#D1D9D5]'
+                  }`}>
+                    {enabledPrizes.has(cat.type) && <span className="text-white text-xs">✓</span>}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-pitch">
+                    <span className="mr-1.5">{cat.icon}</span>{cat.label}
+                  </p>
+                  <p className="text-xs text-mid mt-0.5">{cat.desc}</p>
+                </div>
+              </div>
             </button>
           ))}
         </div>
