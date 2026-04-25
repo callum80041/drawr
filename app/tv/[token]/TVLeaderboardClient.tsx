@@ -41,7 +41,6 @@ export function TVLeaderboardClient({
     Object.fromEntries(initialRanked.map(p => [p.id, p.points]))
   )
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
-  const [currentPanel, setCurrentPanel] = useState<PanelType>('leaderboard')
   const [tickerIndex, setTickerIndex] = useState(0)
 
   const prefersReducedMotion = typeof window !== 'undefined'
@@ -56,25 +55,6 @@ export function TVLeaderboardClient({
   const accent = isEurovision ? PINK_EV : LIME_WC
   const background = isEurovision ? BG_EV : BG_WC
 
-  // Rotate panels every 12 seconds
-  useEffect(() => {
-    // Promo panel only shows until June 11, 2026
-    const now = new Date()
-    const juneEleventhDeadline = new Date('2026-06-11T00:00:00Z')
-    const includePromo = now < juneEleventhDeadline
-
-    const panels: PanelType[] = includePromo
-      ? ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'promo', 'fixtures', 'join']
-      : ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'fixtures', 'join']
-
-    const interval = setInterval(() => {
-      setCurrentPanel(p => {
-        const idx = panels.indexOf(p)
-        return panels[(idx + 1) % panels.length]
-      })
-    }, prefersReducedMotion ? 999999 : 12000)
-    return () => clearInterval(interval)
-  }, [prefersReducedMotion])
 
   // Rotate ticker messages every 5 seconds
   useEffect(() => {
@@ -218,85 +198,15 @@ export function TVLeaderboardClient({
 
       {/* MAIN CONTENT */}
       <div className="flex-1 overflow-hidden px-[clamp(32px,2vw,80px)] py-[clamp(32px,2vw,80px)]">
-        {ranked.length === 0 ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <div
-                style={{
-                  fontSize: 'clamp(64px, 4vw, 128px)',
-                  marginBottom: 'clamp(24px, 2vw, 48px)',
-                }}
-              >
-                {isEurovision ? '🎤' : '🏆'}
-              </div>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(32px, 2vw, 64px)',
-                  color: '#fff',
-                  marginBottom: 'clamp(8px, 0.8vw, 16px)',
-                }}
-              >
-                Draw in progress
-              </p>
-              <p
-                style={{
-                  fontSize: 'clamp(16px, 1vw, 28px)',
-                  color: 'rgba(255,255,255,0.6)',
-                }}
-              >
-                Results coming soon...
-              </p>
-            </div>
-          </div>
-        ) : currentPanel === 'leaderboard' ? (
-          <FullLeaderboard
-            ranked={ranked}
-            accent={accent}
-            isEurovision={isEurovision}
-            getPointDelta={getPointDelta}
-          />
-        ) : currentPanel === 'top5' ? (
-          <Top5Podium
-            ranked={ranked}
-            accent={accent}
-            isEurovision={isEurovision}
-            getPointDelta={getPointDelta}
-          />
-        ) : currentPanel === 'movers' ? (
-          <BiggestMovers
-            movers={getMovers()}
-            accent={accent}
-            isEurovision={isEurovision}
-            getPointDelta={getPointDelta}
-          />
-        ) : currentPanel === 'teams' ? (
-          <TeamsPanel
-            ranked={ranked}
-            accent={accent}
-          />
-        ) : currentPanel === 'stats' ? (
-          <StatsPanel
-            totalPot={totalPot}
-            participantCount={participantCount}
-            entryFee={entryFee}
-            accent={accent}
-          />
-        ) : currentPanel === 'promo' ? (
-          <PromoPanel
-            token={token}
-            ranked={ranked}
-            totalPot={totalPot}
-            participantCount={participantCount}
-            entryFee={entryFee}
-            accent={accent}
-            appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://playdrawr.co.uk'}
-          />
-        ) : currentPanel === 'fixtures' ? (
-          <FixturesPanel accent={accent} />
-        ) : (
-          <JoinPanel token={token} entryFee={entryFee} accent={accent} />
-        )}
+        <PromoPanel
+          token={token}
+          ranked={ranked}
+          totalPot={totalPot}
+          participantCount={participantCount}
+          entryFee={entryFee}
+          accent={accent}
+          appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://playdrawr.co.uk'}
+        />
       </div>
 
       {/* BOTTOM TICKER */}
