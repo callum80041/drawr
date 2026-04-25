@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { SetupBanner } from '@/components/dashboard/SetupBanner'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -22,8 +23,15 @@ export default async function DashboardPage() {
         .order('created_at', { ascending: false })
     : { data: [] }
 
+  const hasName = !!organiser?.name && organiser.name.trim().length > 0
+  const providers = user.identities?.map((i: any) => i.provider) || []
+  const hasPassword = providers.includes('password')
+  const needsSetup = !hasName || !hasPassword
+
   return (
     <div className="p-6 md:p-8 max-w-4xl">
+      {needsSetup && <SetupBanner userId={user.id} organiserId={organiser!.id} hasName={hasName} hasPassword={hasPassword} />}
+
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-pitch tracking-tight">
           My sweepstakes

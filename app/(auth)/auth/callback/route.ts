@@ -67,10 +67,7 @@ export async function GET(request: NextRequest) {
       })
       .eq('user_id', user.id)
 
-    // First-ever login — send to name/password capture
-    if (!organiser?.last_login_at) {
-      response.headers.set('location', `${origin}/welcome`)
-    }
+    // All users go to dashboard (setup banner will show if needed)
   } catch {
     // Non-critical — don't block the redirect if this fails
   }

@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Wordmark } from '@/components/brand/Wordmark'
 
 export default function SignupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) {
+      setEmail(decodeURIComponent(emailParam))
+    }
+  }, [searchParams])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [checkEmail, setCheckEmail] = useState(false)
