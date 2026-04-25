@@ -11,7 +11,7 @@ export default async function DashboardPage() {
 
   const { data: organiser } = await supabase
     .from('organisers')
-    .select('id')
+    .select('id, name')
     .eq('user_id', user.id)
     .single()
 
