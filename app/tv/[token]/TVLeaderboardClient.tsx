@@ -170,26 +170,40 @@ export function TVLeaderboardClient({
           </h1>
         </div>
 
-        {/* Live indicator */}
-        <div className="flex items-center gap-[clamp(12px, 0.8vw, 24px)]">
-          <div
-            className="rounded-full animate-pulse"
-            style={{
-              background: accent,
-              width: 'clamp(12px, 0.6vw, 20px)',
-              height: 'clamp(12px, 0.6vw, 20px)',
-            }}
-          />
-          <span
-            className="font-heading font-bold"
-            style={{
-              fontSize: 'clamp(16px, 1vw, 24px)',
-              color: accent,
-              letterSpacing: '0.05em',
-            }}
-          >
-            LIVE
-          </span>
+        {/* Live indicator + Branding */}
+        <div className="flex flex-col items-end gap-[clamp(8px, 0.5vw, 12px)]">
+          <div className="flex items-center gap-[clamp(12px, 0.8vw, 24px)]">
+            <div
+              className="rounded-full animate-pulse"
+              style={{
+                background: accent,
+                width: 'clamp(12px, 0.6vw, 20px)',
+                height: 'clamp(12px, 0.6vw, 20px)',
+              }}
+            />
+            <span
+              className="font-heading font-bold"
+              style={{
+                fontSize: 'clamp(16px, 1vw, 24px)',
+                color: accent,
+                letterSpacing: '0.05em',
+              }}
+            >
+              LIVE
+            </span>
+          </div>
+          <div className="flex items-center gap-[clamp(8px, 0.5vw, 12px)]">
+            <span style={{ fontSize: 'clamp(16px, 1vw, 24px)' }}>⚽</span>
+            <p
+              style={{
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 500,
+              }}
+            >
+              playdrawr sweepstake
+            </p>
+          </div>
         </div>
       </div>
 
