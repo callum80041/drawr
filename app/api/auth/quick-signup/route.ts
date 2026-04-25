@@ -26,21 +26,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create organiser record
-    const { error: orgError } = await service
-      .from('organisers')
-      .insert({
-        user_id: data.user.id,
-        email: email.toLowerCase(),
-        created_at: new Date().toISOString(),
-      })
-
-    if (orgError) {
-      return NextResponse.json(
-        { error: 'Failed to create organiser record' },
-        { status: 400 }
-      )
-    }
+    // Note: organiser record is created automatically by a DB trigger on user creation.
 
     // Build response first to capture cookies
     const response = NextResponse.json({ success: true })
