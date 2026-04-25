@@ -64,8 +64,6 @@ export default function LoginPage() {
             Sign in
           </h1>
 
-          <OAuthButtons onError={setError} />
-
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[#D1D9D5]" />
@@ -196,6 +194,8 @@ export default function LoginPage() {
               </button>
             </form>
           )}
+
+          <OAuthButtons onError={setError} />
 
           <p className="text-center text-sm text-mid mt-6">
             No account?{' '}

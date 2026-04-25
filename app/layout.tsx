@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { BuyMeACoffee } from "@/components/brand/BuyMeACoffee";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
@@ -31,7 +30,6 @@ export default function RootLayout({
     <html lang="en" className={`${syne.variable} ${dmSans.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         {children}
-        <BuyMeACoffee />
         <Analytics />
         <Script
           async
