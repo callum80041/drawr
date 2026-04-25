@@ -10,7 +10,7 @@ interface Participant {
   rank: number | null
 }
 
-type PanelType = 'leaderboard' | 'top5' | 'movers' | 'organiser'
+type PanelType = 'leaderboard' | 'top5' | 'movers' | 'stats' | 'fixtures' | 'join'
 
 interface Props {
   token: string
@@ -19,6 +19,9 @@ interface Props {
   isEurovision: boolean
   initialRanked: Participant[]
   initialEuScoreByTeam: Record<number, { qualified: boolean; final_position: number | null }>
+  participantCount?: number
+  entryFee?: number
+  totalPot?: number
 }
 
 export function TVLeaderboardClient({
@@ -28,6 +31,9 @@ export function TVLeaderboardClient({
   isEurovision,
   initialRanked,
   initialEuScoreByTeam,
+  participantCount = 0,
+  entryFee = 0,
+  totalPot = 0,
 }: Props) {
   const [ranked, setRanked] = useState<Participant[]>(initialRanked)
   const [previousPoints, setPreviousPoints] = useState<Record<string, number>>(
@@ -44,14 +50,14 @@ export function TVLeaderboardClient({
   const BG_EV = '#040241'
   const PINK_EV = '#F10F59'
   const BG_WC = '#1A2E22'
-  const LIME_WC = '#C8F04D'
+  const LIME_WC = '#C8F046'
 
   const accent = isEurovision ? PINK_EV : LIME_WC
   const background = isEurovision ? BG_EV : BG_WC
 
-  // Rotate panels every 12 seconds
+  // Rotate panels every 12 seconds through all 6 panels
   useEffect(() => {
-    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'organiser']
+    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'stats', 'fixtures', 'join']
     const interval = setInterval(() => {
       setCurrentPanel(p => {
         const idx = panels.indexOf(p)
@@ -241,8 +247,17 @@ export function TVLeaderboardClient({
             isEurovision={isEurovision}
             getPointDelta={getPointDelta}
           />
+        ) : currentPanel === 'stats' ? (
+          <StatsPanel
+            totalPot={totalPot}
+            participantCount={participantCount}
+            entryFee={entryFee}
+            accent={accent}
+          />
+        ) : currentPanel === 'fixtures' ? (
+          <FixturesPanel accent={accent} />
         ) : (
-          <OrganisingHoldingPanel accent={accent} isEurovision={isEurovision} />
+          <JoinPanel token={token} entryFee={entryFee} accent={accent} />
         )}
       </div>
 
@@ -590,43 +605,214 @@ function BiggestMovers({
   )
 }
 
-function OrganisingHoldingPanel({
+function StatsPanel({
+  totalPot,
+  participantCount,
+  entryFee,
   accent,
-  isEurovision,
 }: {
+  totalPot: number
+  participantCount: number
+  entryFee: number
   accent: string
-  isEurovision: boolean
+}) {
+  const first = Math.floor(totalPot * 0.6)
+  const second = Math.floor(totalPot * 0.25)
+  const third = Math.floor(totalPot * 0.15)
+
+  return (
+    <div className="h-full flex flex-col justify-center space-y-[clamp(32px,2vw,64px)]">
+      <h2
+        className="font-heading font-bold text-center"
+        style={{
+          fontSize: 'clamp(32px, 2vw, 56px)',
+          color: accent,
+          marginBottom: 'clamp(16px, 1vw, 28px)',
+        }}
+      >
+        📊 Sweepstake Stats
+      </h2>
+      <div className="grid grid-cols-3 gap-[clamp(20px,1.2vw,40px)]">
+        <StatCard value={`£${totalPot}`} label="Prize Pot" accent={accent} />
+        <StatCard value={participantCount.toString()} label="Participants" accent={accent} />
+        <StatCard value={`£${entryFee}`} label="Entry Fee" accent={accent} />
+      </div>
+      <div className="mt-[clamp(20px,1.5vw,40px)]">
+        <p
+          style={{
+            fontSize: 'clamp(16px, 1vw, 24px)',
+            color: 'rgba(255,255,255,0.7)',
+            textAlign: 'center',
+            marginBottom: 'clamp(20px,1.2vw,40px)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+          }}
+        >
+          Prize Distribution
+        </p>
+        <div className="space-y-[clamp(12px,0.8vw,20px)]">
+          <PrizeRow rank={1} amount={first} accent={accent} />
+          <PrizeRow rank={2} amount={second} accent={accent} />
+          <PrizeRow rank={3} amount={third} accent={accent} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StatCard({
+  value,
+  label,
+  accent,
+}: {
+  value: string
+  label: string
+  accent: string
+}) {
+  return (
+    <div
+      style={{
+        background: 'rgba(255,255,255,0.05)',
+        border: `2px solid ${accent}33`,
+        borderRadius: 'clamp(12px,0.8vw,24px)',
+        padding: 'clamp(20px,1.5vw,40px)',
+        textAlign: 'center',
+      }}
+    >
+      <p
+        className="font-heading font-bold"
+        style={{
+          fontSize: 'clamp(48px, 4vw, 96px)',
+          color: accent,
+          marginBottom: 'clamp(8px, 0.5vw, 16px)',
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </p>
+      <p
+        style={{
+          fontSize: 'clamp(14px, 0.9vw, 22px)',
+          color: 'rgba(255,255,255,0.7)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          fontWeight: 600,
+        }}
+      >
+        {label}
+      </p>
+    </div>
+  )
+}
+
+function PrizeRow({ rank, amount, accent }: { rank: number; amount: number; accent: string }) {
+  const medals = ['🥇', '🥈', '🥉']
+  const colors = [accent, '#C0C0C0', '#CD7F32']
+  const labels = ['1st Place', '2nd Place', '3rd Place']
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto',
+        gap: 'clamp(20px,1.2vw,40px)',
+        alignItems: 'center',
+        background: 'rgba(255,255,255,0.05)',
+        border: `2px solid ${accent}33`,
+        borderRadius: 'clamp(10px,0.6vw,16px)',
+        padding: 'clamp(16px,1vw,28px) clamp(20px,1.2vw,36px)',
+      }}
+    >
+      <span style={{ fontSize: 'clamp(24px, 1.5vw, 40px)' }}>{medals[rank - 1]}</span>
+      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(14px, 0.9vw, 22px)' }}>
+        {labels[rank - 1]}
+      </p>
+      <p
+        className="font-heading font-bold"
+        style={{
+          fontSize: 'clamp(28px, 1.8vw, 48px)',
+          color: colors[rank - 1],
+        }}
+      >
+        £{amount}
+      </p>
+    </div>
+  )
+}
+
+function FixturesPanel({ accent }: { accent: string }) {
+  return (
+    <div className="h-full flex flex-col items-center justify-center">
+      <h2
+        className="font-heading font-bold"
+        style={{
+          fontSize: 'clamp(32px, 2vw, 56px)',
+          color: accent,
+          marginBottom: 'clamp(32px, 2vw, 64px)',
+        }}
+      >
+        ⚽ Upcoming Fixtures
+      </h2>
+      <p
+        style={{
+          fontSize: 'clamp(18px, 1.2vw, 32px)',
+          color: 'rgba(255,255,255,0.6)',
+          textAlign: 'center',
+        }}
+      >
+        Check back closer to the tournament for fixture details
+      </p>
+    </div>
+  )
+}
+
+function JoinPanel({
+  token,
+  entryFee,
+  accent,
+}: {
+  token: string
+  entryFee: number
+  accent: string
 }) {
   return (
     <div className="h-full flex items-center justify-center">
-      <div className="text-center">
+      <div className="flex flex-col items-center gap-[clamp(24px,1.5vw,48px)]">
         <div
           style={{
-            fontSize: 'clamp(96px, 6vw, 160px)',
-            marginBottom: 'clamp(32px, 2vw, 64px)',
+            width: 'clamp(200px, 15vw, 320px)',
+            height: 'clamp(200px, 15vw, 320px)',
+            background: '#fff',
+            borderRadius: 'clamp(16px, 1vw, 24px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 'clamp(80px, 6vw, 140px)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
           }}
         >
-          {isEurovision ? '🎤' : '⚽'}
+          📱
         </div>
-        <h2
-          className="font-heading font-bold"
-          style={{
-            fontSize: 'clamp(40px, 2.5vw, 72px)',
-            color: '#fff',
-            marginBottom: 'clamp(16px, 1vw, 32px)',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {isEurovision ? 'Eurovision 2026' : 'World Cup 2026'}
-        </h2>
-        <p
-          style={{
-            fontSize: 'clamp(24px, 1.5vw, 42px)',
-            color: 'rgba(255,255,255,0.6)',
-          }}
-        >
-          Live leaderboard updates
-        </p>
+        <div className="text-center">
+          <h2
+            className="font-heading font-bold"
+            style={{
+              fontSize: 'clamp(28px, 2vw, 48px)',
+              color: accent,
+              marginBottom: 'clamp(12px, 0.8vw, 20px)',
+            }}
+          >
+            Join the sweepstake
+          </h2>
+          <p
+            style={{
+              fontSize: 'clamp(18px, 1.2vw, 32px)',
+              color: 'rgba(255,255,255,0.8)',
+            }}
+          >
+            Scan to sign up • £{entryFee} entry fee
+          </p>
+        </div>
       </div>
     </div>
   )

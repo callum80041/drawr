@@ -15,7 +15,7 @@ export default async function TVModePage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, sweepstake_type, is_pro, pro_expires_at, logo_url')
+    .select('id, name, status, sweepstake_type, is_pro, pro_expires_at, logo_url, entry_fee')
     .or(`share_token.eq.${token},custom_slug.eq.${token}`)
     .single()
 
@@ -65,6 +65,10 @@ export default async function TVModePage({ params }: Props) {
     .select('id, name')
     .eq('sweepstake_id', sweepstake.id)
     .order('created_at', { ascending: true })
+
+  const participantCount = participants?.length ?? 0
+  const entryFee = Number(sweepstake.entry_fee ?? 0)
+  const totalPot = participantCount * entryFee
 
   const { data: assignments } = await supabase
     .from('assignments')
@@ -130,6 +134,9 @@ export default async function TVModePage({ params }: Props) {
       isEurovision={isEurovision}
       initialRanked={ranked}
       initialEuScoreByTeam={euScoreByTeam}
+      participantCount={participantCount}
+      entryFee={entryFee}
+      totalPot={totalPot}
     />
   )
 }
