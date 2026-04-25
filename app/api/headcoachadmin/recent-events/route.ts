@@ -22,6 +22,7 @@ export async function GET() {
       { data: recentOrganisers },
       { data: recentParticipants },
       { data: recentDraws },
+      { data: sweepstakesMap },
     ] = await Promise.all([
       supabase
         .from('organisers')
@@ -30,7 +31,7 @@ export async function GET() {
         .limit(50),
       supabase
         .from('participants')
-        .select('id, name, created_at, sweepstakes(name)')
+        .select('id, name, created_at, sweepstake_id')
         .order('created_at', { ascending: false })
         .limit(50),
       supabase
@@ -39,6 +40,9 @@ export async function GET() {
         .not('draw_completed_at', 'is', null)
         .order('draw_completed_at', { ascending: false })
         .limit(50),
+      supabase
+        .from('sweepstakes')
+        .select('id, name'),
     ])
 
     const events: TimelineEvent[] = []
@@ -59,12 +63,12 @@ export async function GET() {
     // Add participant events
     if (recentParticipants) {
       recentParticipants.forEach(p => {
-        const sweepstakes = p.sweepstakes as Array<{ name: string }> | null
+        const sweepstake = sweepstakesMap?.find(s => s.id === p.sweepstake_id)
         events.push({
           type: 'participant',
           id: p.id,
           participantName: p.name,
-          sweepstakeName: sweepstakes?.[0]?.name ?? 'Unknown sweepstake',
+          sweepstakeName: sweepstake?.name ?? 'Unknown sweepstake',
           created_at: p.created_at,
         })
       })
