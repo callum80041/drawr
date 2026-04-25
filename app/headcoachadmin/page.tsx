@@ -41,10 +41,14 @@ async function fetchSignupMethodBreakdown(supabase: Awaited<ReturnType<typeof cr
     const date = new Date(now)
     date.setDate(date.getDate() - i)
     const dateStr = date.toISOString().split('T')[0]
+    const counts = dateMap.get(dateStr) || { name: 0, email: 0, google: 0, twitter: 0 }
 
     result.push({
       date: dateStr,
-      ...(dateMap.get(dateStr) || { name: 0, email: 0, google: 0, twitter: 0 }),
+      name: counts.name,
+      email: counts.email,
+      google: counts.google,
+      twitter: counts.twitter,
     })
   }
 
