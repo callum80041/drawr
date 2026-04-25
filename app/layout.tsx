@@ -28,6 +28,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${syne.variable} ${dmSans.variable} h-full`}>
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-J33EV3HX98"
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-J33EV3HX98');
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col antialiased">
         {children}
         <Analytics />
