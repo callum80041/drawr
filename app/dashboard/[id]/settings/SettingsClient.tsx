@@ -330,62 +330,154 @@ export function SettingsClient({
       </form>
 
       {/* ── Custom URL ── */}
-      <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
-        <div className="absolute -top-2 -right-2">
-          <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-            Coming soon
-          </span>
-        </div>
-        <div className="p-6">
-          <label htmlFor="s-slug" className="block text-sm font-medium text-pitch mb-1">Custom leaderboard URL</label>
-          <p className="text-xs text-mid mb-4">Create a friendly URL for your leaderboard (e.g. my-office-cup).</p>
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <input
-                id="s-slug"
-                type="text"
-                disabled
-                placeholder="my-office-cup"
-                className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              />
+      {isPro ? (
+        <form onSubmit={handleSaveSlug} className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
+          <div className="p-6">
+            <label htmlFor="s-slug" className="block text-sm font-medium text-pitch mb-1">Custom leaderboard URL</label>
+            <p className="text-xs text-mid mb-4">Create a friendly URL for your leaderboard (e.g. my-office-cup).</p>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  id="s-slug"
+                  type="text"
+                  value={customSlug}
+                  onChange={e => { setCustomSlug(e.target.value); setSlugCheckError(''); setSaveErrorSlug('') }}
+                  placeholder="my-office-cup"
+                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleCheckSlug(customSlug)}
+                  disabled={checkingSlug || !customSlug.trim() || customSlug === initialCustomSlug}
+                  className="shrink-0 bg-light text-pitch text-sm font-medium px-4 py-2.5 rounded-lg border border-[#D1D9D5] hover:bg-[#D1D9D5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {checkingSlug ? 'Checking…' : 'Check'}
+                </button>
+              </div>
+              {slugAvailable && <p className="text-xs text-grass">✓ Available</p>}
+              {slugCheckError && <p className="text-xs text-red-500">{slugCheckError}</p>}
             </div>
           </div>
+          <div className="p-6 flex items-center gap-4">
+            <button
+              type="submit"
+              disabled={savingSlug || !slugAvailable || !customSlug.trim() || customSlug === initialCustomSlug}
+              className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingSlug ? 'Saving…' : 'Save URL'}
+            </button>
+            {savedSlug && <span className="text-sm text-grass font-medium">✓ Saved</span>}
+            {saveErrorSlug && <span className="text-sm text-red-500">{saveErrorSlug}</span>}
+          </div>
+        </form>
+      ) : (
+        <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
+          <div className="absolute -top-2 -right-2">
+            <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+              Coming soon
+            </span>
+          </div>
+          <div className="p-6">
+            <label htmlFor="s-slug" className="block text-sm font-medium text-pitch mb-1">Custom leaderboard URL</label>
+            <p className="text-xs text-mid mb-4">Create a friendly URL for your leaderboard (e.g. my-office-cup).</p>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  id="s-slug"
+                  type="text"
+                  disabled
+                  placeholder="my-office-cup"
+                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="p-6 flex items-center gap-4">
+            <button
+              type="button"
+              disabled
+              className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save URL
+            </button>
+          </div>
         </div>
-        <div className="p-6 flex items-center gap-4">
-          <button
-            type="button"
-            disabled
-            className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Save URL
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* ── Logo ── */}
-      <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
-        <div className="absolute -top-2 -right-2">
-          <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-            Coming soon
-          </span>
+      {isPro ? (
+        <div className="bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA]">
+          <div className="p-6">
+            <p className="text-sm font-medium text-pitch mb-1">Leaderboard logo <span className="text-mid font-normal">(optional)</span></p>
+            <p className="text-xs text-mid mb-4">A branded logo that appears at the top of your leaderboard. PNG, JPG or WebP, max 2 MB. Recommended: 200px wide (height adjusts automatically).</p>
+            {logoUrl ? (
+              <div className="space-y-3">
+                <img src={logoUrl} alt="Logo" style={{ maxHeight: 48, maxWidth: 200, width: 'auto', height: 'auto' }} />
+                <div className="flex gap-3">
+                  <label className="cursor-pointer text-xs font-medium text-grass hover:underline">
+                    Change logo
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleLogoUpload} disabled={logoUploading} />
+                  </label>
+                  <button type="button" onClick={handleRemoveLogo} className="text-xs text-mid hover:text-red-500 transition-colors">Remove</button>
+                </div>
+              </div>
+            ) : (
+              <label className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D1D9D5] rounded-xl px-6 py-10 cursor-pointer hover:border-grass hover:bg-grass/5 transition-colors ${logoUploading ? 'opacity-60 pointer-events-none' : ''}`}>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-mid">
+                  <path d="M6 22l6-8 5 6 3-4 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+                  <circle cx="21" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+                <p className="text-sm text-mid">{logoUploading ? 'Uploading…' : 'Click to upload a logo'}</p>
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleLogoUpload} disabled={logoUploading} />
+              </label>
+            )}
+            {logoUploadError && <p className="text-xs text-red-500 mt-2">{logoUploadError}</p>}
+          </div>
         </div>
-        <div className="p-6">
-          <p className="text-sm font-medium text-pitch mb-1">Leaderboard logo <span className="text-mid font-normal">(optional)</span></p>
-          <p className="text-xs text-mid mb-4">A branded logo that appears at the top of your leaderboard. PNG, JPG or WebP, max 2 MB. Recommended: 200px wide (height adjusts automatically).</p>
-          <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D1D9D5] rounded-xl px-6 py-10 cursor-not-allowed opacity-50">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-mid">
-              <path d="M6 22l6-8 5 6 3-4 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" strokeWidth="1.5"/>
-              <circle cx="21" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
-            </svg>
-            <p className="text-sm text-mid">Click to upload a logo</p>
-            <input type="file" disabled className="hidden" />
-          </label>
+      ) : (
+        <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
+          <div className="absolute -top-2 -right-2">
+            <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+              Coming soon
+            </span>
+          </div>
+          <div className="p-6">
+            <p className="text-sm font-medium text-pitch mb-1">Leaderboard logo <span className="text-mid font-normal">(optional)</span></p>
+            <p className="text-xs text-mid mb-4">A branded logo that appears at the top of your leaderboard. PNG, JPG or WebP, max 2 MB. Recommended: 200px wide (height adjusts automatically).</p>
+            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D1D9D5] rounded-xl px-6 py-10 cursor-not-allowed opacity-50">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-mid">
+                <path d="M6 22l6-8 5 6 3-4 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="21" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+              </svg>
+              <p className="text-sm text-mid">Click to upload a logo</p>
+              <input type="file" disabled className="hidden" />
+            </label>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── TV Mode ── */}
-      {isPro && (
+      {isPro ? (
+        <div className="bg-white rounded-xl border border-[#E5EDEA] p-6">
+          <p className="text-sm font-medium text-pitch mb-1">TV mode</p>
+          <p className="text-xs text-mid mb-4">Full-screen display for break rooms or screens.</p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+              {appUrl}/tv/{shareToken}
+            </code>
+            <a
+              href={`${appUrl}/tv/${shareToken}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm:shrink-0 bg-pitch text-white text-xs font-medium px-3 py-2 rounded-lg hover:bg-pitch/80 transition-colors text-center"
+            >
+              Open →
+            </a>
+          </div>
+        </div>
+      ) : (
         <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
           <div className="absolute -top-2 -right-2">
             <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -395,7 +487,7 @@ export function SettingsClient({
           <div className="p-6">
             <p className="text-sm font-medium text-pitch mb-1">TV mode</p>
             <p className="text-xs text-mid mb-4">Full-screen display for break rooms or screens.</p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pointer-events-none">
               <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
                 {appUrl}/tv/{shareToken}
               </code>

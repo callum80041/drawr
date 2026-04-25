@@ -273,18 +273,13 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
             </h2>
             <div className="flex items-center gap-3">
               {isPro && (
-                <div className="relative inline-block">
-                  <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full absolute -top-2 -right-2 z-10">
-                    Coming soon
-                  </span>
-                  <a
-                    href={`/api/dashboard/${sweepstakeId}/export/participants`}
-                    download
-                    className="text-xs text-grass font-medium hover:underline opacity-60 pointer-events-none cursor-not-allowed"
-                  >
-                    Download CSV
-                  </a>
-                </div>
+                <a
+                  href={`/api/dashboard/${sweepstakeId}/export/participants`}
+                  download
+                  className="text-xs text-grass font-medium hover:underline"
+                >
+                  Download CSV
+                </a>
               )}
               {entryFee > 0 && unpaidWithEmail > 0 && (
                 <button

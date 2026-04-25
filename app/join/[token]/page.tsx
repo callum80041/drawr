@@ -291,7 +291,20 @@ export default function JoinPage({ params }: Props) {
               </div>
 
               {/* Notifications — Pro only */}
-              {isPro && (
+              {isPro ? (
+                <label className="flex items-start gap-3 cursor-pointer group bg-lime/10 rounded-xl border border-lime/30 p-3">
+                  <input
+                    type="checkbox"
+                    checked={notifyEnabled}
+                    onChange={e => setNotifyEnabled(e.target.checked)}
+                    disabled={!email.trim()}
+                    className="mt-0.5 w-4 h-4 rounded border-[#D1D9D5] accent-[#1A2E22] shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <span className="text-xs text-mid leading-relaxed group-hover:text-pitch transition-colors">
+                    Notify me by email during the tournament — when my team plays, scores, or if the leader changes. (Requires an email address)
+                  </span>
+                </label>
+              ) : (
                 <div className="bg-amber-50 rounded-xl border border-amber-200 p-3">
                   <p className="text-xs font-semibold text-amber-900 mb-2">⚡ Pro feature coming soon</p>
                   <label className="flex items-start gap-3 opacity-50 cursor-not-allowed">

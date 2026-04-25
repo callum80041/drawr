@@ -275,7 +275,25 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
           </div>
 
           {/* TV Mode link — Pro only */}
-          {isPro && (
+          {isPro ? (
+            <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
+              <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">TV mode</h2>
+              <p className="text-sm text-mid mb-3">Full-screen display for break rooms or screens.</p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+                  {appUrl}/tv/{sweepstake.custom_slug || sweepstake.share_token}
+                </code>
+                <Link
+                  href={`/tv/${sweepstake.custom_slug || sweepstake.share_token}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`sm:shrink-0 ${accentBg} ${accentText} text-xs font-medium px-3 py-2 rounded-lg hover:opacity-90 transition-opacity text-center`}
+                >
+                  Open →
+                </Link>
+              </div>
+            </div>
+          ) : (
             <div className="relative bg-white rounded-xl border border-[#E5EDEA] p-5 opacity-60">
               <div className="absolute -top-2 -right-2">
                 <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
