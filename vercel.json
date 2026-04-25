@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/sync-daily",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/cleanup-unverified-sweepstakes",
-      "schedule": "0 */6 * * *"
     }
   ]
 }
