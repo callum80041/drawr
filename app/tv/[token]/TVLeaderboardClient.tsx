@@ -821,7 +821,7 @@ function PromoPanel({
   accent: string
   appUrl: string
 }) {
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0 })
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -832,12 +832,14 @@ function PromoPanel({
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24))
         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
-        setCountdown({ days, hours })
+        const minutes = Math.floor((difference / (1000 * 60)) % 60)
+        const seconds = Math.floor((difference / 1000) % 60)
+        setCountdown({ days, hours, minutes, seconds })
       }
     }
 
     updateCountdown()
-    const interval = setInterval(updateCountdown, 60000)
+    const interval = setInterval(updateCountdown, 1000)
     return () => clearInterval(interval)
   }, [])
 
@@ -873,23 +875,28 @@ function PromoPanel({
           </p>
         </div>
 
+        {/* FIFA Logo */}
+        <div style={{ fontSize: 'clamp(48px, 3vw, 80px)', marginBottom: 'clamp(12px, 0.8vw, 20px)' }}>
+          ⚽
+        </div>
+
         {/* Countdown */}
-        <div className="flex gap-[clamp(32px,2vw,64px)]" style={{ justifyContent: 'center' }}>
+        <div className="flex gap-[clamp(16px,1vw,32px)]" style={{ justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
             <p
               className="font-heading font-bold"
               style={{
-                fontSize: 'clamp(56px, 3.5vw, 96px)',
+                fontSize: 'clamp(40px, 2.5vw, 64px)',
                 color: accent,
                 lineHeight: 1,
                 marginBottom: 'clamp(4px, 0.3vw, 8px)',
               }}
             >
-              {countdown.days}
+              {String(countdown.days).padStart(2, '0')}
             </p>
             <p
               style={{
-                fontSize: 'clamp(16px, 1vw, 24px)',
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
                 color: 'rgba(255,255,255,0.7)',
                 fontWeight: 600,
                 letterSpacing: '0.05em',
@@ -902,23 +909,69 @@ function PromoPanel({
             <p
               className="font-heading font-bold"
               style={{
-                fontSize: 'clamp(56px, 3.5vw, 96px)',
+                fontSize: 'clamp(40px, 2.5vw, 64px)',
                 color: accent,
                 lineHeight: 1,
                 marginBottom: 'clamp(4px, 0.3vw, 8px)',
               }}
             >
-              {countdown.hours}
+              {String(countdown.hours).padStart(2, '0')}
             </p>
             <p
               style={{
-                fontSize: 'clamp(16px, 1vw, 24px)',
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
                 color: 'rgba(255,255,255,0.7)',
                 fontWeight: 600,
                 letterSpacing: '0.05em',
               }}
             >
               Hours
+            </p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              className="font-heading font-bold"
+              style={{
+                fontSize: 'clamp(40px, 2.5vw, 64px)',
+                color: accent,
+                lineHeight: 1,
+                marginBottom: 'clamp(4px, 0.3vw, 8px)',
+              }}
+            >
+              {String(countdown.minutes).padStart(2, '0')}
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 600,
+                letterSpacing: '0.05em',
+              }}
+            >
+              Minutes
+            </p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              className="font-heading font-bold"
+              style={{
+                fontSize: 'clamp(40px, 2.5vw, 64px)',
+                color: accent,
+                lineHeight: 1,
+                marginBottom: 'clamp(4px, 0.3vw, 8px)',
+              }}
+            >
+              {String(countdown.seconds).padStart(2, '0')}
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 600,
+                letterSpacing: '0.05em',
+              }}
+            >
+              Seconds
             </p>
           </div>
         </div>
@@ -933,7 +986,8 @@ function PromoPanel({
             border: `2px solid ${accent}33`,
             borderRadius: 'clamp(16px,1vw,32px)',
             padding: 'clamp(24px,1.5vw,40px)',
-            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <p
@@ -948,44 +1002,52 @@ function PromoPanel({
           >
             {participantCount} Signed Up
           </p>
-          <div className="space-y-[clamp(12px,0.8vw,20px)]">
-            {ranked.map(p => (
-              <div key={p.id}>
-                <p
-                  style={{
-                    fontSize: 'clamp(14px, 0.95vw, 22px)',
-                    color: '#fff',
-                    fontWeight: 500,
-                    marginBottom: 'clamp(4px, 0.2vw, 6px)',
-                  }}
-                >
-                  ✓ {p.name}
-                </p>
-                {p.teams.length > 0 && (
-                  <div className="flex flex-wrap gap-[clamp(6px,0.4vw,10px)]">
-                    {p.teams.map(t => (
-                      <div
-                        key={t.team_id}
-                        className="inline-flex items-center gap-[clamp(4px,0.3vw,8px)]"
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(12px,0.8vw,20px)', flex: 1 }}>
+            {ranked.map(p => {
+              const primaryTeam = p.teams.length > 0 ? p.teams[0] : null
+              return (
+                <div key={p.id} style={{ textAlign: 'center' }}>
+                  {primaryTeam && (
+                    <div>
+                      <div style={{ fontSize: 'clamp(32px, 2vw, 48px)', marginBottom: 'clamp(4px, 0.2vw, 8px)' }}>
+                        {primaryTeam.team_flag}
+                      </div>
+                      <p
                         style={{
-                          fontSize: 'clamp(11px, 0.8vw, 16px)',
-                          background: `${accent}20`,
+                          fontSize: 'clamp(11px, 0.75vw, 16px)',
                           color: accent,
-                          padding: `${
-                            'clamp(4px, 0.2vw, 6px)'
-                          } clamp(8px, 0.5vw, 12px)`,
-                          borderRadius: 'clamp(4px, 0.3vw, 8px)',
-                          fontWeight: 600,
+                          fontWeight: 700,
+                          marginBottom: 'clamp(2px, 0.1vw, 4px)',
+                          lineHeight: 1.2,
                         }}
                       >
-                        {t.team_flag && <span style={{ fontSize: 'clamp(12px, 0.9vw, 18px)' }}>{t.team_flag}</span>}
-                        <span>{t.team_name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                        {primaryTeam.team_name}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 'clamp(10px, 0.7vw, 14px)',
+                          color: 'rgba(255,255,255,0.6)',
+                          fontWeight: 400,
+                        }}
+                      >
+                        {p.name}
+                      </p>
+                    </div>
+                  )}
+                  {!primaryTeam && (
+                    <p
+                      style={{
+                        fontSize: 'clamp(11px, 0.75vw, 16px)',
+                        color: '#fff',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {p.name}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 
