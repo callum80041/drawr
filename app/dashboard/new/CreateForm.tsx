@@ -103,9 +103,10 @@ export function CreateForm({ organiserId }: Props) {
         prize_type: prizeType,
         amount: null,
       }))
-      await supabase
+      supabase
         .from('sweepstake_prizes')
         .insert(prizeRows)
+        .then(() => { /* done */ })
         .catch(() => { /* best-effort */ })
     }
 
