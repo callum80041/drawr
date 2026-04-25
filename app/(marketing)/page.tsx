@@ -3,7 +3,6 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { createServiceClient } from '@/lib/supabase/server'
 import { ScrollReveal } from '@/components/marketing/ScrollReveal'
-import { HeroEmailForm } from '@/components/marketing/HeroEmailForm'
 import { HeroDrawAnimation } from '@/components/marketing/HeroDrawAnimation'
 import { CountdownBanner } from '@/components/marketing/CountdownBanner'
 
@@ -165,9 +164,15 @@ export default async function LandingPage() {
           <span className="text-white/40">60 seconds to set up</span>
         </div>
 
-        {/* Email form CTA */}
+        {/* CTA Button */}
         <div className="w-full max-w-md">
-          <HeroEmailForm variant="hero" />
+          <Link
+            href="/signup"
+            className="inline-flex items-center justify-center w-full gap-2 bg-lime text-pitch font-bold text-base px-6 py-3.5 rounded-xl hover:bg-lime/90 transition-colors"
+          >
+            Get started for free
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
         </div>
       </section>
 
@@ -292,7 +297,13 @@ export default async function LandingPage() {
           <p className="text-lg text-white/50 font-light mb-10">
             Free account. One link to share. Zero admin after you hit go.
           </p>
-          <HeroEmailForm variant="band" />
+          <Link
+            href="/signup"
+            className="inline-flex items-center justify-center gap-2 bg-lime text-pitch font-bold text-base px-8 py-3.5 rounded-xl hover:bg-lime/90 transition-colors"
+          >
+            Get started for free
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
           <p className="mt-5 text-xs text-white/30">
             Free · No credit card · World Cup & Eurovision ready
           </p>
