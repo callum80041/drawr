@@ -23,7 +23,9 @@ export default async function DashboardPage() {
         .order('created_at', { ascending: false })
     : { data: [] }
 
-  const hasName = !!organiser?.name && organiser.name.trim().length > 0
+  // Check user_metadata, not organiser.name — the DB trigger auto-fills
+  // organiser.name from the email prefix, so it's not a reliable signal.
+  const hasName = !!user.user_metadata?.name && (user.user_metadata.name as string).trim().length > 0
   const providers = user.identities?.map((i: any) => i.provider) || []
   const hasPassword = providers.includes('password')
   const needsSetup = !hasName || !hasPassword
