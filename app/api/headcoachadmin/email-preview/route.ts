@@ -6,10 +6,10 @@ import { paymentChaseEmailHtml }             from '@/lib/email/templates/payment
 import { sweepstakeCreatedEmailHtml }        from '@/lib/email/templates/sweepstake-created'
 import { participantJoinedEmailHtml }        from '@/lib/email/templates/participant-joined'
 import { welcomeEmailHtml }                  from '@/lib/email/templates/welcome'
+import { setupGuideEmailHtml }               from '@/lib/email/templates/setup-guide'
 import { waitlistPromotedEmailHtml }         from '@/lib/email/templates/waitlist-promoted'
 import { organiserUpdateEmailHtml }          from '@/lib/email/templates/organiser-update'
 import {
-  campaignNoSweepstakeHtml,
   campaignLowParticipantsHtml,
   campaignPushToTenHtml,
 } from '@/lib/email/templates/campaign-wc'
@@ -102,6 +102,9 @@ function buildHtml(template: string, version: string, isEurovision: boolean): st
     case 'welcome':
       return welcomeEmailHtml({ name: s.organiserName })
 
+    case 'setup-guide':
+      return setupGuideEmailHtml({ name: s.organiserName })
+
     case 'waitlist-promoted':
       return waitlistPromotedEmailHtml({
         name:           s.name,
@@ -137,7 +140,7 @@ function buildCampaignHtml(template: string, p: URLSearchParams): string | null 
 
   switch (template) {
     case 'campaign-1':
-      return campaignNoSweepstakeHtml({ firstName, createSweepstakeLink: createLink })
+      return setupGuideEmailHtml({ name: firstName })
     case 'campaign-2':
       return campaignLowParticipantsHtml({ firstName, sweepstakeName: sweepName, sweepstakeLink: sweepLink })
     case 'campaign-3':
