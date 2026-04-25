@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
   }
 
   const metaName = user.user_metadata?.name as string | undefined
+  const userEmail = user.email
 
   // Use service role here to bypass RLS — the user's own row may not be readable
   // via the anon/user client until the session is fully established
@@ -55,17 +56,32 @@ export async function GET(request: NextRequest) {
 
     const { data: organiser } = await service
       .from('organisers')
-      .select('last_login_at')
+      .select('id')
       .eq('user_id', user.id)
       .single()
 
-    await service
-      .from('organisers')
-      .update({
-        last_login_at: new Date().toISOString(),
-        ...(metaName ? { name: metaName } : {}),
-      })
-      .eq('user_id', user.id)
+    if (organiser) {
+      // Existing organiser — just update last_login_at
+      await service
+        .from('organisers')
+        .update({
+          last_login_at: new Date().toISOString(),
+          ...(metaName ? { name: metaName } : {}),
+        })
+        .eq('user_id', user.id)
+    } else {
+      // New organiser (e.g., from Google OAuth) — insert record
+      await service
+        .from('organisers')
+        .insert({
+          user_id: user.id,
+          name: metaName || userEmail?.split('@')[0] || 'Organiser',
+          email: userEmail,
+          plan: 'free',
+          created_at: new Date().toISOString(),
+          last_login_at: new Date().toISOString(),
+        })
+    }
 
     // All users go to dashboard (setup banner will show if needed)
   } catch {
