@@ -849,183 +849,150 @@ function PromoPanel({
   const third = Math.floor(totalPot * 0.15)
 
   return (
-    <div className="h-full flex flex-col justify-between py-[clamp(24px,1.5vw,48px)]">
-      {/* Header: Centered FIFA logo and countdown */}
-      <div className="text-center flex flex-col items-center gap-[clamp(16px,1vw,32px)]">
-        <div>
-          <h2
+    <div className="h-full flex flex-col gap-[clamp(16px,1vw,24px)] py-[clamp(16px,1vw,24px)]">
+      {/* Countdown */}
+      <div className="flex gap-[clamp(12px,0.8vw,20px)]" style={{ justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p
             className="font-heading font-bold"
             style={{
-              fontSize: 'clamp(48px, 3.5vw, 80px)',
+              fontSize: 'clamp(36px, 2vw, 56px)',
               color: accent,
               lineHeight: 1,
-              marginBottom: 'clamp(8px, 0.5vw, 12px)',
+              marginBottom: 'clamp(4px, 0.2vw, 6px)',
             }}
           >
-            FIFA World Cup 2026
-          </h2>
+            {String(countdown.days).padStart(2, '0')}
+          </p>
           <p
             style={{
-              fontSize: 'clamp(18px, 1.2vw, 28px)',
-              color: 'rgba(255,255,255,0.8)',
-              fontWeight: 500,
+              fontSize: 'clamp(11px, 0.7vw, 15px)',
+              color: 'rgba(255,255,255,0.7)',
+              fontWeight: 600,
             }}
           >
-            Join the playdrawr sweepstake
+            Days
           </p>
         </div>
-
-        {/* FIFA World Cup 2026 Trophy */}
-        <div style={{ marginBottom: 'clamp(12px, 0.8vw, 20px)', fontSize: 'clamp(80px, 6vw, 140px)' }}>
-          🏆
+        <div style={{ textAlign: 'center' }}>
+          <p
+            className="font-heading font-bold"
+            style={{
+              fontSize: 'clamp(36px, 2vw, 56px)',
+              color: accent,
+              lineHeight: 1,
+              marginBottom: 'clamp(4px, 0.2vw, 6px)',
+            }}
+          >
+            {String(countdown.hours).padStart(2, '0')}
+          </p>
+          <p
+            style={{
+              fontSize: 'clamp(11px, 0.7vw, 15px)',
+              color: 'rgba(255,255,255,0.7)',
+              fontWeight: 600,
+            }}
+          >
+            Hours
+          </p>
         </div>
-
-        {/* Countdown */}
-        <div className="flex gap-[clamp(16px,1vw,32px)]" style={{ justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <p
-              className="font-heading font-bold"
-              style={{
-                fontSize: 'clamp(40px, 2.5vw, 64px)',
-                color: accent,
-                lineHeight: 1,
-                marginBottom: 'clamp(4px, 0.3vw, 8px)',
-              }}
-            >
-              {String(countdown.days).padStart(2, '0')}
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(12px, 0.8vw, 18px)',
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}
-            >
-              Days
-            </p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <p
-              className="font-heading font-bold"
-              style={{
-                fontSize: 'clamp(40px, 2.5vw, 64px)',
-                color: accent,
-                lineHeight: 1,
-                marginBottom: 'clamp(4px, 0.3vw, 8px)',
-              }}
-            >
-              {String(countdown.hours).padStart(2, '0')}
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(12px, 0.8vw, 18px)',
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}
-            >
-              Hours
-            </p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <p
-              className="font-heading font-bold"
-              style={{
-                fontSize: 'clamp(40px, 2.5vw, 64px)',
-                color: accent,
-                lineHeight: 1,
-                marginBottom: 'clamp(4px, 0.3vw, 8px)',
-              }}
-            >
-              {String(countdown.minutes).padStart(2, '0')}
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(12px, 0.8vw, 18px)',
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}
-            >
-              Minutes
-            </p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <p
-              className="font-heading font-bold"
-              style={{
-                fontSize: 'clamp(40px, 2.5vw, 64px)',
-                color: accent,
-                lineHeight: 1,
-                marginBottom: 'clamp(4px, 0.3vw, 8px)',
-              }}
-            >
-              {String(countdown.seconds).padStart(2, '0')}
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(12px, 0.8vw, 18px)',
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}
-            >
-              Seconds
-            </p>
-          </div>
+        <div style={{ textAlign: 'center' }}>
+          <p
+            className="font-heading font-bold"
+            style={{
+              fontSize: 'clamp(36px, 2vw, 56px)',
+              color: accent,
+              lineHeight: 1,
+              marginBottom: 'clamp(4px, 0.2vw, 6px)',
+            }}
+          >
+            {String(countdown.minutes).padStart(2, '0')}
+          </p>
+          <p
+            style={{
+              fontSize: 'clamp(11px, 0.7vw, 15px)',
+              color: 'rgba(255,255,255,0.7)',
+              fontWeight: 600,
+            }}
+          >
+            Minutes
+          </p>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <p
+            className="font-heading font-bold"
+            style={{
+              fontSize: 'clamp(36px, 2vw, 56px)',
+              color: accent,
+              lineHeight: 1,
+              marginBottom: 'clamp(4px, 0.2vw, 6px)',
+            }}
+          >
+            {String(countdown.seconds).padStart(2, '0')}
+          </p>
+          <p
+            style={{
+              fontSize: 'clamp(11px, 0.7vw, 15px)',
+              color: 'rgba(255,255,255,0.7)',
+              fontWeight: 600,
+            }}
+          >
+            Seconds
+          </p>
         </div>
       </div>
 
       {/* Main content grid - 3 columns */}
-      <div className="flex-1 grid grid-cols-3 gap-[clamp(20px,1.2vw,40px)] overflow-hidden min-h-0">
+      <div className="flex-1 grid grid-cols-3 gap-[clamp(12px,0.8vw,20px)] overflow-hidden min-h-0">
         {/* Participants with teams */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(16px,1vw,32px)',
-            padding: 'clamp(24px,1.5vw,40px)',
+            borderRadius: 'clamp(12px,0.8vw,20px)',
+            padding: 'clamp(16px,1vw,24px)',
             display: 'flex',
             flexDirection: 'column',
+            minHeight: 0,
           }}
         >
           <p
             style={{
-              fontSize: 'clamp(18px, 1.2vw, 28px)',
+              fontSize: 'clamp(12px, 0.9vw, 18px)',
               color: accent,
               fontWeight: 700,
-              marginBottom: 'clamp(16px,1vw,24px)',
+              marginBottom: 'clamp(12px,0.8vw,16px)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
+              flexShrink: 0,
             }}
           >
             {participantCount} Signed Up
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(12px,0.8vw,20px)', flex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(8px,0.6vw,12px)', flex: 1, minHeight: 0 }}>
             {ranked.map(p => {
               const primaryTeam = p.teams.length > 0 ? p.teams[0] : null
               return (
-                <div key={p.id} style={{ textAlign: 'center' }}>
+                <div key={p.id} style={{ textAlign: 'center', minHeight: 0 }}>
                   {primaryTeam && (
                     <div>
-                      <div style={{ fontSize: 'clamp(32px, 2vw, 48px)', marginBottom: 'clamp(4px, 0.2vw, 8px)' }}>
+                      <div style={{ fontSize: 'clamp(24px, 1.4vw, 36px)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
                         {primaryTeam.team_flag}
                       </div>
                       <p
                         style={{
-                          fontSize: 'clamp(11px, 0.75vw, 16px)',
+                          fontSize: 'clamp(9px, 0.65vw, 13px)',
                           color: accent,
                           fontWeight: 700,
-                          marginBottom: 'clamp(2px, 0.1vw, 4px)',
-                          lineHeight: 1.2,
+                          marginBottom: 'clamp(1px, 0.1vw, 2px)',
+                          lineHeight: 1.1,
                         }}
                       >
                         {primaryTeam.team_name}
                       </p>
                       <p
                         style={{
-                          fontSize: 'clamp(10px, 0.7vw, 14px)',
+                          fontSize: 'clamp(8px, 0.6vw, 12px)',
                           color: 'rgba(255,255,255,0.6)',
                           fontWeight: 400,
                         }}
@@ -1037,7 +1004,7 @@ function PromoPanel({
                   {!primaryTeam && (
                     <p
                       style={{
-                        fontSize: 'clamp(11px, 0.75vw, 16px)',
+                        fontSize: 'clamp(9px, 0.65vw, 13px)',
                         color: '#fff',
                         fontWeight: 500,
                       }}
@@ -1051,22 +1018,22 @@ function PromoPanel({
           </div>
         </div>
 
-        {/* Prizes - smaller */}
+        {/* Prizes */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(16px,1vw,32px)',
-            padding: 'clamp(24px,1.5vw,40px)',
+            borderRadius: 'clamp(12px,0.8vw,20px)',
+            padding: 'clamp(16px,1vw,24px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            gap: 'clamp(20px,1.2vw,32px)',
+            gap: 'clamp(12px,0.8vw,18px)',
           }}
         >
           <p
             style={{
-              fontSize: 'clamp(18px, 1.2vw, 28px)',
+              fontSize: 'clamp(12px, 0.9vw, 18px)',
               color: accent,
               fontWeight: 700,
               textTransform: 'uppercase',
@@ -1075,15 +1042,15 @@ function PromoPanel({
           >
             Prizes
           </p>
-          <div className="space-y-[clamp(16px,1vw,24px)]">
+          <div className="space-y-[clamp(10px,0.7vw,14px)]">
             <div>
-              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
-                1st Place
+              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
+                1st
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(28px, 1.8vw, 44px)',
+                  fontSize: 'clamp(20px, 1.3vw, 32px)',
                   color: accent,
                   lineHeight: 1,
                 }}
@@ -1092,13 +1059,13 @@ function PromoPanel({
               </p>
             </div>
             <div>
-              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
-                2nd Place
+              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
+                2nd
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(24px, 1.5vw, 36px)',
+                  fontSize: 'clamp(18px, 1.2vw, 28px)',
                   color: '#C0C0C0',
                   lineHeight: 1,
                 }}
@@ -1107,13 +1074,13 @@ function PromoPanel({
               </p>
             </div>
             <div>
-              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
-                3rd Place
+              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
+                3rd
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(24px, 1.5vw, 36px)',
+                  fontSize: 'clamp(18px, 1.2vw, 28px)',
                   color: '#CD7F32',
                   lineHeight: 1,
                 }}
@@ -1124,48 +1091,48 @@ function PromoPanel({
           </div>
         </div>
 
-        {/* QR Code - larger */}
+        {/* QR Code */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(16px,1vw,32px)',
-            padding: 'clamp(24px,1.5vw,40px)',
+            borderRadius: 'clamp(12px,0.8vw,20px)',
+            padding: 'clamp(16px,1vw,24px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'clamp(20px,1.2vw,32px)',
+            gap: 'clamp(12px,0.8vw,16px)',
           }}
         >
           <div
             style={{
               background: '#fff',
-              padding: 'clamp(16px, 1vw, 24px)',
-              borderRadius: 'clamp(12px, 0.8vw, 20px)',
+              padding: 'clamp(12px, 0.8vw, 18px)',
+              borderRadius: 'clamp(8px, 0.6vw, 12px)',
             }}
           >
-            <QRCodeSVG value={joinUrl} size={240} level="H" />
+            <QRCodeSVG value={joinUrl} size={160} level="H" />
           </div>
           <div style={{ textAlign: 'center' }}>
             <p
               style={{
-                fontSize: 'clamp(18px, 1.2vw, 26px)',
+                fontSize: 'clamp(12px, 0.9vw, 18px)',
                 color: accent,
                 fontWeight: 700,
-                marginBottom: 'clamp(8px, 0.5vw, 12px)',
+                marginBottom: 'clamp(4px, 0.3vw, 6px)',
               }}
             >
               Scan to join
             </p>
             <p
               style={{
-                fontSize: 'clamp(14px, 0.95vw, 20px)',
+                fontSize: 'clamp(10px, 0.7vw, 14px)',
                 color: 'rgba(255,255,255,0.8)',
                 fontWeight: 500,
               }}
             >
-              £{entryFee} entry fee
+              £{entryFee}
             </p>
           </div>
         </div>
