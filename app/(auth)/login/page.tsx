@@ -165,6 +165,12 @@ export default function LoginPage() {
                 />
               </div>
 
+              <div className="bg-light rounded-lg px-4 py-3">
+                <p className="text-xs text-mid leading-relaxed">
+                  No password needed. We'll send you a link via email — click it and you're in.
+                </p>
+              </div>
+
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
               )}
