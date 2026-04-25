@@ -105,17 +105,17 @@ export function SettingsClient({
 
     setLogoUploading(true)
     const ext = file.name.split('.').pop()
-    const path = `${sweepstakeId}/logo.${ext}`
+    const path = `logos/${sweepstakeId}/logo.${ext}`
 
     if (logoUrl) {
-      const oldPath = logoUrl.split('/sweepstake-logos/')[1]
-      if (oldPath) await supabase.storage.from('sweepstake-logos').remove([oldPath])
+      const oldPath = logoUrl.split('/sweepstake-images/')[1]
+      if (oldPath) await supabase.storage.from('sweepstake-images').remove([oldPath])
     }
 
-    const { error: uploadErr } = await supabase.storage.from('sweepstake-logos').upload(path, file, { upsert: true })
+    const { error: uploadErr } = await supabase.storage.from('sweepstake-images').upload(path, file, { upsert: true })
     if (uploadErr) { setLogoUploadError(uploadErr.message); setLogoUploading(false); return }
 
-    const { data: { publicUrl } } = supabase.storage.from('sweepstake-logos').getPublicUrl(path)
+    const { data: { publicUrl } } = supabase.storage.from('sweepstake-images').getPublicUrl(path)
     await supabase.from('sweepstakes').update({ logo_url: publicUrl }).eq('id', sweepstakeId)
     setLogoUrl(publicUrl)
     setLogoUploading(false)
@@ -124,8 +124,8 @@ export function SettingsClient({
 
   async function handleRemoveLogo() {
     if (!logoUrl) return
-    const oldPath = logoUrl.split('/sweepstake-logos/')[1]
-    if (oldPath) await supabase.storage.from('sweepstake-logos').remove([oldPath])
+    const oldPath = logoUrl.split('/sweepstake-images/')[1]
+    if (oldPath) await supabase.storage.from('sweepstake-images').remove([oldPath])
     await supabase.from('sweepstakes').update({ logo_url: null }).eq('id', sweepstakeId)
     setLogoUrl(null)
     router.refresh()
