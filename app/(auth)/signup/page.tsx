@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Wordmark } from '@/components/brand/Wordmark'
+import { OAuthButtons } from '@/app/(auth)/components/OAuthButtons'
 
 function SignupForm() {
   const router = useRouter()
@@ -172,6 +173,9 @@ function SignupForm() {
           🔒 We will never share your details with anyone. No spam, ever.
         </p>
       </form>
+
+      <OAuthButtons onError={setError} />
+
       <p className="text-center text-sm text-mid mt-6">
         Already have an account?{' '}
         <Link href="/login" className="text-grass font-medium hover:underline">

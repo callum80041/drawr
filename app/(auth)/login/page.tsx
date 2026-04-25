@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Wordmark } from '@/components/brand/Wordmark'
+import { OAuthButtons } from '@/app/(auth)/components/OAuthButtons'
 
 type Mode = 'password' | 'magic'
 
@@ -62,6 +63,17 @@ export default function LoginPage() {
           <h1 className="font-heading text-2xl font-bold text-pitch tracking-tight mb-6">
             Sign in
           </h1>
+
+          <OAuthButtons onError={setError} />
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#D1D9D5]" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-mid">Or use password</span>
+            </div>
+          </div>
 
           {/* Mode tabs */}
           <div className="flex gap-1 bg-light rounded-lg p-1 mb-6">

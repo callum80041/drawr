@@ -29,10 +29,13 @@ export default function WelcomePage() {
         setName(metaName)
       }
 
-      // Check if user has password (magic link users won't)
+      // Check auth methods: OAuth users have 'google'/'twitter', email users have 'password'
       const providers = user.identities?.map((i: any) => i.provider) || []
+      const isOAuthUser = providers.includes('google') || providers.includes('twitter')
       const hasPasswordAuth = providers.includes('password')
-      setHasPassword(hasPasswordAuth)
+
+      // For OAuth users or those who already set password: no password input needed
+      setHasPassword(isOAuthUser || hasPasswordAuth)
     }
 
     checkUser()
@@ -98,12 +101,10 @@ export default function WelcomePage() {
 
         <div className="bg-white rounded-2xl p-8">
           <h1 className="font-heading text-2xl font-bold text-pitch tracking-tight mb-2">
-            {hasPassword ? 'What should we call you?' : 'Nearly there'}
+            What should we call you?
           </h1>
           <p className="text-sm text-mid mb-6">
-            {hasPassword
-              ? "This is how you'll appear to participants in your sweepstakes."
-              : 'Just a couple of things to get you set up.'}
+            This is how you'll appear to participants in your sweepstakes.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,7 +116,7 @@ export default function WelcomePage() {
                 id="name"
                 type="text"
                 required
-                autoFocus={!hasPassword}
+                autoFocus
                 autoComplete="name"
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -140,9 +141,6 @@ export default function WelcomePage() {
                   className="w-full px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
                   placeholder="Min. 8 characters"
                 />
-                <p className="text-xs text-mid mt-1.5">
-                  You can also sign in with magic links next time.
-                </p>
               </div>
             )}
 
