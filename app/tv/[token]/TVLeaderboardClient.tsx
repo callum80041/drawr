@@ -10,7 +10,7 @@ interface Participant {
   rank: number | null
 }
 
-type PanelType = 'leaderboard' | 'top5' | 'movers' | 'stats' | 'fixtures' | 'join'
+type PanelType = 'leaderboard' | 'top5' | 'movers' | 'teams' | 'stats' | 'fixtures' | 'join'
 
 interface Props {
   token: string
@@ -55,9 +55,9 @@ export function TVLeaderboardClient({
   const accent = isEurovision ? PINK_EV : LIME_WC
   const background = isEurovision ? BG_EV : BG_WC
 
-  // Rotate panels every 12 seconds through all 6 panels
+  // Rotate panels every 12 seconds through all 7 panels
   useEffect(() => {
-    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'stats', 'fixtures', 'join']
+    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'fixtures', 'join']
     const interval = setInterval(() => {
       setCurrentPanel(p => {
         const idx = panels.indexOf(p)
@@ -246,6 +246,11 @@ export function TVLeaderboardClient({
             accent={accent}
             isEurovision={isEurovision}
             getPointDelta={getPointDelta}
+          />
+        ) : currentPanel === 'teams' ? (
+          <TeamsPanel
+            ranked={ranked}
+            accent={accent}
           />
         ) : currentPanel === 'stats' ? (
           <StatsPanel
@@ -600,6 +605,71 @@ function BiggestMovers({
             </div>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+function TeamsPanel({
+  ranked,
+  accent,
+}: {
+  ranked: Participant[]
+  accent: string
+}) {
+  return (
+    <div className="h-full flex flex-col space-y-[clamp(16px,1vw,28px)]">
+      <h2
+        className="font-heading font-bold"
+        style={{
+          fontSize: 'clamp(32px, 2vw, 56px)',
+          color: accent,
+        }}
+      >
+        🏆 Teams & Participants
+      </h2>
+      <div className="flex-1 overflow-hidden">
+        <div className="grid grid-cols-2 gap-[clamp(16px,1vw,24px)] h-full">
+          {ranked.map(p => (
+            <div
+              key={p.id}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: `2px solid ${accent}33`,
+                borderRadius: 'clamp(10px, 0.6vw, 16px)',
+                padding: 'clamp(16px, 1vw, 28px)',
+              }}
+            >
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(18px, 1.2vw, 28px)',
+                  color: '#fff',
+                  marginBottom: 'clamp(8px, 0.5vw, 12px)',
+                }}
+              >
+                {p.name}
+              </p>
+              <div className="space-y-[clamp(6px, 0.4vw, 10px)]">
+                {p.teams.map(t => (
+                  <div
+                    key={t.team_id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'clamp(8px, 0.5vw, 12px)',
+                      fontSize: 'clamp(14px, 0.9vw, 22px)',
+                      color: 'rgba(255,255,255,0.8)',
+                    }}
+                  >
+                    <span>{t.team_flag || '🏳️'}</span>
+                    <span>{t.team_name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
