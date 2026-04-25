@@ -103,11 +103,13 @@ export function CreateForm({ organiserId }: Props) {
         prize_type: prizeType,
         amount: null,
       }))
-      supabase
-        .from('sweepstake_prizes')
-        .insert(prizeRows)
-        .then(() => { /* done */ })
-        .catch(() => { /* best-effort */ })
+      try {
+        await supabase
+          .from('sweepstake_prizes')
+          .insert(prizeRows)
+      } catch {
+        // best-effort
+      }
     }
 
     // Fire confirmation email (non-blocking)
