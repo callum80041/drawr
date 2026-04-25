@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface Participant {
   id: string
@@ -10,7 +11,7 @@ interface Participant {
   rank: number | null
 }
 
-type PanelType = 'leaderboard' | 'top5' | 'movers' | 'teams' | 'stats' | 'fixtures' | 'join'
+type PanelType = 'leaderboard' | 'top5' | 'movers' | 'teams' | 'stats' | 'promo' | 'fixtures' | 'join'
 
 interface Props {
   token: string
@@ -55,9 +56,9 @@ export function TVLeaderboardClient({
   const accent = isEurovision ? PINK_EV : LIME_WC
   const background = isEurovision ? BG_EV : BG_WC
 
-  // Rotate panels every 12 seconds through all 7 panels
+  // Rotate panels every 12 seconds through all 8 panels
   useEffect(() => {
-    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'fixtures', 'join']
+    const panels: PanelType[] = ['leaderboard', 'top5', 'movers', 'teams', 'stats', 'promo', 'fixtures', 'join']
     const interval = setInterval(() => {
       setCurrentPanel(p => {
         const idx = panels.indexOf(p)
@@ -272,6 +273,16 @@ export function TVLeaderboardClient({
             participantCount={participantCount}
             entryFee={entryFee}
             accent={accent}
+          />
+        ) : currentPanel === 'promo' ? (
+          <PromoPanel
+            token={token}
+            ranked={ranked}
+            totalPot={totalPot}
+            participantCount={participantCount}
+            entryFee={entryFee}
+            accent={accent}
+            appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://playdrawr.co.uk'}
           />
         ) : currentPanel === 'fixtures' ? (
           <FixturesPanel accent={accent} />
@@ -896,6 +907,292 @@ function JoinPanel({
           >
             Scan to sign up • £{entryFee} entry fee
           </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PromoPanel({
+  token,
+  ranked,
+  totalPot,
+  participantCount,
+  entryFee,
+  accent,
+  appUrl,
+}: {
+  token: string
+  ranked: Participant[]
+  totalPot: number
+  participantCount: number
+  entryFee: number
+  accent: string
+  appUrl: string
+}) {
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 })
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const targetDate = new Date('2026-06-11T00:00:00Z').getTime()
+      const now = new Date().getTime()
+      const difference = targetDate - now
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
+        const minutes = Math.floor((difference / 1000 / 60) % 60)
+        setCountdown({ days, hours, minutes })
+      }
+    }
+
+    updateCountdown()
+    const interval = setInterval(updateCountdown, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const joinUrl = `${appUrl}/join/${token}`
+  const first = Math.floor(totalPot * 0.6)
+  const second = Math.floor(totalPot * 0.25)
+  const third = Math.floor(totalPot * 0.15)
+
+  return (
+    <div className="h-full flex flex-col gap-[clamp(20px,1.5vw,40px)]">
+      {/* Header with FIFA logo and countdown */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h2
+            className="font-heading font-bold"
+            style={{
+              fontSize: 'clamp(32px, 2vw, 56px)',
+              color: accent,
+              marginBottom: 'clamp(8px, 0.5vw, 12px)',
+            }}
+          >
+            FIFA World Cup 2026
+          </h2>
+          <p
+            style={{
+              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              color: 'rgba(255,255,255,0.7)',
+            }}
+          >
+            Join the playdrawr sweepstake
+          </p>
+        </div>
+
+        {/* Countdown */}
+        <div className="text-center">
+          <p
+            style={{
+              fontSize: 'clamp(12px, 0.8vw, 18px)',
+              color: 'rgba(255,255,255,0.6)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: 'clamp(8px, 0.5vw, 12px)',
+            }}
+          >
+            First match in
+          </p>
+          <div className="flex gap-[clamp(12px, 0.8vw, 20px)]">
+            <div style={{ textAlign: 'center' }}>
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(28px, 1.8vw, 48px)',
+                  color: accent,
+                  lineHeight: 1,
+                }}
+              >
+                {countdown.days}
+              </p>
+              <p
+                style={{
+                  fontSize: 'clamp(10px, 0.7vw, 14px)',
+                  color: 'rgba(255,255,255,0.6)',
+                  marginTop: 'clamp(4px, 0.3vw, 6px)',
+                }}
+              >
+                days
+              </p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(28px, 1.8vw, 48px)',
+                  color: accent,
+                  lineHeight: 1,
+                }}
+              >
+                {countdown.hours}
+              </p>
+              <p
+                style={{
+                  fontSize: 'clamp(10px, 0.7vw, 14px)',
+                  color: 'rgba(255,255,255,0.6)',
+                  marginTop: 'clamp(4px, 0.3vw, 6px)',
+                }}
+              >
+                hrs
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content grid */}
+      <div className="flex-1 grid grid-cols-3 gap-[clamp(16px,1vw,24px)] overflow-hidden">
+        {/* Participants list */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: `2px solid ${accent}33`,
+            borderRadius: 'clamp(12px,0.8vw,24px)',
+            padding: 'clamp(16px,1vw,28px)',
+            overflow: 'auto',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              color: accent,
+              fontWeight: 700,
+              marginBottom: 'clamp(12px,0.8vw,20px)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
+          >
+            {participantCount} Signed Up
+          </p>
+          <div className="space-y-[clamp(6px,0.4vw,10px)]">
+            {ranked.map(p => (
+              <p
+                key={p.id}
+                style={{
+                  fontSize: 'clamp(12px, 0.8vw, 18px)',
+                  color: 'rgba(255,255,255,0.8)',
+                }}
+              >
+                ✓ {p.name}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {/* Prizes */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: `2px solid ${accent}33`,
+            borderRadius: 'clamp(12px,0.8vw,24px)',
+            padding: 'clamp(16px,1vw,28px)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 'clamp(12px,0.8vw,20px)',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              color: accent,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
+          >
+            Prizes
+          </p>
+          <div className="space-y-[clamp(8px,0.5vw,12px)]">
+            <div>
+              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+                1st Place
+              </p>
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(24px, 1.6vw, 40px)',
+                  color: accent,
+                }}
+              >
+                £{first}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+                2nd Place
+              </p>
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(20px, 1.3vw, 32px)',
+                  color: '#C0C0C0',
+                }}
+              >
+                £{second}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+                3rd Place
+              </p>
+              <p
+                className="font-heading font-bold"
+                style={{
+                  fontSize: 'clamp(20px, 1.3vw, 32px)',
+                  color: '#CD7F32',
+                }}
+              >
+                £{third}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* QR Code */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: `2px solid ${accent}33`,
+            borderRadius: 'clamp(12px,0.8vw,24px)',
+            padding: 'clamp(16px,1vw,28px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'clamp(12px,0.8vw,20px)',
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              padding: 'clamp(8px, 0.5vw, 12px)',
+              borderRadius: 'clamp(8px, 0.5vw, 12px)',
+            }}
+          >
+            <QRCodeSVG value={joinUrl} size={120} level="H" />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: 'clamp(12px, 0.8vw, 18px)',
+                color: accent,
+                fontWeight: 700,
+              }}
+            >
+              Scan to join
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(10px, 0.7vw, 14px)',
+                color: 'rgba(255,255,255,0.6)',
+                marginTop: 'clamp(4px, 0.3vw, 6px)',
+              }}
+            >
+              £{entryFee} entry
+            </p>
+          </div>
         </div>
       </div>
     </div>
