@@ -52,7 +52,8 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
   const isEurovision = sweepstake.sweepstake_type === 'eurovision'
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
-  const joinUrl = `${appUrl}/join/${sweepstake.share_token}`
+  const urlSlug = sweepstake.custom_slug || sweepstake.share_token
+  const joinUrl = `${appUrl}/join/${urlSlug}`
 
   const steps = [
     {
@@ -73,7 +74,7 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
       num: 3,
       label: 'Share the link',
       done: sweepstake.status === 'active' || sweepstake.status === 'complete',
-      href: `/s/${sweepstake.share_token}`,
+      href: `/s/${urlSlug}`,
       cta: 'View participant page',
       external: true,
     },
@@ -236,10 +237,10 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
             <p className="text-sm text-mid mb-3">View standings, fixtures and groups.</p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
-                {appUrl}/s/{sweepstake.share_token}
+                {appUrl}/s/{urlSlug}
               </code>
               <Link
-                href={`/s/${sweepstake.share_token}`}
+                href={`/s/${urlSlug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`sm:shrink-0 ${accentBg} ${accentText} text-xs font-medium px-3 py-2 rounded-lg hover:opacity-90 transition-opacity text-center`}
