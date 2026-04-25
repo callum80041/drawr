@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
     .select('is_pro, pro_expires_at')
-    .eq('share_token', token)
+    .or(`share_token.eq.${token},custom_slug.eq.${token}`)
     .single()
 
   if (!sweepstake) {
