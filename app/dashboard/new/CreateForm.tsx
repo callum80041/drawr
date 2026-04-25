@@ -60,7 +60,13 @@ export function CreateForm({ organiserId }: Props) {
   const [currency, setCurrency] = useState<CurrencyCode>('GBP')
   const [mode, setMode] = useState<Mode>('random')
   const [prizeType, setPrizeType] = useState<PrizeType>('money')
-  const [enabledPrizes, setEnabledPrizes] = useState<Set<PrizeCategory>>(new Set(['first_place']))
+  const [prizeAmounts, setPrizeAmounts] = useState<Record<PrizeCategory, { enabled: boolean; amount: string; type: 'fixed' | 'percent' }>>(() => {
+    const initial = {} as Record<PrizeCategory, { enabled: boolean; amount: string; type: 'fixed' | 'percent' }>
+    PRIZE_CATEGORIES.forEach(cat => {
+      initial[cat.type] = { enabled: cat.type === 'first_place', amount: '', type: 'fixed' }
+    })
+    return initial
+  })
   const [tournament, setTournament] = useState<TournamentType>('worldcup')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -97,12 +103,21 @@ export function CreateForm({ organiserId }: Props) {
     }
 
     // Create prize entries
-    if (enabledPrizes.size > 0) {
-      const prizeRows = Array.from(enabledPrizes).map(prizeType => ({
-        sweepstake_id: data.id,
-        prize_type: prizeType,
-        amount: null,
-      }))
+    const enabledPrizeKeys = Object.entries(prizeAmounts)
+      .filter(([, state]) => state.enabled)
+      .map(([key]) => key as PrizeCategory)
+
+    if (enabledPrizeKeys.length > 0) {
+      const prizeRows = enabledPrizeKeys.map(prizeKey => {
+        const state = prizeAmounts[prizeKey]
+        const parsed = parseFloat(state.amount)
+        return {
+          sweepstake_id: data.id,
+          prize_type: prizeKey,
+          amount: isNaN(parsed) || parsed < 0 ? null : parsed,
+          amount_type: state.type,
+        }
+      })
       try {
         await supabase
           .from('sweepstake_prizes')
@@ -212,41 +227,65 @@ export function CreateForm({ organiserId }: Props) {
       {/* Prize categories */}
       <div>
         <label className="block text-sm font-medium text-pitch mb-3">What are the prizes?</label>
-        <div className="space-y-2">
-          {PRIZE_CATEGORIES.map(cat => (
-            <button
-              key={cat.type}
-              type="button"
-              onClick={() => {
-                const newSet = new Set(enabledPrizes)
-                if (newSet.has(cat.type)) {
-                  newSet.delete(cat.type)
-                } else {
-                  newSet.add(cat.type)
-                }
-                setEnabledPrizes(newSet)
-              }}
-              className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
-                enabledPrizes.has(cat.type) ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="pt-0.5">
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                    enabledPrizes.has(cat.type) ? 'border-grass bg-grass' : 'border-[#D1D9D5]'
-                  }`}>
-                    {enabledPrizes.has(cat.type) && <span className="text-white text-xs">✓</span>}
+        <div className="space-y-3">
+          {PRIZE_CATEGORIES.map(cat => {
+            const state = prizeAmounts[cat.type]
+            return (
+              <div key={cat.type} className="p-3 rounded-lg border border-[#D1D9D5] bg-white">
+                <div className="flex items-start gap-3">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={state.enabled}
+                    onClick={() => setPrizeAmounts(prev => ({
+                      ...prev,
+                      [cat.type]: { ...prev[cat.type], enabled: !prev[cat.type].enabled }
+                    }))}
+                    className={`relative shrink-0 inline-flex h-6 w-10 items-center rounded-full transition-colors mt-0.5 ${state.enabled ? 'bg-grass' : 'bg-[#D1D9D5]'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${state.enabled ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-pitch">
+                      <span className="mr-1.5">{cat.icon}</span>{cat.label}
+                    </p>
+                    <p className="text-xs text-mid mt-0.5">{cat.desc}</p>
                   </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-pitch">
-                    <span className="mr-1.5">{cat.icon}</span>{cat.label}
-                  </p>
-                  <p className="text-xs text-mid mt-0.5">{cat.desc}</p>
+
+                  {state.enabled && (
+                    <div className="flex gap-2 shrink-0">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mid text-sm">{state.type === 'fixed' ? '£' : '%'}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.50"
+                          value={state.amount}
+                          onChange={e => setPrizeAmounts(prev => ({
+                            ...prev,
+                            [cat.type]: { ...prev[cat.type], amount: e.target.value }
+                          }))}
+                          placeholder="0"
+                          className="w-24 pl-7 pr-3 py-2 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPrizeAmounts(prev => ({
+                          ...prev,
+                          [cat.type]: { ...prev[cat.type], type: prev[cat.type].type === 'fixed' ? 'percent' : 'fixed' }
+                        }))}
+                        className="px-2 py-2 rounded-lg border border-[#D1D9D5] text-pitch hover:bg-light text-xs font-medium transition-colors"
+                      >
+                        {state.type === 'fixed' ? '£' : '%'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-            </button>
-          ))}
+            )
+          })}
         </div>
       </div>
 
