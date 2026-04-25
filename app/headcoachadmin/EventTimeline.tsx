@@ -7,27 +7,19 @@ interface EventTimelineProps {
   initialEvents: TimelineEvent[]
 }
 
-function formatRelativeTime(date: string): string {
-  const now = new Date()
+function formatTimeGMT1(date: string): string {
   const eventDate = new Date(date)
-  const seconds = Math.floor((now.getTime() - eventDate.getTime()) / 1000)
-
-  if (seconds < 60) return 'Just now'
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-  return `${Math.floor(seconds / 86400)}d ago`
+  return eventDate.toLocaleString('en-GB', {
+    timeZone: 'Europe/London',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
 }
 
 function EventItem({ event }: { event: TimelineEvent }) {
-  const [relativeTime, setRelativeTime] = useState(() => formatRelativeTime(event.created_at))
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRelativeTime(formatRelativeTime(event.created_at))
-    }, 30000) // Update every 30 seconds
-
-    return () => clearInterval(interval)
-  }, [event.created_at])
+  const time = formatTimeGMT1(event.created_at)
 
   const baseClasses = 'flex gap-3 py-3 px-3 border-b border-[#E5EDEA] last:border-b-0 hover:bg-light/50 transition-colors'
 
@@ -40,7 +32,7 @@ function EventItem({ event }: { event: TimelineEvent }) {
           <p className="text-xs text-mid truncate">{event.email}</p>
           <p className="text-xs text-[#C0CFC8] mt-1">Organiser joined</p>
         </div>
-        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{relativeTime}</div>
+        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{time}</div>
       </div>
     )
   }
@@ -54,7 +46,7 @@ function EventItem({ event }: { event: TimelineEvent }) {
           <p className="text-xs text-mid truncate">{event.sweepstakeName}</p>
           <p className="text-xs text-[#C0CFC8] mt-1">Joined sweepstake</p>
         </div>
-        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{relativeTime}</div>
+        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{time}</div>
       </div>
     )
   }
@@ -68,7 +60,7 @@ function EventItem({ event }: { event: TimelineEvent }) {
           <p className="text-xs text-mid">{event.participantCount} participant{event.participantCount !== 1 ? 's' : ''}</p>
           <p className="text-xs text-[#C0CFC8] mt-1">Draw completed</p>
         </div>
-        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{relativeTime}</div>
+        <div className="text-xs text-mid shrink-0 whitespace-nowrap">{time}</div>
       </div>
     )
   }
