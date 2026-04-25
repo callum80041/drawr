@@ -22,6 +22,9 @@ interface Props {
   isPro: boolean
   initialCustomSlug: string | null
   initialLogoUrl: string | null
+  appUrl: string
+  shareToken: string
+  sweepstakeType: 'worldcup' | 'eurovision'
 }
 
 export function SettingsClient({
@@ -37,6 +40,9 @@ export function SettingsClient({
   isPro,
   initialCustomSlug,
   initialLogoUrl,
+  appUrl,
+  shareToken,
+  sweepstakeType,
 }: Props) {
   const router = useRouter()
   const supabase = createClient()
@@ -377,6 +383,26 @@ export function SettingsClient({
           </label>
         </div>
       </div>
+
+      {/* ── TV Mode ── */}
+      {isPro && (
+        <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
+          <div className="absolute -top-2 -right-2">
+            <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+              Coming soon
+            </span>
+          </div>
+          <div className="p-6">
+            <p className="text-sm font-medium text-pitch mb-1">TV mode</p>
+            <p className="text-xs text-mid mb-4">Full-screen display for break rooms or screens.</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+                {appUrl}/tv/{shareToken}
+              </code>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Prizes ── */}
       <PrizesSection sweepstakeId={sweepstakeId} initialPrizes={initialPrizes} />

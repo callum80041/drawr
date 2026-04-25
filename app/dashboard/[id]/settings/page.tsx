@@ -24,12 +24,14 @@ export default async function SettingsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, assignment_mode, image_url, teams_per_participant, is_pro, pro_expires_at, custom_slug, logo_url')
+    .select('id, name, status, entry_fee, assignment_mode, image_url, teams_per_participant, is_pro, pro_expires_at, custom_slug, logo_url, share_token, sweepstake_type')
     .eq('id', id)
     .eq('organiser_id', organiser.id)
     .single()
 
   if (!sweepstake) notFound()
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
   const [{ count: assignmentCount }, { data: prizes }] = await Promise.all([
     supabase
@@ -56,6 +58,9 @@ export default async function SettingsPage({ params }: Props) {
       isPro={isSweepstakePro(sweepstake)}
       initialCustomSlug={sweepstake.custom_slug ?? null}
       initialLogoUrl={sweepstake.logo_url ?? null}
+      appUrl={appUrl}
+      shareToken={sweepstake.share_token}
+      sweepstakeType={sweepstake.sweepstake_type ?? 'worldcup'}
     />
   )
 }
