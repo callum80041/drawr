@@ -209,33 +209,6 @@ export function TVLeaderboardClient({
         />
       </div>
 
-      {/* BOTTOM TICKER */}
-      <div
-        className="border-t flex items-center gap-[clamp(16px,1vw,32px)] px-[clamp(32px,2vw,80px)] py-[clamp(16px,1vw,32px)] overflow-hidden"
-        style={{
-          borderColor: 'rgba(255,255,255,0.15)',
-          background: 'rgba(0,0,0,0.4)',
-        }}
-      >
-        <div
-          style={{
-            fontSize: 'clamp(24px, 1.2vw, 42px)',
-            color: accent,
-            fontWeight: 'bold',
-          }}
-        >
-          ●
-        </div>
-        <div
-          style={{
-            fontSize: 'clamp(20px, 1.1vw, 36px)',
-            color: '#fff',
-            fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif',
-          }}
-        >
-          {currentTickerMessage}
-        </div>
-      </div>
     </div>
   )
 }
@@ -848,7 +821,7 @@ function PromoPanel({
   accent: string
   appUrl: string
 }) {
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 })
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0 })
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -859,8 +832,7 @@ function PromoPanel({
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24))
         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
-        const minutes = Math.floor((difference / 1000 / 60) % 60)
-        setCountdown({ days, hours, minutes })
+        setCountdown({ days, hours })
       }
     }
 
@@ -875,25 +847,26 @@ function PromoPanel({
   const third = Math.floor(totalPot * 0.15)
 
   return (
-    <div className="h-full flex flex-col gap-[clamp(12px,0.8vw,20px)]">
-      {/* Header with FIFA logo and countdown */}
-      <div className="flex items-center justify-between shrink-0">
+    <div className="h-full flex flex-col justify-between py-[clamp(24px,1.5vw,48px)]">
+      {/* Header: Centered FIFA logo and countdown */}
+      <div className="text-center flex flex-col items-center gap-[clamp(16px,1vw,32px)]">
         <div>
           <h2
             className="font-heading font-bold"
             style={{
-              fontSize: 'clamp(24px, 1.5vw, 40px)',
+              fontSize: 'clamp(48px, 3.5vw, 80px)',
               color: accent,
-              marginBottom: 'clamp(4px, 0.3vw, 8px)',
               lineHeight: 1,
+              marginBottom: 'clamp(8px, 0.5vw, 12px)',
             }}
           >
             FIFA World Cup 2026
           </h2>
           <p
             style={{
-              fontSize: 'clamp(12px, 0.8vw, 18px)',
-              color: 'rgba(255,255,255,0.7)',
+              fontSize: 'clamp(18px, 1.2vw, 28px)',
+              color: 'rgba(255,255,255,0.8)',
+              fontWeight: 500,
             }}
           >
             Join the playdrawr sweepstake
@@ -901,120 +874,137 @@ function PromoPanel({
         </div>
 
         {/* Countdown */}
-        <div className="text-right">
-          <p
-            style={{
-              fontSize: 'clamp(10px, 0.7vw, 14px)',
-              color: 'rgba(255,255,255,0.6)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              marginBottom: 'clamp(4px, 0.3vw, 6px)',
-            }}
-          >
-            First match in
-          </p>
-          <div className="flex gap-[clamp(8px, 0.5vw, 12px)] justify-end">
-            <div style={{ textAlign: 'center' }}>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(20px, 1.3vw, 32px)',
-                  color: accent,
-                  lineHeight: 1,
-                }}
-              >
-                {countdown.days}
-              </p>
-              <p
-                style={{
-                  fontSize: 'clamp(9px, 0.6vw, 12px)',
-                  color: 'rgba(255,255,255,0.6)',
-                  marginTop: 'clamp(2px, 0.2vw, 4px)',
-                }}
-              >
-                d
-              </p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(20px, 1.3vw, 32px)',
-                  color: accent,
-                  lineHeight: 1,
-                }}
-              >
-                {countdown.hours}
-              </p>
-              <p
-                style={{
-                  fontSize: 'clamp(9px, 0.6vw, 12px)',
-                  color: 'rgba(255,255,255,0.6)',
-                  marginTop: 'clamp(2px, 0.2vw, 4px)',
-                }}
-              >
-                h
-              </p>
-            </div>
+        <div className="flex gap-[clamp(32px,2vw,64px)]" style={{ justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              className="font-heading font-bold"
+              style={{
+                fontSize: 'clamp(56px, 3.5vw, 96px)',
+                color: accent,
+                lineHeight: 1,
+                marginBottom: 'clamp(4px, 0.3vw, 8px)',
+              }}
+            >
+              {countdown.days}
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(16px, 1vw, 24px)',
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 600,
+                letterSpacing: '0.05em',
+              }}
+            >
+              Days
+            </p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p
+              className="font-heading font-bold"
+              style={{
+                fontSize: 'clamp(56px, 3.5vw, 96px)',
+                color: accent,
+                lineHeight: 1,
+                marginBottom: 'clamp(4px, 0.3vw, 8px)',
+              }}
+            >
+              {countdown.hours}
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(16px, 1vw, 24px)',
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 600,
+                letterSpacing: '0.05em',
+              }}
+            >
+              Hours
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Main content grid */}
-      <div className="flex-1 grid grid-cols-3 gap-[clamp(12px,0.8vw,16px)] overflow-hidden min-h-0">
-        {/* Participants list */}
+      {/* Main content grid - 3 columns */}
+      <div className="flex-1 grid grid-cols-3 gap-[clamp(20px,1.2vw,40px)] overflow-hidden min-h-0">
+        {/* Participants with teams */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(12px,0.8vw,24px)',
-            padding: 'clamp(16px,1vw,28px)',
+            borderRadius: 'clamp(16px,1vw,32px)',
+            padding: 'clamp(24px,1.5vw,40px)',
             overflow: 'auto',
           }}
         >
           <p
             style={{
-              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              fontSize: 'clamp(18px, 1.2vw, 28px)',
               color: accent,
               fontWeight: 700,
-              marginBottom: 'clamp(12px,0.8vw,20px)',
+              marginBottom: 'clamp(16px,1vw,24px)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
             }}
           >
             {participantCount} Signed Up
           </p>
-          <div className="space-y-[clamp(6px,0.4vw,10px)]">
+          <div className="space-y-[clamp(12px,0.8vw,20px)]">
             {ranked.map(p => (
-              <p
-                key={p.id}
-                style={{
-                  fontSize: 'clamp(12px, 0.8vw, 18px)',
-                  color: 'rgba(255,255,255,0.8)',
-                }}
-              >
-                ✓ {p.name}
-              </p>
+              <div key={p.id}>
+                <p
+                  style={{
+                    fontSize: 'clamp(14px, 0.95vw, 22px)',
+                    color: '#fff',
+                    fontWeight: 500,
+                    marginBottom: 'clamp(4px, 0.2vw, 6px)',
+                  }}
+                >
+                  ✓ {p.name}
+                </p>
+                {p.teams.length > 0 && (
+                  <div className="flex flex-wrap gap-[clamp(6px,0.4vw,10px)]">
+                    {p.teams.map(t => (
+                      <div
+                        key={t.team_id}
+                        className="inline-flex items-center gap-[clamp(4px,0.3vw,8px)]"
+                        style={{
+                          fontSize: 'clamp(11px, 0.8vw, 16px)',
+                          background: `${accent}20`,
+                          color: accent,
+                          padding: `${
+                            'clamp(4px, 0.2vw, 6px)'
+                          } clamp(8px, 0.5vw, 12px)`,
+                          borderRadius: 'clamp(4px, 0.3vw, 8px)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t.team_flag && <span style={{ fontSize: 'clamp(12px, 0.9vw, 18px)' }}>{t.team_flag}</span>}
+                        <span>{t.team_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Prizes */}
+        {/* Prizes - smaller */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(12px,0.8vw,24px)',
-            padding: 'clamp(16px,1vw,28px)',
+            borderRadius: 'clamp(16px,1vw,32px)',
+            padding: 'clamp(24px,1.5vw,40px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            gap: 'clamp(12px,0.8vw,20px)',
+            gap: 'clamp(20px,1.2vw,32px)',
           }}
         >
           <p
             style={{
-              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              fontSize: 'clamp(18px, 1.2vw, 28px)',
               color: accent,
               fontWeight: 700,
               textTransform: 'uppercase',
@@ -1023,44 +1013,47 @@ function PromoPanel({
           >
             Prizes
           </p>
-          <div className="space-y-[clamp(8px,0.5vw,12px)]">
+          <div className="space-y-[clamp(16px,1vw,24px)]">
             <div>
-              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
                 1st Place
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(24px, 1.6vw, 40px)',
+                  fontSize: 'clamp(28px, 1.8vw, 44px)',
                   color: accent,
+                  lineHeight: 1,
                 }}
               >
                 £{first}
               </p>
             </div>
             <div>
-              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
                 2nd Place
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(20px, 1.3vw, 32px)',
+                  fontSize: 'clamp(24px, 1.5vw, 36px)',
                   color: '#C0C0C0',
+                  lineHeight: 1,
                 }}
               >
                 £{second}
               </p>
             </div>
             <div>
-              <p style={{ fontSize: 'clamp(11px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.6)' }}>
+              <p style={{ fontSize: 'clamp(12px, 0.8vw, 16px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(4px, 0.2vw, 6px)' }}>
                 3rd Place
               </p>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(20px, 1.3vw, 32px)',
+                  fontSize: 'clamp(24px, 1.5vw, 36px)',
                   color: '#CD7F32',
+                  lineHeight: 1,
                 }}
               >
                 £{third}
@@ -1069,47 +1062,48 @@ function PromoPanel({
           </div>
         </div>
 
-        {/* QR Code */}
+        {/* QR Code - larger */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(12px,0.8vw,24px)',
-            padding: 'clamp(16px,1vw,28px)',
+            borderRadius: 'clamp(16px,1vw,32px)',
+            padding: 'clamp(24px,1.5vw,40px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'clamp(12px,0.8vw,20px)',
+            gap: 'clamp(20px,1.2vw,32px)',
           }}
         >
           <div
             style={{
               background: '#fff',
-              padding: 'clamp(8px, 0.5vw, 12px)',
-              borderRadius: 'clamp(8px, 0.5vw, 12px)',
+              padding: 'clamp(16px, 1vw, 24px)',
+              borderRadius: 'clamp(12px, 0.8vw, 20px)',
             }}
           >
-            <QRCodeSVG value={joinUrl} size={120} level="H" />
+            <QRCodeSVG value={joinUrl} size={240} level="H" />
           </div>
           <div style={{ textAlign: 'center' }}>
             <p
               style={{
-                fontSize: 'clamp(12px, 0.8vw, 18px)',
+                fontSize: 'clamp(18px, 1.2vw, 26px)',
                 color: accent,
                 fontWeight: 700,
+                marginBottom: 'clamp(8px, 0.5vw, 12px)',
               }}
             >
               Scan to join
             </p>
             <p
               style={{
-                fontSize: 'clamp(10px, 0.7vw, 14px)',
-                color: 'rgba(255,255,255,0.6)',
-                marginTop: 'clamp(4px, 0.3vw, 6px)',
+                fontSize: 'clamp(14px, 0.95vw, 20px)',
+                color: 'rgba(255,255,255,0.8)',
+                fontWeight: 500,
               }}
             >
-              £{entryFee} entry
+              £{entryFee} entry fee
             </p>
           </div>
         </div>
