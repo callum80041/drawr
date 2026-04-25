@@ -10,7 +10,7 @@ interface OAuthButtonsProps {
 
 export function OAuthButtons({ onError }: OAuthButtonsProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState<'google' | 'x' | null>(null)
+  const [loading, setLoading] = useState<'google' | 'twitter' | null>(null)
   const supabase = createClient()
 
   async function handleOAuth(provider: 'google' | 'twitter') {
@@ -80,7 +80,7 @@ export function OAuthButtons({ onError }: OAuthButtonsProps) {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.514l-5.106-6.693-5.828 6.693h-3.308l7.725-8.835L.46 2.25h6.734l4.823 6.38 5.227-6.38zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
-          {loading === 'x' ? 'Signing in…' : 'X'}
+          {loading === 'twitter' ? 'Signing in…' : 'X'}
         </button>
       </div>
     </>
