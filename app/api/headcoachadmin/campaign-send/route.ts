@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email'
+import { setupGuideEmailHtml } from '@/lib/email/templates/setup-guide'
 import {
-  campaignNoSweepstakeHtml,
   campaignLowParticipantsHtml,
   campaignPushToTenHtml,
 } from '@/lib/email/templates/campaign-wc'
@@ -162,11 +162,7 @@ export async function POST(req: NextRequest) {
 
     let html: string
     if (campaignId === 1) {
-      html = campaignNoSweepstakeHtml({
-        firstName,
-        createSweepstakeLink: `${APP_URL}/dashboard/new`,
-        unsubscribeUrl,
-      })
+      html = setupGuideEmailHtml({ name: firstName })
     } else if (campaignId === 2) {
       html = campaignLowParticipantsHtml({
         firstName,
