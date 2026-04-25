@@ -6,13 +6,14 @@ import { EntryFeeEditor } from '@/components/dashboard/EntryFeeEditor'
 
 interface Props {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ created?: string }>
+  searchParams: Promise<{ created?: string; verified?: string }>
 }
 
 export default async function SweepstakeOverviewPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { created } = await searchParams
+  const { created, verified } = await searchParams
   const justCreated = created === '1'
+  const justVerified = verified === '1'
 
   const supabase = await createClient()
 
@@ -82,6 +83,28 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
 
   return (
     <div className="max-w-3xl space-y-8">
+
+      {/* ── Pending verification banner ── shown when sweepstake not yet verified */}
+      {sweepstake.verified_at === null && (
+        <div className="bg-white rounded-2xl border-2 border-yellow-400 overflow-hidden">
+          <div className="bg-yellow-50 px-6 py-5">
+            <p className="text-xs font-bold tracking-widest uppercase mb-1.5 text-yellow-800">
+              ⏳ Pending verification
+            </p>
+            <h2 className="font-heading font-bold text-xl text-yellow-900 tracking-tight leading-tight">
+              Check your email
+            </h2>
+            <p className="text-sm text-yellow-800 mt-2 leading-relaxed">
+              We've sent a verification link to your email address. Click it to activate your sweepstake.
+            </p>
+            {justVerified && (
+              <p className="text-sm text-green-700 mt-3 font-semibold">
+                ✓ Your sweepstake is now verified!
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Get people in ── shown when just created OR no participants yet */}
       {(!hasParticipants || justCreated) && (

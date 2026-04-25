@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { CampaignSection, type CampaignData } from './CampaignSection'
 import { SignupMethodChart, type SignupData } from './SignupMethodChart'
 import { GrowthTrendChart, type GrowthData } from './GrowthTrendChart'
+import { EventTimeline } from './EventTimeline'
+import type { TimelineEvent } from '@/app/api/headcoachadmin/recent-events/route'
 
 interface Stats {
   totalOrganisers: number
@@ -89,6 +91,7 @@ interface Props {
   campaignData: CampaignData
   signupMethodBreakdown: SignupData[]
   growthTrend: GrowthData[]
+  timelineEvents: TimelineEvent[]
 }
 
 const APP_URL = 'https://playdrawr.co.uk'
@@ -109,7 +112,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   )
 }
 
-export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData, signupMethodBreakdown, growthTrend }: Props) {
+export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organiserDetails, emailLog, analytics, campaignData, signupMethodBreakdown, growthTrend, timelineEvents }: Props) {
   const router = useRouter()
   const [expandedOrganiser, setExpandedOrganiser] = useState<string | null>(null)
   const [expandedSweepstake, setExpandedSweepstake] = useState<string | null>(null)
@@ -258,14 +261,19 @@ export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organi
         </button>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
 
         {/* Quick links */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 mb-8">
           <a href="/headcoachadmin/lottery" className="text-sm font-medium bg-white border border-[#E5EDEA] rounded-lg px-4 py-2 text-pitch hover:bg-[#F2F7F5] transition">
             🎱 Lottery syndicates →
           </a>
         </div>
+
+        {/* Two-column layout: Metrics + Timeline */}
+        <div className="flex gap-8 mb-8">
+          {/* Left column: Metrics */}
+          <div className="flex-1 space-y-8">
 
         {/* Traffic */}
         <section>
@@ -403,6 +411,18 @@ export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organi
             <GrowthTrendChart data={growthTrend} />
           </div>
         </section>
+          </div>
+
+          {/* Right column: Timeline */}
+          <div className="w-80 shrink-0">
+            <div className="sticky top-8">
+              <EventTimeline initialEvents={timelineEvents} />
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width sections below */}
+        <div className="space-y-8">
 
         {/* Bulk email */}
         <section>
@@ -1012,6 +1032,7 @@ export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organi
           </div>
         </section>
 
+        </div>
       </div>
     </div>
   )

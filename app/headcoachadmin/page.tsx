@@ -5,6 +5,7 @@ import { AdminLogin } from './AdminLogin'
 import type { CampaignQualifier } from './CampaignSection'
 import type { SignupData } from './SignupMethodChart'
 import type { GrowthData } from './GrowthTrendChart'
+import type { TimelineEvent } from '@/app/api/headcoachadmin/recent-events/route'
 
 async function fetchSignupMethodBreakdown(supabase: Awaited<ReturnType<typeof createServiceClient>>, days: number = 7) {
   const now = new Date()
@@ -129,6 +130,77 @@ async function fetchGrowthTrend(supabase: Awaited<ReturnType<typeof createServic
   return result
 }
 
+async function fetchRecentEvents(supabase: Awaited<ReturnType<typeof createServiceClient>>) {
+  const [
+    { data: recentOrganisers },
+    { data: recentParticipants },
+    { data: recentDraws },
+  ] = await Promise.all([
+    supabase
+      .from('organisers')
+      .select('id, name, email, created_at')
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('participants')
+      .select('id, name, created_at, sweepstakes(name)')
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('sweepstakes')
+      .select('id, name, draw_completed_at, participants(id)')
+      .not('draw_completed_at', 'is', null)
+      .order('draw_completed_at', { ascending: false })
+      .limit(50),
+  ])
+
+  const events: TimelineEvent[] = []
+
+  if (recentOrganisers) {
+    recentOrganisers.forEach(org => {
+      events.push({
+        type: 'organiser',
+        id: org.id,
+        name: org.name,
+        email: org.email,
+        created_at: org.created_at,
+      })
+    })
+  }
+
+  if (recentParticipants) {
+    recentParticipants.forEach(p => {
+      const sweepstakes = p.sweepstakes as Array<{ name: string }> | null
+      events.push({
+        type: 'participant',
+        id: p.id,
+        participantName: p.name,
+        sweepstakeName: sweepstakes?.[0]?.name ?? 'Unknown sweepstake',
+        created_at: p.created_at,
+      })
+    })
+  }
+
+  if (recentDraws) {
+    recentDraws.forEach(s => {
+      const participants = s.participants as Array<{ id: string }> | null
+      if (s.draw_completed_at) {
+        events.push({
+          type: 'draw',
+          id: s.id,
+          sweepstakeName: s.name,
+          participantCount: participants?.length ?? 0,
+          created_at: s.draw_completed_at,
+        })
+      }
+    })
+  }
+
+  return events
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 20)
+}
+
 export const dynamic = 'force-dynamic'
 
 async function fetchVercelAnalytics() {
@@ -192,6 +264,7 @@ export default async function HeadCoachAdminPage() {
     analytics,
     signupMethodBreakdown,
     growthTrend,
+    timelineEvents,
   ] = await Promise.all([
     supabase.from('organisers').select('*', { count: 'exact', head: true }),
     supabase.from('organisers').select('*', { count: 'exact', head: true }).gte('created_at', d7.toISOString()),
@@ -216,6 +289,7 @@ export default async function HeadCoachAdminPage() {
     fetchVercelAnalytics(),
     fetchSignupMethodBreakdown(supabase, 7),
     fetchGrowthTrend(supabase, 30),
+    fetchRecentEvents(supabase),
   ])
 
   const sweepstakes = sweepstakeRows ?? []
@@ -324,6 +398,7 @@ export default async function HeadCoachAdminPage() {
       analytics={analytics}
       signupMethodBreakdown={signupMethodBreakdown}
       growthTrend={growthTrend}
+      timelineEvents={timelineEvents}
     />
   )
 }
