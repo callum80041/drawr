@@ -965,23 +965,24 @@ function PromoPanel({
   const third = Math.floor(totalPot * 0.15)
 
   return (
-    <div className="h-full flex flex-col gap-[clamp(20px,1.5vw,40px)]">
+    <div className="h-full flex flex-col gap-[clamp(12px,0.8vw,20px)]">
       {/* Header with FIFA logo and countdown */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between shrink-0">
         <div>
           <h2
             className="font-heading font-bold"
             style={{
-              fontSize: 'clamp(32px, 2vw, 56px)',
+              fontSize: 'clamp(24px, 1.5vw, 40px)',
               color: accent,
-              marginBottom: 'clamp(8px, 0.5vw, 12px)',
+              marginBottom: 'clamp(4px, 0.3vw, 8px)',
+              lineHeight: 1,
             }}
           >
             FIFA World Cup 2026
           </h2>
           <p
             style={{
-              fontSize: 'clamp(14px, 0.9vw, 22px)',
+              fontSize: 'clamp(12px, 0.8vw, 18px)',
               color: 'rgba(255,255,255,0.7)',
             }}
           >
@@ -990,24 +991,24 @@ function PromoPanel({
         </div>
 
         {/* Countdown */}
-        <div className="text-center">
+        <div className="text-right">
           <p
             style={{
-              fontSize: 'clamp(12px, 0.8vw, 18px)',
+              fontSize: 'clamp(10px, 0.7vw, 14px)',
               color: 'rgba(255,255,255,0.6)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
-              marginBottom: 'clamp(8px, 0.5vw, 12px)',
+              marginBottom: 'clamp(4px, 0.3vw, 6px)',
             }}
           >
             First match in
           </p>
-          <div className="flex gap-[clamp(12px, 0.8vw, 20px)]">
+          <div className="flex gap-[clamp(8px, 0.5vw, 12px)] justify-end">
             <div style={{ textAlign: 'center' }}>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(28px, 1.8vw, 48px)',
+                  fontSize: 'clamp(20px, 1.3vw, 32px)',
                   color: accent,
                   lineHeight: 1,
                 }}
@@ -1016,19 +1017,19 @@ function PromoPanel({
               </p>
               <p
                 style={{
-                  fontSize: 'clamp(10px, 0.7vw, 14px)',
+                  fontSize: 'clamp(9px, 0.6vw, 12px)',
                   color: 'rgba(255,255,255,0.6)',
-                  marginTop: 'clamp(4px, 0.3vw, 6px)',
+                  marginTop: 'clamp(2px, 0.2vw, 4px)',
                 }}
               >
-                days
+                d
               </p>
             </div>
             <div style={{ textAlign: 'center' }}>
               <p
                 className="font-heading font-bold"
                 style={{
-                  fontSize: 'clamp(28px, 1.8vw, 48px)',
+                  fontSize: 'clamp(20px, 1.3vw, 32px)',
                   color: accent,
                   lineHeight: 1,
                 }}
@@ -1037,12 +1038,12 @@ function PromoPanel({
               </p>
               <p
                 style={{
-                  fontSize: 'clamp(10px, 0.7vw, 14px)',
+                  fontSize: 'clamp(9px, 0.6vw, 12px)',
                   color: 'rgba(255,255,255,0.6)',
-                  marginTop: 'clamp(4px, 0.3vw, 6px)',
+                  marginTop: 'clamp(2px, 0.2vw, 4px)',
                 }}
               >
-                hrs
+                h
               </p>
             </div>
           </div>
@@ -1050,7 +1051,7 @@ function PromoPanel({
       </div>
 
       {/* Main content grid */}
-      <div className="flex-1 grid grid-cols-3 gap-[clamp(16px,1vw,24px)] overflow-hidden">
+      <div className="flex-1 grid grid-cols-3 gap-[clamp(12px,0.8vw,16px)] overflow-hidden min-h-0">
         {/* Participants list */}
         <div
           style={{
