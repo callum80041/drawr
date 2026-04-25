@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Determine signup method: use provided value, or auto-detect
-  const validMethods = ['name', 'email', 'google', 'twitter']
+  const validMethods = ['name', 'email', 'google', 'x']
   let signupMethod = providedMethod && validMethods.includes(providedMethod) ? providedMethod : (email?.trim() ? 'email' : 'name')
 
   // Email is optional — but if provided it must be a valid format

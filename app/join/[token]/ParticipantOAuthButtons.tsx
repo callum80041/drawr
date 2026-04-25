@@ -10,10 +10,10 @@ interface ParticipantOAuthButtonsProps {
 }
 
 export function ParticipantOAuthButtons({ token, onSuccess, onError }: ParticipantOAuthButtonsProps) {
-  const [loading, setLoading] = useState<'google' | 'twitter' | null>(null)
+  const [loading, setLoading] = useState<'google' | 'x' | null>(null)
   const supabase = createClient()
 
-  async function handleOAuth(provider: 'google' | 'twitter') {
+  async function handleOAuth(provider: 'google' | 'x') {
     setLoading(provider)
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -64,14 +64,14 @@ export function ParticipantOAuthButtons({ token, onSuccess, onError }: Participa
 
         <button
           type="button"
-          onClick={() => handleOAuth('twitter')}
+          onClick={() => handleOAuth('x')}
           disabled={loading !== null}
           className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch font-medium text-sm hover:bg-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.514l-5.106-6.693-5.828 6.693h-3.308l7.725-8.835L.46 2.25h6.734l4.823 6.38 5.227-6.38zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
-          {loading === 'twitter' ? 'Signing in…' : 'X'}
+          {loading === 'x' ? 'Signing in…' : 'X'}
         </button>
       </div>
     </>

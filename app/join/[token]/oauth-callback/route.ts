@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       email,
       name,
       provider,
-      signup_method: provider === 'google' ? 'google' : 'twitter',
+      signup_method: provider === 'google' ? 'google' : 'x',
     })
 
     return NextResponse.redirect(`${origin}/join/${token}?${params.toString()}`)
