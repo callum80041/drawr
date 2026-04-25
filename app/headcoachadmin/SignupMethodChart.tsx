@@ -1,6 +1,6 @@
 'use client'
 
-interface SignupData {
+export interface SignupData {
   date: string
   name: number
   email: number
