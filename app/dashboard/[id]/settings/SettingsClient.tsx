@@ -19,6 +19,9 @@ interface Props {
   initialPrizes: PrizeRow[]
   drawDone: boolean
   status: string
+  isPro: boolean
+  initialCustomSlug: string | null
+  initialLogoUrl: string | null
 }
 
 export function SettingsClient({
@@ -31,6 +34,9 @@ export function SettingsClient({
   initialPrizes,
   drawDone,
   status,
+  isPro,
+  initialCustomSlug,
+  initialLogoUrl,
 }: Props) {
   const router = useRouter()
   const supabase = createClient()
@@ -77,6 +83,48 @@ export function SettingsClient({
     router.refresh()
   }
 
+  // ── Logo ──────────────────────────────────────────────────────────────────
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoUploadError, setLogoUploadError] = useState('')
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploadError('')
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) { setLogoUploadError('Please upload a PNG, JPG, or WebP image.'); return }
+    if (file.size > 2 * 1024 * 1024) { setLogoUploadError('Logo must be under 2 MB.'); return }
+
+    setLogoUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = `${sweepstakeId}/logo.${ext}`
+
+    if (logoUrl) {
+      const oldPath = logoUrl.split('/sweepstake-logos/')[1]
+      if (oldPath) await supabase.storage.from('sweepstake-logos').remove([oldPath])
+    }
+
+    const { error: uploadErr } = await supabase.storage.from('sweepstake-logos').upload(path, file, { upsert: true })
+    if (uploadErr) { setLogoUploadError(uploadErr.message); setLogoUploading(false); return }
+
+    const { data: { publicUrl } } = supabase.storage.from('sweepstake-logos').getPublicUrl(path)
+    await supabase.from('sweepstakes').update({ logo_url: publicUrl }).eq('id', sweepstakeId)
+    setLogoUrl(publicUrl)
+    setLogoUploading(false)
+    router.refresh()
+  }
+
+  async function handleRemoveLogo() {
+    if (!logoUrl) return
+    const oldPath = logoUrl.split('/sweepstake-logos/')[1]
+    if (oldPath) await supabase.storage.from('sweepstake-logos').remove([oldPath])
+    await supabase.from('sweepstakes').update({ logo_url: null }).eq('id', sweepstakeId)
+    setLogoUrl(null)
+    router.refresh()
+  }
+
   // ── Basic settings ───────────────────────────────────────────────────────
   const [name, setName] = useState(initialName)
   const [entryFee, setEntryFee] = useState(initialEntryFee > 0 ? String(initialEntryFee) : '')
@@ -119,6 +167,62 @@ export function SettingsClient({
     setSavingDraw(false)
     if (error) { setSaveErrorDraw(error.message) } else {
       setSavedDraw(true); router.refresh(); setTimeout(() => setSavedDraw(false), 3000)
+    }
+  }
+
+  // ── Custom slug ─────────────────────────────────────────────────────────
+  const [customSlug, setCustomSlug] = useState(initialCustomSlug ?? '')
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null)
+  const [checkingSlug, setCheckingSlug] = useState(false)
+  const [savingSlug, setSavingSlug] = useState(false)
+  const [savedSlug, setSavedSlug] = useState(false)
+  const [saveErrorSlug, setSaveErrorSlug] = useState('')
+  const [slugCheckError, setSlugCheckError] = useState('')
+
+  const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/
+
+  async function handleCheckSlug(slug: string) {
+    if (!slug.trim()) { setSlugAvailable(null); setSlugCheckError(''); return }
+    if (!SLUG_REGEX.test(slug)) {
+      setSlugAvailable(false)
+      setSlugCheckError('Invalid format. Use 3–40 lowercase letters, numbers, and hyphens only.')
+      return
+    }
+    setCheckingSlug(true)
+    setSlugCheckError('')
+    try {
+      const res = await fetch(`/api/dashboard/${sweepstakeId}/slug/check?slug=${slug}`)
+      const data = await res.json()
+      setSlugAvailable(data.available)
+      if (!data.available) setSlugCheckError(data.reason || 'Not available')
+    } catch {
+      setSlugAvailable(false)
+      setSlugCheckError('Error checking availability')
+    }
+    setCheckingSlug(false)
+  }
+
+  async function handleSaveSlug(e: React.FormEvent) {
+    e.preventDefault()
+    const slug = customSlug.trim()
+    if (!slug) {
+      setSaveErrorSlug('Slug cannot be empty')
+      return
+    }
+    if (!slugAvailable) {
+      setSaveErrorSlug('Please choose an available slug')
+      return
+    }
+    setSavingSlug(true)
+    setSavedSlug(false)
+    setSaveErrorSlug('')
+    const { error } = await supabase
+      .from('sweepstakes')
+      .update({ custom_slug: slug })
+      .eq('id', sweepstakeId)
+    setSavingSlug(false)
+    if (error) { setSaveErrorSlug(error.message) } else {
+      setSavedSlug(true); router.refresh(); setTimeout(() => setSavedSlug(false), 3000)
     }
   }
 
@@ -218,6 +322,61 @@ export function SettingsClient({
           {saveErrorBasic && <span className="text-sm text-red-500">{saveErrorBasic}</span>}
         </div>
       </form>
+
+      {/* ── Custom URL ── */}
+      <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
+        <div className="absolute -top-2 -right-2">
+          <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+            Coming soon
+          </span>
+        </div>
+        <div className="p-6">
+          <label htmlFor="s-slug" className="block text-sm font-medium text-pitch mb-1">Custom leaderboard URL</label>
+          <p className="text-xs text-mid mb-4">Create a friendly URL for your leaderboard (e.g. my-office-cup).</p>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                id="s-slug"
+                type="text"
+                disabled
+                placeholder="my-office-cup"
+                className="flex-1 px-3.5 py-2.5 rounded-lg border border-[#D1D9D5] text-pitch placeholder:text-mid focus:outline-none focus:ring-2 focus:ring-grass focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="p-6 flex items-center gap-4">
+          <button
+            type="button"
+            disabled
+            className="bg-lime text-pitch font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-[#b8e03d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Save URL
+          </button>
+        </div>
+      </div>
+
+      {/* ── Logo ── */}
+      <div className="relative bg-white rounded-xl border border-[#E5EDEA] divide-y divide-[#E5EDEA] opacity-60">
+        <div className="absolute -top-2 -right-2">
+          <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+            Coming soon
+          </span>
+        </div>
+        <div className="p-6">
+          <p className="text-sm font-medium text-pitch mb-1">Leaderboard logo <span className="text-mid font-normal">(optional)</span></p>
+          <p className="text-xs text-mid mb-4">A branded logo that appears at the top of your leaderboard. PNG, JPG or WebP, max 2 MB. Recommended: 200px wide (height adjusts automatically).</p>
+          <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D1D9D5] rounded-xl px-6 py-10 cursor-not-allowed opacity-50">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-mid">
+              <path d="M6 22l6-8 5 6 3-4 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+              <circle cx="21" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+            <p className="text-sm text-mid">Click to upload a logo</p>
+            <input type="file" disabled className="hidden" />
+          </label>
+        </div>
+      </div>
 
       {/* ── Prizes ── */}
       <PrizesSection sweepstakeId={sweepstakeId} initialPrizes={initialPrizes} />

@@ -16,7 +16,7 @@ export default async function LeaderboardPage({ params }: Props) {
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
     .select('id, status, sweepstake_type')
-    .eq('share_token', token)
+    .or(`share_token.eq.${token},custom_slug.eq.${token}`)
     .single()
 
   if (!sweepstake) notFound()

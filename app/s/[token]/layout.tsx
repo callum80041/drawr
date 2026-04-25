@@ -2,9 +2,11 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { PublicTabs } from '@/components/participant/PublicTabs'
 import { DemoBar } from '@/components/participant/DemoBar'
+import { LeaderboardWrapper } from '@/components/leaderboard/LeaderboardWrapper'
 
 const DEMO_TOKENS = new Set(['demo2026', 'demoeurovision'])
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
@@ -19,8 +21,8 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
   const supabase = await createClient()
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('name, tournament_name')
-    .eq('share_token', token)
+    .select('name, tournament_name, is_pro, pro_expires_at')
+    .or(`share_token.eq.${token},custom_slug.eq.${token}`)
     .single()
 
   if (!sweepstake) return {}
@@ -56,14 +58,15 @@ export default async function PublicLayout({ children, params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, tournament_name, share_token, image_url, sweepstake_type')
-    .eq('share_token', token)
+    .select('id, name, status, tournament_name, share_token, image_url, sweepstake_type, is_pro, pro_expires_at, logo_url')
+    .or(`share_token.eq.${token},custom_slug.eq.${token}`)
     .single()
 
   if (!sweepstake) notFound()
 
   const isDemo = DEMO_TOKENS.has(sweepstake.share_token)
   const isEurovision = sweepstake.sweepstake_type === 'eurovision'
+  const isPro = isSweepstakePro(sweepstake)
 
   // Eurovision brand colours
   const BG      = isEurovision ? '#040241' : undefined
@@ -124,6 +127,13 @@ export default async function PublicLayout({ children, params }: Props) {
             </span>
           </div>
 
+          {/* Tournament/organiser logo */}
+          {sweepstake.logo_url && (
+            <div className="mb-4">
+              <img src={sweepstake.logo_url} alt="Logo" style={{ maxHeight: 48, maxWidth: 200, width: 'auto', height: 'auto' }} />
+            </div>
+          )}
+
           {/* Eurovision: logo above title */}
           {isEurovision && (
             <div className="mb-3">
@@ -140,17 +150,21 @@ export default async function PublicLayout({ children, params }: Props) {
       </header>
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-8 py-6">
-        {children}
+        <LeaderboardWrapper token={token} sweepstakeName={sweepstake.name} isPro={isPro} isEurovision={isEurovision}>
+          {children}
+        </LeaderboardWrapper>
       </main>
 
       <footer
         className="text-center py-6 px-4 space-y-1.5"
         style={isEurovision ? { background: '#040241', borderTop: '1px solid rgba(255,255,255,0.08)' } : undefined}
       >
-        <p className="text-xs" style={isEurovision ? { color: 'rgba(255,255,255,0.4)' } : { color: undefined }} >
-          Powered by{' '}
-          <Link href="/" className="font-medium hover:underline" style={isEurovision ? { color: '#F10F59' } : { color: undefined }}>playdrawr</Link>
-        </p>
+        {!isPro && (
+          <p className="text-xs" style={isEurovision ? { color: 'rgba(255,255,255,0.4)' } : { color: undefined }} >
+            Powered by{' '}
+            <Link href="/" className="font-medium hover:underline" style={isEurovision ? { color: '#F10F59' } : { color: undefined }}>playdrawr</Link>
+          </p>
+        )}
         <p className="text-xs" style={isEurovision ? { color: 'rgba(255,255,255,0.25)' } : { color: undefined }}>
           Sweepstake tool for entertainment purposes only. No gambling services provided.
         </p>

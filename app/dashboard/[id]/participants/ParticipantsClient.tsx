@@ -9,6 +9,7 @@ import { ShareButtons } from '@/components/dashboard/ShareButtons'
 import { type CurrencyCode } from '@/lib/constants/currencies'
 
 const FREE_PLAN_CAP = 48
+const PRO_PLAN_CAP = 200
 
 interface Participant {
   id: string
@@ -22,7 +23,7 @@ interface Props {
   sweepstakeName: string
   joinUrl: string
   isEurovision?: boolean
-  plan: string
+  isPro: boolean
   entryFee: number
   currency?: CurrencyCode
   drawDone: boolean
@@ -32,7 +33,7 @@ interface Props {
   organiserEmail: string
 }
 
-export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, plan, entryFee, currency = 'GBP', drawDone, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
+export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEurovision = false, isPro, entryFee, currency = 'GBP', drawDone, initialParticipants, initialWaitlist, organiserName, organiserEmail }: Props) {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants)
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(initialWaitlist)
@@ -44,7 +45,7 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
   const [removeOption, setRemoveOption] = useState<'return-teams' | null>('return-teams')
   const [removing, setRemoving] = useState(false)
 
-  const cap = plan === 'free' ? FREE_PLAN_CAP : Infinity
+  const cap = isPro ? PRO_PLAN_CAP : FREE_PLAN_CAP
   const atCap = participants.length >= cap
   const paidCount = participants.filter(p => p.paid).length
 
@@ -74,7 +75,10 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
     setError('')
 
     if (atCap) {
-      setError(`Free plan is limited to ${FREE_PLAN_CAP} participants. Upgrade to Pro for unlimited.`)
+      const message = isPro
+        ? `You've reached the ${PRO_PLAN_CAP}-participant limit.`
+        : `You've reached the ${FREE_PLAN_CAP}-participant limit. Upgrade to Pro for up to ${PRO_PLAN_CAP} participants.`
+      setError(message)
       return
     }
 
@@ -246,7 +250,9 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
 
           {atCap && (
             <p className="text-xs text-mid bg-light rounded-lg px-3 py-2">
-              Free plan limit reached ({FREE_PLAN_CAP} participants).
+              {isPro
+                ? `Pro plan limit reached (${PRO_PLAN_CAP} participants).`
+                : `Free plan limit reached (${FREE_PLAN_CAP} participants). Upgrade to Pro for up to ${PRO_PLAN_CAP} participants.`}
             </p>
           )}
           {error && (
@@ -262,10 +268,24 @@ export function ParticipantsClient({ sweepstakeId, sweepstakeName, joinUrl, isEu
             <h2 className="font-heading font-bold text-pitch tracking-tight">
               Participants
               <span className="ml-2 text-sm font-normal text-mid font-body">
-                {participants.length}{plan === 'free' ? `/${FREE_PLAN_CAP}` : ''}
+                {participants.length}{!isPro ? `/${FREE_PLAN_CAP}` : `/${PRO_PLAN_CAP}`}
               </span>
             </h2>
             <div className="flex items-center gap-3">
+              {isPro && (
+                <div className="relative inline-block">
+                  <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full absolute -top-2 -right-2 z-10">
+                    Coming soon
+                  </span>
+                  <a
+                    href={`/api/dashboard/${sweepstakeId}/export/participants`}
+                    download
+                    className="text-xs text-grass font-medium hover:underline opacity-60 pointer-events-none cursor-not-allowed"
+                  >
+                    Download CSV
+                  </a>
+                </div>
+              )}
               {entryFee > 0 && unpaidWithEmail > 0 && (
                 <button
                   type="button"

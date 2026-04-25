@@ -27,6 +27,8 @@ export default function JoinPage({ params }: Props) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [successData, setSuccessData] = useState<{ name: string; sweepstakeName: string; entryFee: number; currency: CurrencyCode; waitlisted: boolean } | null>(null)
+  const [isPro, setIsPro] = useState(false)
+  const [notifyEnabled, setNotifyEnabled] = useState(true)
 
   const joinUrl = `${APP_URL}/join/${token}`
 
@@ -45,6 +47,7 @@ export default function JoinPage({ params }: Props) {
           email: email.trim(),
           website: honeypot,
           signup_method: signupMethod,
+          notify_enabled: notifyEnabled,
         }),
       })
       const data = await res.json()
@@ -78,6 +81,21 @@ export default function JoinPage({ params }: Props) {
     setErrorMsg(error)
     setStatus('error')
   }
+
+  // Fetch sweepstake to determine Pro status
+  useEffect(() => {
+    async function fetchSweepstake() {
+      try {
+        const res = await fetch(`/api/sweepstake-public?token=${token}`)
+        if (!res.ok) return
+        const data = await res.json()
+        setIsPro(data.isPro ?? false)
+      } catch {
+        // Fail silently — default to showing badge
+      }
+    }
+    if (token) fetchSweepstake()
+  }, [token])
 
   // Handle OAuth callback — pre-fill form and auto-submit
   useEffect(() => {
@@ -272,6 +290,23 @@ export default function JoinPage({ params }: Props) {
                 </p>
               </div>
 
+              {/* Notifications — Pro only */}
+              {isPro && (
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-3">
+                  <p className="text-xs font-semibold text-amber-900 mb-2">⚡ Pro feature coming soon</p>
+                  <label className="flex items-start gap-3 opacity-50 cursor-not-allowed">
+                    <input
+                      type="checkbox"
+                      disabled
+                      className="mt-0.5 w-4 h-4 rounded border-[#D1D9D5] accent-[#1A2E22] shrink-0 cursor-not-allowed"
+                    />
+                    <span className="text-xs text-mid leading-relaxed">
+                      Notify me by email during the tournament — when my team plays, scores, or if the leader changes.
+                    </span>
+                  </label>
+                </div>
+              )}
+
               {/* 18+ confirmation */}
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input
@@ -357,12 +392,14 @@ export default function JoinPage({ params }: Props) {
           </div>
         </div>
 
-        <p className="text-center text-xs text-mid mt-4">
-          Powered by{' '}
-          <Link href="/" className="text-grass hover:underline font-medium">
-            playdrawr.co.uk
-          </Link>
-        </p>
+        {!isPro && (
+          <p className="text-center text-xs text-mid mt-4">
+            Powered by{' '}
+            <Link href="/" className="text-grass hover:underline font-medium">
+              playdrawr.co.uk
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   )

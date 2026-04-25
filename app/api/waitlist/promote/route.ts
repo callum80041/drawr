@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { sendEmail } from '@/lib/email'
 import { waitlistPromotedEmailHtml } from '@/lib/email/templates/waitlist-promoted'
 
 const FREE_PLAN_CAP = 48
+const PRO_PLAN_CAP = 200
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, entry_fee, plan, sweepstake_type')
+    .select('id, name, share_token, entry_fee, plan, sweepstake_type, is_pro, pro_expires_at')
     .eq('id', sweepstakeId)
     .eq('organiser_id', organiser.id)
     .single()
@@ -45,15 +47,14 @@ export async function POST(req: NextRequest) {
   if (!entry) return NextResponse.json({ error: 'Waitlist entry not found' }, { status: 404 })
 
   // Guard: re-check capacity
-  if (sweepstake.plan === 'free') {
-    const { count } = await service
-      .from('participants')
-      .select('*', { count: 'exact', head: true })
-      .eq('sweepstake_id', sweepstakeId)
+  const cap = isSweepstakePro(sweepstake) ? PRO_PLAN_CAP : FREE_PLAN_CAP
+  const { count } = await service
+    .from('participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('sweepstake_id', sweepstakeId)
 
-    if ((count ?? 0) >= FREE_PLAN_CAP) {
-      return NextResponse.json({ error: 'Sweepstake is still full' }, { status: 400 })
-    }
+  if ((count ?? 0) >= cap) {
+    return NextResponse.json({ error: 'Sweepstake is full' }, { status: 400 })
   }
 
   // Insert into participants

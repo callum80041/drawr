@@ -30,6 +30,10 @@ export type Database = {
           share_token: string
           assignment_mode: 'random' | 'auto' | 'manual'
           draw_completed_at: string | null
+          is_pro: boolean
+          pro_expires_at: string | null
+          custom_slug: string | null
+          logo_url: string | null
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['sweepstakes']['Row'], 'id' | 'created_at' | 'share_token'> & {
@@ -47,6 +51,7 @@ export type Database = {
           email: string | null
           paid: boolean
           paid_at: string | null
+          notify_enabled: boolean
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['participants']['Row'], 'id' | 'created_at'> & {

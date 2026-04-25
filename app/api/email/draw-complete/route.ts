@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { sendEmail } from '@/lib/email'
 import { drawCompleteEmailHtml } from '@/lib/email/templates/draw-complete'
 import { drawCompleteEurovisionEmailHtml } from '@/lib/email/templates/draw-complete-eurovision'
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
   // Verify ownership
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, share_token, organiser_id, sweepstake_type, tournament_id')
+    .select('id, name, share_token, organiser_id, sweepstake_type, tournament_id, is_pro, pro_expires_at, logo_url')
     .eq('id', sweepstakeId)
     .eq('organiser_id', organiser.id)
     .single()
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
 
   const isEurovision = sweepstake.sweepstake_type === 'eurovision'
   const tournamentId = sweepstake.tournament_id ?? 1
+  const isPro = isSweepstakePro(sweepstake)
 
   // Fetch participants with emails + their assignments
   const [{ data: participants }, { data: assignments }, { data: teams }] = await Promise.all([
@@ -91,6 +93,8 @@ export async function POST(req: NextRequest) {
             sweepstakeName: sweepstake.name,
             shareToken: sweepstake.share_token,
             countries: myCountries,
+            isPro,
+            logoUrl: sweepstake.logo_url,
           }),
         })
       } else {
@@ -111,6 +115,8 @@ export async function POST(req: NextRequest) {
             sweepstakeName: sweepstake.name,
             shareToken: sweepstake.share_token,
             teams: myTeams,
+            isPro,
+            logoUrl: sweepstake.logo_url,
           }),
         })
       }

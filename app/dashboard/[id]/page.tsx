@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { ShareButtons } from '@/components/dashboard/ShareButtons'
 import { EntryFeeEditor } from '@/components/dashboard/EntryFeeEditor'
 
@@ -36,6 +37,8 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
     .single()
 
   if (!sweepstake) notFound()
+
+  const isPro = isSweepstakePro(sweepstake)
 
   const [{ count: participantCount }, { count: paidCount }, { count: assignmentCount }] =
     await Promise.all([
@@ -226,7 +229,7 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
 
       {/* Links — shown only when participants exist (otherwise the top banner covers this) */}
       {hasParticipants && (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className={`grid gap-4 ${isPro ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
           {/* Leaderboard link */}
           <div className="bg-white rounded-xl border border-[#E5EDEA] p-5">
             <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">Leaderboard link</h2>
@@ -270,6 +273,45 @@ export default async function SweepstakeOverviewPage({ params, searchParams }: P
               size="sm"
             />
           </div>
+
+          {/* TV Mode link — Pro only */}
+          {isPro && (
+            <div className="relative bg-white rounded-xl border border-[#E5EDEA] p-5 opacity-60">
+              <div className="absolute -top-2 -right-2">
+                <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+                  Coming soon
+                </span>
+              </div>
+              <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">TV mode</h2>
+              <p className="text-sm text-mid mb-3">Full-screen display for break rooms or screens.</p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pointer-events-none">
+                <code className="flex-1 bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+                  {appUrl}/tv/{sweepstake.custom_slug || sweepstake.share_token}
+                </code>
+                <div
+                  className={`sm:shrink-0 ${accentBg} ${accentText} text-xs font-medium px-3 py-2 rounded-lg text-center cursor-not-allowed`}
+                >
+                  Open →
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Embed leaderboard — Pro feature coming soon */}
+          {isPro && (
+            <div className="relative bg-white rounded-xl border border-[#E5EDEA] p-5 opacity-60">
+              <div className="absolute -top-2 -right-2">
+                <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+                  Coming soon
+                </span>
+              </div>
+              <h2 className="font-heading font-bold text-pitch tracking-tight mb-1">Embed leaderboard</h2>
+              <p className="text-sm text-mid mb-3">Embed the leaderboard on your website or intranet.</p>
+              <code className="block bg-light rounded-lg px-3 py-2 text-xs text-pitch font-mono truncate">
+                &lt;iframe src="..." /&gt;
+              </code>
+            </div>
+          )}
         </div>
       )}
 

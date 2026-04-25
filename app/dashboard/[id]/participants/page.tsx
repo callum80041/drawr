@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { ParticipantsClient } from './ParticipantsClient'
 
 interface Props {
@@ -23,7 +24,7 @@ export default async function ParticipantsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, plan, entry_fee, currency, organiser_id, share_token, sweepstake_type')
+    .select('id, name, plan, entry_fee, currency, organiser_id, share_token, sweepstake_type, is_pro, pro_expires_at')
     .eq('id', id)
     .single()
 
@@ -56,7 +57,7 @@ export default async function ParticipantsPage({ params }: Props) {
       sweepstakeName={sweepstake.name}
       joinUrl={`${appUrl}/join/${sweepstake.share_token}`}
       isEurovision={sweepstake.sweepstake_type === 'eurovision'}
-      plan={sweepstake.plan}
+      isPro={isSweepstakePro(sweepstake)}
       entryFee={Number(sweepstake.entry_fee)}
       currency={sweepstake.currency ?? 'GBP'}
       drawDone={(assignmentCount ?? 0) > 0}

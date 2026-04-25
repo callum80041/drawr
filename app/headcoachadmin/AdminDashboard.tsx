@@ -263,6 +263,13 @@ export function AdminDashboard({ stats, breakdownStats, recentOrganisers, organi
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
 
+        {/* Cron job disabled note */}
+        <div className="mb-8 bg-amber-50 border border-amber-200 rounded-lg px-5 py-4">
+          <p className="text-sm text-amber-900">
+            <strong>⚠️ Cron job disabled:</strong> Email notifications are not being sent. Re-enable in <code className="bg-white px-1.5 py-0.5 rounded">vercel.json</code> when off Hobby plan.
+          </p>
+        </div>
+
         {/* Quick links */}
         <div className="flex gap-3 mb-8">
           <a href="/headcoachadmin/lottery" className="text-sm font-medium bg-white border border-[#E5EDEA] rounded-lg px-4 py-2 text-pitch hover:bg-[#F2F7F5] transition">

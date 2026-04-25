@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { sendEmail } from '@/lib/email'
 import { participantJoinedEmailHtml } from '@/lib/email/templates/participant-joined'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
+const FREE_PLAN_CAP = 48
+const PRO_PLAN_CAP = 200
 
 export async function POST(req: NextRequest) {
-  const { token, name, email, website, signup_method: providedMethod } = await req.json()
+  const { token, name, email, website, signup_method: providedMethod, notify_enabled: providedNotifyEnabled } = await req.json()
 
   // Honeypot — bots fill this in, humans don't
   if (website) {
@@ -37,7 +40,7 @@ export async function POST(req: NextRequest) {
   // Look up sweepstake by share token (public_read RLS allows this)
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, currency, plan, organiser_id, sweepstake_type')
+    .select('id, name, status, entry_fee, currency, plan, organiser_id, sweepstake_type, is_pro, pro_expires_at')
     .eq('share_token', token)
     .single()
 
@@ -62,47 +65,56 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Free plan cap — if full, add to waitlist instead of blocking
-  if (sweepstake.plan === 'free') {
-    const { count } = await supabase
-      .from('participants')
+  // Participant cap check
+  const isPro = isSweepstakePro(sweepstake)
+  const cap = isPro ? PRO_PLAN_CAP : FREE_PLAN_CAP
+  const { count } = await supabase
+    .from('participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('sweepstake_id', sweepstake.id)
+
+  // Determine notify_enabled: only for Pro sweepstakes with email provided
+  const notifyEnabled = isPro && email?.trim() ? (providedNotifyEnabled !== false) : false
+
+  if ((count ?? 0) >= cap) {
+    // Pro: reject (hard cap)
+    if (isPro) {
+      return NextResponse.json({ error: 'Sweepstake is full' }, { status: 429 })
+    }
+
+    // Free: add to waitlist
+    // Check not already on waitlist
+    const { count: wCount } = await supabase
+      .from('waitlist')
       .select('*', { count: 'exact', head: true })
       .eq('sweepstake_id', sweepstake.id)
+      .eq('email', email.trim().toLowerCase())
 
-    if ((count ?? 0) >= 48) {
-      // Check not already on waitlist
-      const { count: wCount } = await supabase
-        .from('waitlist')
-        .select('*', { count: 'exact', head: true })
-        .eq('sweepstake_id', sweepstake.id)
-        .eq('email', email.trim().toLowerCase())
-
-      if ((wCount ?? 0) > 0) {
-        return NextResponse.json({ error: 'You\'re already on the reserve list for this sweepstake.' }, { status: 400 })
-      }
-
-      const { data: waitlistEntry, error: wErr } = await service
-        .from('waitlist')
-        .insert({
-          sweepstake_id: sweepstake.id,
-          name: name.trim(),
-          email: email?.trim() ? email.trim().toLowerCase() : null,
-          signup_method: signupMethod,
-        })
-        .select('id, name, email')
-        .single()
-
-      if (wErr || !waitlistEntry) {
-        return NextResponse.json({ error: 'Failed to join reserve list. Please try again.' }, { status: 500 })
-      }
-
-      return NextResponse.json({
-        ok: true,
-        waitlisted: true,
-        participant: { name: waitlistEntry.name },
-        sweepstake: { name: sweepstake.name, entryFee: Number(sweepstake.entry_fee ?? 0), currency: sweepstake.currency ?? 'GBP' },
-      })
+    if ((wCount ?? 0) > 0) {
+      return NextResponse.json({ error: 'You\'re already on the reserve list for this sweepstake.' }, { status: 400 })
     }
+
+    const { data: waitlistEntry, error: wErr } = await service
+      .from('waitlist')
+      .insert({
+        sweepstake_id: sweepstake.id,
+        name: name.trim(),
+        email: email?.trim() ? email.trim().toLowerCase() : null,
+        signup_method: signupMethod,
+      })
+      .select('id, name, email')
+      .single()
+
+    if (wErr || !waitlistEntry) {
+      return NextResponse.json({ error: 'Failed to join reserve list. Please try again.' }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      ok: true,
+      waitlisted: true,
+      participant: { name: waitlistEntry.name },
+      sweepstake: { name: sweepstake.name, entryFee: Number(sweepstake.entry_fee ?? 0), currency: sweepstake.currency ?? 'GBP' },
+    })
   }
 
   // INSERT via service client — anon role has no INSERT policy on participants
@@ -114,6 +126,7 @@ export async function POST(req: NextRequest) {
       email: email?.trim() ? email.trim().toLowerCase() : null,
       paid: false,
       signup_method: signupMethod,
+      notify_enabled: notifyEnabled,
     })
     .select('id, name, email')
     .single()

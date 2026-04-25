@@ -12,11 +12,15 @@ export function drawCompleteEurovisionEmailHtml({
   sweepstakeName,
   shareToken,
   countries,
+  isPro = false,
+  logoUrl = null,
 }: {
   participantName: string
   sweepstakeName: string
   shareToken: string
   countries: CountryAssignment[]
+  isPro?: boolean
+  logoUrl?: string | null
 }) {
   const link = `${APP_URL}/s/${shareToken}`
   const primary = countries[0]
@@ -49,6 +53,14 @@ export function drawCompleteEurovisionEmailHtml({
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #CFC3F0;overflow:hidden;">
       ${emailHeaderEurovision}
+
+      <!-- Organiser logo -->
+      ${logoUrl ? `
+      <tr>
+        <td style="padding:16px 32px 0;text-align:center;">
+          <img src="${logoUrl}" alt="Logo" style="max-height:48px;max-width:200px;height:auto;width:auto;" />
+        </td>
+      </tr>` : ''}
 
       <!-- Hero country -->
       <tr>
@@ -108,6 +120,11 @@ export function drawCompleteEurovisionEmailHtml({
             No account needed — just bookmark the link above.<br/>
             May your country serve up three minutes of pure drama.
           </p>
+
+          ${!isPro ? `
+          <p style="margin:16px 0 0;font-size:11px;color:#8EA899;text-align:center;">
+            Powered by <a href="${APP_URL}" style="color:#8EA899;text-decoration:none;font-weight:600;border-bottom:1px solid #8EA899;">playdrawr</a>
+          </p>` : ''}
         </td>
       </tr>
 

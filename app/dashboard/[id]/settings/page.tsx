@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { SettingsClient } from './SettingsClient'
 
 interface Props {
@@ -23,7 +24,7 @@ export default async function SettingsPage({ params }: Props) {
 
   const { data: sweepstake } = await supabase
     .from('sweepstakes')
-    .select('id, name, status, entry_fee, assignment_mode, image_url, teams_per_participant')
+    .select('id, name, status, entry_fee, assignment_mode, image_url, teams_per_participant, is_pro, pro_expires_at, custom_slug, logo_url')
     .eq('id', id)
     .eq('organiser_id', organiser.id)
     .single()
@@ -52,6 +53,9 @@ export default async function SettingsPage({ params }: Props) {
       initialPrizes={prizes ?? []}
       drawDone={(assignmentCount ?? 0) > 0}
       status={sweepstake.status}
+      isPro={isSweepstakePro(sweepstake)}
+      initialCustomSlug={sweepstake.custom_slug ?? null}
+      initialLogoUrl={sweepstake.logo_url ?? null}
     />
   )
 }

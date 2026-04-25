@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isSweepstakePro } from '@/lib/utils/pro'
 import { SetupBanner } from '@/components/dashboard/SetupBanner'
 
 export default async function DashboardPage() {
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
   const { data: sweepstakes } = organiser
     ? await supabase
         .from('sweepstakes')
-        .select('id, name, status, plan, entry_fee, created_at')
+        .select('id, name, status, plan, entry_fee, is_pro, pro_expires_at, created_at')
         .eq('organiser_id', organiser.id)
         .order('created_at', { ascending: false })
     : { data: [] }
@@ -74,11 +75,9 @@ export default async function DashboardPage() {
                   <p className="text-sm text-mid mt-0.5 capitalize">{s.status}</p>
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                  s.plan === 'free' ? 'bg-light text-mid' :
-                  s.plan === 'pro' ? 'bg-lime/20 text-pitch' :
-                  'bg-gold/20 text-pitch'
+                  isSweepstakePro(s) ? 'bg-lime/20 text-pitch' : 'bg-light text-mid'
                 }`}>
-                  {s.plan}
+                  {isSweepstakePro(s) ? 'Pro' : 'Free'}
                 </span>
               </div>
             </Link>

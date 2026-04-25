@@ -12,11 +12,15 @@ export function drawCompleteEmailHtml({
   sweepstakeName,
   shareToken,
   teams,
+  isPro = false,
+  logoUrl = null,
 }: {
   participantName: string
   sweepstakeName: string
   shareToken: string
   teams: TeamAssignment[]
+  isPro?: boolean
+  logoUrl?: string | null
 }) {
   const link = `${APP_URL}/s/${shareToken}`
   const primaryTeam = teams[0]
@@ -45,6 +49,14 @@ export function drawCompleteEmailHtml({
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid #E5EDEA;overflow:hidden;">
       ${emailHeader}
+
+      <!-- Organiser logo -->
+      ${logoUrl ? `
+      <tr>
+        <td style="padding:16px 32px 0;text-align:center;">
+          <img src="${logoUrl}" alt="Logo" style="max-height:48px;max-width:200px;height:auto;width:auto;" />
+        </td>
+      </tr>` : ''}
 
       <!-- Hero flag -->
       <tr>
@@ -90,6 +102,11 @@ export function drawCompleteEmailHtml({
             Points accumulate as your team progresses through the tournament.<br/>
             No refunds if your team exits in the group stage. You knew the risks.
           </p>
+
+          ${!isPro ? `
+          <p style="margin:16px 0 0;font-size:11px;color:#8EA899;text-align:center;">
+            Powered by <a href="${APP_URL}" style="color:#5A7265;text-decoration:none;font-weight:600;border-bottom:1px solid #5A7265;">playdrawr</a>
+          </p>` : ''}
         </td>
       </tr>
 

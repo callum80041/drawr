@@ -57,6 +57,8 @@ function buildHtml(template: string, version: string, isEurovision: boolean): st
           { name: 'Brazil',    flag: '🇧🇷', group_name: 'Group E' },
           { name: 'Argentina', flag: '🇦🇷', group_name: 'Group F' },
         ],
+        isPro: false,
+        logoUrl: null,
       })
 
     case 'draw-complete-eurovision':
@@ -68,6 +70,8 @@ function buildHtml(template: string, version: string, isEurovision: boolean): st
           { name: 'Sweden',    flag: '🇸🇪', semi_final: null },
           { name: 'Bulgaria',  flag: '🇧🇬', semi_final: 1 },
         ],
+        isPro: false,
+        logoUrl: null,
       })
 
     case 'payment-chase':
