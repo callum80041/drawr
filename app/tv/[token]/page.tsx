@@ -39,6 +39,27 @@ export default async function TVModePage({ params }: Props) {
 
   const isEurovision = sweepstake.sweepstake_type === 'eurovision'
 
+  // Check if draw has been completed
+  const { count: assignmentCount } = await supabase
+    .from('assignments')
+    .select('*', { count: 'exact', head: true })
+    .eq('sweepstake_id', sweepstake.id)
+
+  const drawDone = (assignmentCount ?? 0) > 0
+
+  if (!drawDone) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center" style={{ background: '#0a0f0a' }}>
+        <div className="text-center">
+          <p className="text-2xl font-heading font-bold mb-4" style={{ color: '#fff' }}>Complete your draw first to use TV mode.</p>
+          <a href={`/dashboard/${sweepstake.id}/draw`} className="text-sm" style={{ color: '#8EA899' }}>
+            Go to draw →
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   const { data: participants } = await supabase
     .from('participants')
     .select('id, name')
