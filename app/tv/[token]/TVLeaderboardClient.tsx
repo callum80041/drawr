@@ -942,8 +942,8 @@ function PromoPanel({
         </div>
       </div>
 
-      {/* Main content grid - 3 columns */}
-      <div className="flex-1 grid grid-cols-3 gap-[clamp(12px,0.8vw,20px)] overflow-hidden min-h-0">
+      {/* Main content grid - 2 columns */}
+      <div className="flex-1 grid grid-cols-2 gap-[clamp(12px,0.8vw,20px)] overflow-hidden min-h-0">
         {/* Participants with teams */}
         <div
           style={{
@@ -969,30 +969,30 @@ function PromoPanel({
           >
             {participantCount} Signed Up
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(8px,0.6vw,12px)', flex: 1, minHeight: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(6px,0.5vw,10px)', flex: 1, minHeight: 0 }}>
             {ranked.map(p => {
               const primaryTeam = p.teams.length > 0 ? p.teams[0] : null
               return (
                 <div key={p.id} style={{ textAlign: 'center', minHeight: 0 }}>
                   {primaryTeam && (
                     <div>
-                      <div style={{ fontSize: 'clamp(24px, 1.4vw, 36px)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
+                      <div style={{ fontSize: 'clamp(20px, 1.2vw, 32px)', marginBottom: 'clamp(1px, 0.1vw, 3px)' }}>
                         {primaryTeam.team_flag}
                       </div>
                       <p
                         style={{
-                          fontSize: 'clamp(9px, 0.65vw, 13px)',
+                          fontSize: 'clamp(8px, 0.6vw, 12px)',
                           color: accent,
                           fontWeight: 700,
-                          marginBottom: 'clamp(1px, 0.1vw, 2px)',
-                          lineHeight: 1.1,
+                          marginBottom: '0px',
+                          lineHeight: 1,
                         }}
                       >
                         {primaryTeam.team_name}
                       </p>
                       <p
                         style={{
-                          fontSize: 'clamp(8px, 0.6vw, 12px)',
+                          fontSize: 'clamp(7px, 0.5vw, 11px)',
                           color: 'rgba(255,255,255,0.6)',
                           fontWeight: 400,
                         }}
@@ -1018,7 +1018,7 @@ function PromoPanel({
           </div>
         </div>
 
-        {/* Prizes */}
+        {/* Prizes and QR Code */}
         <div
           style={{
             background: 'rgba(255,255,255,0.05)',
@@ -1027,113 +1027,104 @@ function PromoPanel({
             padding: 'clamp(16px,1vw,24px)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 'clamp(12px,0.8vw,18px)',
+            gap: 'clamp(16px,1vw,24px)',
           }}
         >
-          <p
-            style={{
-              fontSize: 'clamp(12px, 0.9vw, 18px)',
-              color: accent,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}
-          >
-            Prizes
-          </p>
-          <div className="space-y-[clamp(10px,0.7vw,14px)]">
-            <div>
-              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
-                1st
-              </p>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(20px, 1.3vw, 32px)',
-                  color: accent,
-                  lineHeight: 1,
-                }}
-              >
-                £{first}
-              </p>
-            </div>
-            <div>
-              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
-                2nd
-              </p>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(18px, 1.2vw, 28px)',
-                  color: '#C0C0C0',
-                  lineHeight: 1,
-                }}
-              >
-                £{second}
-              </p>
-            </div>
-            <div>
-              <p style={{ fontSize: 'clamp(10px, 0.7vw, 14px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(2px, 0.15vw, 4px)' }}>
-                3rd
-              </p>
-              <p
-                className="font-heading font-bold"
-                style={{
-                  fontSize: 'clamp(18px, 1.2vw, 28px)',
-                  color: '#CD7F32',
-                  lineHeight: 1,
-                }}
-              >
-                £{third}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* QR Code */}
-        <div
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: `2px solid ${accent}33`,
-            borderRadius: 'clamp(12px,0.8vw,20px)',
-            padding: 'clamp(16px,1vw,24px)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'clamp(12px,0.8vw,16px)',
-          }}
-        >
-          <div
-            style={{
-              background: '#fff',
-              padding: 'clamp(12px, 0.8vw, 18px)',
-              borderRadius: 'clamp(8px, 0.6vw, 12px)',
-            }}
-          >
-            <QRCodeSVG value={joinUrl} size={160} level="H" />
-          </div>
-          <div style={{ textAlign: 'center' }}>
+          {/* Prizes */}
+          <div>
             <p
               style={{
-                fontSize: 'clamp(12px, 0.9vw, 18px)',
+                fontSize: 'clamp(11px, 0.8vw, 16px)',
                 color: accent,
                 fontWeight: 700,
-                marginBottom: 'clamp(4px, 0.3vw, 6px)',
+                marginBottom: 'clamp(10px,0.7vw,14px)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
               }}
             >
-              Scan to join
+              Prizes
             </p>
-            <p
+            <div className="space-y-[clamp(8px,0.6vw,12px)]">
+              <div>
+                <p style={{ fontSize: 'clamp(9px, 0.65vw, 13px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(1px, 0.1vw, 3px)' }}>
+                  1st
+                </p>
+                <p
+                  className="font-heading font-bold"
+                  style={{
+                    fontSize: 'clamp(18px, 1.2vw, 28px)',
+                    color: accent,
+                    lineHeight: 1,
+                  }}
+                >
+                  £{first}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: 'clamp(9px, 0.65vw, 13px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(1px, 0.1vw, 3px)' }}>
+                  2nd
+                </p>
+                <p
+                  className="font-heading font-bold"
+                  style={{
+                    fontSize: 'clamp(16px, 1vw, 24px)',
+                    color: '#C0C0C0',
+                    lineHeight: 1,
+                  }}
+                >
+                  £{second}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: 'clamp(9px, 0.65vw, 13px)', color: 'rgba(255,255,255,0.7)', marginBottom: 'clamp(1px, 0.1vw, 3px)' }}>
+                  3rd
+                </p>
+                <p
+                  className="font-heading font-bold"
+                  style={{
+                    fontSize: 'clamp(16px, 1vw, 24px)',
+                    color: '#CD7F32',
+                    lineHeight: 1,
+                  }}
+                >
+                  £{third}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* QR Code */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(10px,0.7vw,14px)' }}>
+            <div
               style={{
-                fontSize: 'clamp(10px, 0.7vw, 14px)',
-                color: 'rgba(255,255,255,0.8)',
-                fontWeight: 500,
+                background: '#fff',
+                padding: 'clamp(10px, 0.7vw, 16px)',
+                borderRadius: 'clamp(8px, 0.6vw, 12px)',
               }}
             >
-              £{entryFee}
-            </p>
+              <QRCodeSVG value={joinUrl} size={140} level="H" />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <p
+                style={{
+                  fontSize: 'clamp(11px, 0.8vw, 16px)',
+                  color: accent,
+                  fontWeight: 700,
+                  marginBottom: 'clamp(2px, 0.15vw, 4px)',
+                }}
+              >
+                Scan to join
+              </p>
+              <p
+                style={{
+                  fontSize: 'clamp(9px, 0.65vw, 13px)',
+                  color: 'rgba(255,255,255,0.8)',
+                  fontWeight: 500,
+                }}
+              >
+                £{entryFee}
+              </p>
+            </div>
           </div>
         </div>
       </div>
