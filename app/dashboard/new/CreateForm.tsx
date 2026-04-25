@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AssignmentModeSelector } from '@/components/dashboard/AssignmentModeSelector'
+import { PrizesSection } from '@/components/dashboard/PrizesSection'
 import { CURRENCIES, CURRENCY_OPTIONS, type CurrencyCode } from '@/lib/constants/currencies'
 
 type Mode = 'random' | 'auto' | 'manual'
@@ -177,28 +178,7 @@ export function CreateForm({ organiserId }: Props) {
       </div>
 
       {/* Prize type */}
-      <div>
-        <label className="block text-sm font-medium text-pitch mb-3">What are you playing for?</label>
-        <div className="grid grid-cols-2 gap-3">
-          {([
-            { value: 'money', icon: '💷', label: 'Money pot', desc: 'Entry fees go into a prize pot.' },
-            { value: 'prizes', icon: '🏆', label: 'Prizes', desc: 'Physical or non-cash prizes.' },
-          ] as { value: PrizeType; icon: string; label: string; desc: string }[]).map(opt => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setPrizeType(opt.value)}
-              className={`text-left p-4 rounded-xl border-2 transition-all ${
-                prizeType === opt.value ? 'border-grass bg-grass/5' : 'border-[#D1D9D5] bg-white hover:border-mid'
-              }`}
-            >
-              <span className="text-2xl mb-2 block">{opt.icon}</span>
-              <p className="text-sm font-medium text-pitch mb-1">{opt.label}</p>
-              <p className="text-xs text-mid">{opt.desc}</p>
-            </button>
-          ))}
-        </div>
-      </div>
+      <PrizesSection value={prizeType} onChange={setPrizeType} />
 
       {/* Payout structure */}
       <div>
