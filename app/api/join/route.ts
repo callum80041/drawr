@@ -6,7 +6,7 @@ import { participantJoinedEmailHtml } from '@/lib/email/templates/participant-jo
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
 export async function POST(req: NextRequest) {
-  const { token, name, email, website } = await req.json()
+  const { token, name, email, website, signup_method: providedMethod } = await req.json()
 
   // Honeypot — bots fill this in, humans don't
   if (website) {
@@ -17,6 +17,10 @@ export async function POST(req: NextRequest) {
   if (!token || !name?.trim()) {
     return NextResponse.json({ error: 'Missing token or name' }, { status: 400 })
   }
+
+  // Determine signup method: use provided value, or auto-detect
+  const validMethods = ['name', 'email', 'google', 'twitter']
+  let signupMethod = providedMethod && validMethods.includes(providedMethod) ? providedMethod : (email?.trim() ? 'email' : 'name')
 
   // Email is optional — but if provided it must be a valid format
   if (email?.trim()) {
@@ -83,6 +87,7 @@ export async function POST(req: NextRequest) {
           sweepstake_id: sweepstake.id,
           name: name.trim(),
           email: email?.trim() ? email.trim().toLowerCase() : null,
+          signup_method: signupMethod,
         })
         .select('id, name, email')
         .single()
@@ -108,6 +113,7 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: email?.trim() ? email.trim().toLowerCase() : null,
       paid: false,
+      signup_method: signupMethod,
     })
     .select('id, name, email')
     .single()

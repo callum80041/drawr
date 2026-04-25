@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, use } from 'react'
+import { useState, use, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ShareButtons } from '@/components/dashboard/ShareButtons'
 import { type CurrencyCode } from '@/lib/constants/currencies'
 import { formatCurrency } from '@/lib/utils/formatCurrency'
+import { ParticipantOAuthButtons } from './ParticipantOAuthButtons'
+
+type SignupTab = 'standard' | 'oauth'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://playdrawr.co.uk'
 
@@ -14,6 +18,8 @@ interface Props {
 
 export default function JoinPage({ params }: Props) {
   const { token } = use(params)
+  const searchParams = useSearchParams()
+  const [signupTab, setSignupTab] = useState<SignupTab>('standard')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [honeypot, setHoneypot] = useState('') // spam trap
@@ -24,8 +30,7 @@ export default function JoinPage({ params }: Props) {
 
   const joinUrl = `${APP_URL}/join/${token}`
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function performJoin(signupMethod: string) {
     if (!name.trim()) return
     setStatus('submitting')
     setErrorMsg('')
@@ -34,7 +39,13 @@ export default function JoinPage({ params }: Props) {
       const res = await fetch('/api/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, name: name.trim(), email: email.trim(), website: honeypot }),
+        body: JSON.stringify({
+          token,
+          name: name.trim(),
+          email: email.trim(),
+          website: honeypot,
+          signup_method: signupMethod,
+        }),
       })
       const data = await res.json()
 
@@ -57,6 +68,34 @@ export default function JoinPage({ params }: Props) {
       setStatus('error')
     }
   }
+
+  async function handleSubmit(e: React.FormEvent, signupMethod: string = 'email') {
+    e.preventDefault()
+    await performJoin(signupMethod)
+  }
+
+  function handleOAuthError(error: string) {
+    setErrorMsg(error)
+    setStatus('error')
+  }
+
+  // Handle OAuth callback — pre-fill form and auto-submit
+  useEffect(() => {
+    const oauthEmail = searchParams.get('email')
+    const oauthName = searchParams.get('name')
+    const signupMethod = searchParams.get('signup_method')
+
+    if (oauthEmail && oauthName && signupMethod) {
+      setEmail(oauthEmail)
+      setName(oauthName)
+      setAgeConfirmed(true)
+      setSignupTab('oauth')
+      // Auto-submit after state update
+      setTimeout(() => {
+        performJoin(signupMethod)
+      }, 100)
+    }
+  }, [])
 
   if (status === 'success' && successData) {
     const isWaitlisted = successData.waitlisted
@@ -161,7 +200,34 @@ export default function JoinPage({ params }: Props) {
               Enter your details to grab your spot. You&apos;ll be assigned a team once the organiser runs the draw.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Signup tabs */}
+            <div className="flex gap-1 bg-light rounded-lg p-1 mb-6">
+              <button
+                type="button"
+                onClick={() => { setSignupTab('standard'); setErrorMsg('') }}
+                className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+                  signupTab === 'standard'
+                    ? 'bg-white text-pitch shadow-sm'
+                    : 'text-mid hover:text-pitch'
+                }`}
+              >
+                Standard signup
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSignupTab('oauth'); setErrorMsg('') }}
+                className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${
+                  signupTab === 'oauth'
+                    ? 'bg-white text-pitch shadow-sm'
+                    : 'text-mid hover:text-pitch'
+                }`}
+              >
+                Quick signup
+              </button>
+            </div>
+
+            {signupTab === 'standard' ? (
+            <form onSubmit={(e) => handleSubmit(e, 'email')} className="space-y-4">
               {/* Honeypot — hidden from real users, bots fill it */}
               <div style={{ display: 'none' }} aria-hidden="true">
                 <input
@@ -242,6 +308,45 @@ export default function JoinPage({ params }: Props) {
                 {status === 'submitting' ? 'Joining…' : 'Join sweepstake →'}
               </button>
             </form>
+            ) : (
+            <div className="space-y-4">
+              <div className="text-center mb-6">
+                <p className="text-sm text-mid mb-2">Sign up quickly with Google or X</p>
+                <p className="text-xs text-mid/60">We&apos;ll use your email and name from your account</p>
+              </div>
+
+              <ParticipantOAuthButtons token={token} onError={handleOAuthError} />
+
+              {status === 'error' && errorMsg && (
+                <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{errorMsg}</p>
+              )}
+
+              <div className="mt-4 p-4 rounded-lg border border-[#E5EDEA] bg-light/50">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={ageConfirmed}
+                    onChange={e => setAgeConfirmed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-[#D1D9D5] accent-[#1A2E22] shrink-0 cursor-pointer"
+                  />
+                  <span className="text-xs text-mid leading-relaxed group-hover:text-pitch transition-colors">
+                    I confirm I am aged 18 or over. I understand this is a sweepstake for entertainment purposes only —
+                    no gambling services are provided.{' '}
+                    <a
+                      href="/responsible-gambling"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-grass hover:underline"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      Gamble responsibly.
+                    </a>
+                  </span>
+                </label>
+              </div>
+            </div>
+            )}
 
             <p className="mt-5 text-center text-xs text-mid">
               Already signed up?{' '}
