@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { createServerClient as createSSRClient } from '@supabase/ssr'
+import { setupGuideEmailHtml } from '@/lib/email/templates/setup-guide'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +29,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Note: organiser record is created automatically by a DB trigger on user creation.
+
+    // Send setup guide email to new organiser (non-blocking)
+    try {
+      const firstName = data.user.user_metadata?.name?.split(' ')[0] ?? 'there'
+      await sendEmail({
+        to: email.toLowerCase(),
+        subject: 'How to set up your World Cup sweepstake',
+        html: setupGuideEmailHtml({ name: firstName }),
+        template: 'setup-guide-signup',
+      })
+    } catch {
+      // Don't block signup if email fails
+    }
 
     // Build response first to capture cookies
     const response = NextResponse.json({ success: true })
