@@ -3,6 +3,53 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminLogin } from './AdminLogin'
 import type { CampaignQualifier } from './CampaignSection'
+import type { SignupData } from './SignupMethodChart'
+
+async function fetchSignupMethodBreakdown(supabase: Awaited<ReturnType<typeof createServiceClient>>, days: number = 7) {
+  const now = new Date()
+  const startDate = new Date(now); startDate.setDate(startDate.getDate() - days)
+
+  // Query all participants from last N days, grouped by signup_method
+  const { data: participants } = await supabase
+    .from('participants')
+    .select('created_at, signup_method')
+    .gte('created_at', startDate.toISOString())
+    .order('created_at', { ascending: true })
+
+  if (!participants) return []
+
+  // Group by date and signup_method
+  const dateMap = new Map<string, Record<string, number>>()
+
+  for (const p of participants) {
+    const date = p.created_at?.split('T')[0] || ''
+    const method = (p.signup_method || 'email') as string
+
+    if (!dateMap.has(date)) {
+      dateMap.set(date, { name: 0, email: 0, google: 0, twitter: 0 })
+    }
+
+    const counts = dateMap.get(date)!
+    if (method === 'name' || method === 'email' || method === 'google' || method === 'twitter') {
+      counts[method as keyof typeof counts]++
+    }
+  }
+
+  // Convert to sorted array with all dates in range
+  const result: SignupData[] = []
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+
+    result.push({
+      date: dateStr,
+      ...(dateMap.get(dateStr) || { name: 0, email: 0, google: 0, twitter: 0 }),
+    })
+  }
+
+  return result
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -65,6 +112,7 @@ export default async function HeadCoachAdminPage() {
     { data: organiserDetails },
     { data: emailLog },
     analytics,
+    signupMethodBreakdown,
   ] = await Promise.all([
     supabase.from('organisers').select('*', { count: 'exact', head: true }),
     supabase.from('organisers').select('*', { count: 'exact', head: true }).gte('created_at', d7.toISOString()),
@@ -87,6 +135,7 @@ export default async function HeadCoachAdminPage() {
       .order('created_at', { ascending: false })
       .limit(200),
     fetchVercelAnalytics(),
+    fetchSignupMethodBreakdown(supabase, 7),
   ])
 
   const sweepstakes = sweepstakeRows ?? []
@@ -193,6 +242,7 @@ export default async function HeadCoachAdminPage() {
       organiserDetails={organiserDetails ?? []}
       emailLog={emailLog ?? []}
       analytics={analytics}
+      signupMethodBreakdown={signupMethodBreakdown}
     />
   )
 }
