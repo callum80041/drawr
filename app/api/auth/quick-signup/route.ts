@@ -69,17 +69,17 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
     })
 
-    if (linkError || !linkData?.properties?.recovery_token) {
+    if (linkError || !linkData?.properties?.email_otp) {
       return NextResponse.json(
         { error: 'Failed to generate session token' },
         { status: 400 }
       )
     }
 
-    // Verify OTP with recovery token (this will set session cookies via the client)
+    // Verify OTP to establish session (sets session cookies via the client)
     const { error: sessionError } = await supabase.auth.verifyOtp({
       email: email.toLowerCase(),
-      token: linkData.properties.recovery_token,
+      token: linkData.properties.email_otp,
       type: 'recovery',
     })
 
